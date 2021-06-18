@@ -229,6 +229,43 @@ function listPrimes(num) {
 이번 문제는 사실 풀이를 봐도 헷갈린다. 기억해뒀다가 한번 더 풀어보는 시간을 꼭 갖도록 하자.
 
 </br>
+
+**+ 코드스테이츠에서 제공해준 조금 더 직관적인 풀이가 있어서 추가하게 되었다.**
+
+```javascript
+function isPrime(num) {
+  let isNumPrime = true;
+  // 1부터 num까지 num(자기 자신)으로 나누어 떨어지는 경우 (나머지가 0인 경우)
+  // num은 소수입니다.
+  for (let i = 2; i < num; i += 1){
+    if (num % i === 0){
+      isNumPrime = false;
+    }
+  }
+  // 하지만, 나누는 도중 나누어 떨어지는 수가 발견이 되면, num은 소수가 아닙니다.
+  return isNumPrime
+  // 그 결과값을 리턴합니다.
+}
+
+function listPrimes(num){
+  let result = '2';
+
+  for (let i = 3; i <= num; i += 1){ // 2부터 num까지 반복하여 
+    if (isPrime(i)){ // 소수(isPrime)라면 아래 조건문을 작동합니다.
+      result = result + '-' + i // 이어붙입니다.
+    }
+  }
+
+  return result;
+}
+```
+이전 문제에서 인자값이 소수인지를 판별하는 함수를 그대로 for문 안에서 조건문으로 활용해서 함수이면 빈 문자열에 차례대로 Concatenation해나가는 방식이다. 이것을 문제의 조건인 2중 for문으로 바꾸기 위해서 위쪽에 정리해둔 '구글링을 통해 찾아낸 코드'와 'Reference'의 방식으로 묶어주면 되는 것이다.
+
+**+ Reference의 코드에서 let sqrt=parseInt(제곱근)로 선언했는데, parseInt는 왜 썼는가?**
+</br>
+A. 명시적으로 표기하기 위해 사용되었다. 제곱근을 쓰면 소숫점이 붙은 숫자들이 나오는 경우도 있다. 하지만 애초에 인자값은 정수라고 표기되어 있어서 굳이 소숫점이 붙을 숫자까지를 반복 조건으로 명시할 필요가 없고, int 타입으로 바꿔서 비교해도 충분하다. for문의 반복 조건을 정수까지로 잡아주는 것이 더 직관적이기 때문에 parseInt를 사용했다.
+
+</br>
 </br>
 
 ### **makeMarginalString**
