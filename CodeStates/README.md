@@ -1,4 +1,4 @@
-2021년 6월 14일부터 코드스테이츠의 SEB(Software Engineering Bootcamp)교육과정을 듣게 되었습니다.  
+2021년 6월 14일부터 코드스테이츠의 SEB(Software Engineering Bootcamp) 교육과정을 듣게 되었습니다.  
 </br>
 이 폴더의 문서들은 코드스테이츠에서 배웠던 내용들을 목차대로 정리한 문서들입니다.  
 </br>
