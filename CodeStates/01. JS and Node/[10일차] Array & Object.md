@@ -148,3 +148,5 @@ for (let key in obj) {
   console.log(key);
 }
 ```
+
+※ for in 반복문은 객체에 사용 / for of 반복문은 배열, 문자열에 사용
