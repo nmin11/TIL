@@ -315,4 +315,5 @@ justify-content 속성은 main axis를 기준으로 정렬하며, align-items �
 
 </br>
 
-(이미지 첨부 : 와이어프레임 예시)
+![와이어 프레임 예시](https://user-images.githubusercontent.com/75058239/123936881-915abd00-d9d0-11eb-934d-e42561591475.png)
+
