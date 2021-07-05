@@ -40,7 +40,7 @@ script 태그를 추가하는 두 가지 대표적인 방법이 있다.
 
 </br>
 
-(이미지 첨부 console.dir)
+![console dir](https://user-images.githubusercontent.com/75058239/124461701-ee3ce580-ddcb-11eb-8a3c-0b991e8c6a8b.png)
 
 </br>
 
