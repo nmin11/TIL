@@ -240,7 +240,7 @@ str.replace(/  /g, " ");
 
 </br>
 
-(이미지 첨부 바빌로니아 법)
+![바빌로니아 법의 점화식](https://user-images.githubusercontent.com/75058239/124605307-bce51800-dea6-11eb-9172-f3fdca5979e4.png)
 
 </br>
 
