@@ -37,4 +37,5 @@ state = {
 };
 ```
 
-Redux에 대해 다시 이야기해보자면, Redux는 이러한 state를 관리하는 tool이라고 생각하면 된다.
+Redux에 대해 다시 이야기해보자면, Redux는 이러한 state를 관리하는 tool이라고 생각하면 된다.  
+사실 Redux는 Learning Curve가 높지만 자주 사용하다보면 익숙해질 것이다.
