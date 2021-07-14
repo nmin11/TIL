@@ -122,5 +122,13 @@ str.replace(/(^|\s)\S/g, (firstStr) => firstStr.toUpperCase());
 ### 비밀번호 (대소문자 및 숫자 조합, 특수 문자 금지, 길이 8 ~ 10)
 
 ```javascript
-/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,10}/
+/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,10}/;
+```
+
+</br>
+
+### 여러 개의 공백이 있을 경우 한 칸의 공백으로 변환
+
+```javascript
+str = str.replace(/(^ *)|( *$)/g, "").replace(/ +/g, " ");
 ```
