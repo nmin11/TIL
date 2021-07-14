@@ -60,8 +60,6 @@ items.sort(function (a, b) {
 });
 ```
 
-a가 b보다 작을 때 -1
-
 </br>
 
 ### 비 ASCII 문자 정렬
