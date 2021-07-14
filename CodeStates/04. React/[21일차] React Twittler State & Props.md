@@ -113,5 +113,5 @@ React와 더 많이 친해지는 시간을 가져야 한다.
 
 ## React의 history
 
-URL의 hisory 뿐만 아니라 상태의 history를 저장한다.  
+URL의 hisory 뿐만 아니라 상태의 history도 저장한다.  
 useState 사용 시, 기존 값을 직접 변경하기보다는 setState를 꼭 해주어야 한다.
