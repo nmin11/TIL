@@ -14,6 +14,6 @@ Node JS가 자동차의 엔진이라고 한다면, Express JS는 자동차를 �
 
 </br>
 
-### Express JS의 설치
+## Express JS의 설치
 
 npm init을 완료한 폴더에서 다시 npm install --save 라는 커맨드를 입력하면 된다.
