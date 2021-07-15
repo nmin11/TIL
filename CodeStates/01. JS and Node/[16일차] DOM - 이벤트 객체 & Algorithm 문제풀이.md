@@ -171,6 +171,13 @@ button.onclick = func; 같은 식으로 클릭 함수를 지정할 경우에는 
 removeEventListener를 통해 겹친 이벤트 중 특정 이벤트를 지울 수도 있다.
 
 </br>
+
+### event.preventDefault()
+
+버튼 클릭과 같은 이벤트의 경우에 어떤 동작도 하지 않았으면서 웹 페이지를 새로 갱신하는 것을 방지한다.  
+이렇게 되면 기존에 하려던 것을 못하고 화면이 넘어가 버릴 수 있다.
+
+</br>
 </br>
 
 # Algorithm 문제 풀이
