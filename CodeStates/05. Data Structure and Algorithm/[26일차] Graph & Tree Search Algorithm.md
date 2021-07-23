@@ -15,8 +15,10 @@
 루트에서 시작해 왼쪽의 노드들을 순차적으로 둘러본 뒤, 왼쪽의 노드 탐색이 끝나면 오른쪽 노드를 탐색한다.
 
 <details>
-  <summary>전위 순회</summary>
-  ![전위 순회](https://user-images.githubusercontent.com/75058239/126772216-582aa7b4-2fb9-4338-918c-98114ce05f2c.gif)
+<summary>그림으로 확인하기</summary>
+<div markdown="1">
+<img src = "https://user-images.githubusercontent.com/75058239/126772881-131b5ac9-4ebb-4dfd-bd26-b49e794ebcb0.gif"/>
+</div>
 </details>
 
 </br>
@@ -25,12 +27,26 @@
 
 제일 왼쪽 끝에 있는 노드부터 순회하기 시작하여, 루트를 기준으로 왼쪽에 있는 노드의 순회가 끝나면 루트를 거쳐 오른쪽에 있는 노드로 이동하여 마저 탐색한다.
 
+<details>
+<summary>그림으로 확인하기</summary>
+<div markdown="1">
+<img src = "https://user-images.githubusercontent.com/75058239/126772574-5e4f4050-e5da-4158-901a-340357b1fd7d.gif"/>
+</div>
+</details>
+
 </br>
 
 ## 후위 순회 (Postorder)
 
 루트를 가장 마지막에 순회한다.  
 제일 왼쪽 끝에 있는 노드부터 순회하기 시작하여, 루트를 거치지 않고 오른쪽으로 이동해 순회한 뒤, 제일 마지막에 루트를 방문한다.
+
+<details>
+<summary>그림으로 확인하기</summary>
+<div markdown="1">
+<img src = "https://user-images.githubusercontent.com/75058239/126772579-3fe05e1f-63ad-423e-ac10-15df876f4b0c.gif"/>
+</div>
+</details>
 
 </br>
 </br>
@@ -52,6 +68,13 @@ BFS는 가장 **가까운 정점부터 탐색** 한다.
 BFS는 이처럼 너비를 우선적으로 탐색하기 때문에 Breadth-First Search, **너비 우선 탐색** 이라고 한다.  
 주로 두 정점 사이의 최단 경로를 찾을 때 사용한다.
 
+<details>
+<summary>그림으로 확인하기</summary>
+<div markdown="1">
+<img src = "https://user-images.githubusercontent.com/75058239/126773168-ea4d25dd-1934-4e54-8bad-9ab1d9ed6ab6.gif"/>
+</div>
+</details>
+
 </br>
 
 ## DFS (Depth-First Search)
@@ -61,6 +84,13 @@ DFS는 **하나의 경로를 끝까지 탐색한 후, 원하는 정점이 아니
 이렇게 깊이를 우선적으로 탐색하는 방법을 Depth-First Search, **깊이 우선 탐색** 이라고 한다.  
 한 정점에서 시작해서 다음 경로로 넘어가기 전에 해당 경로를 완벽하게 탐색할 때 사용한다.  
 BFS보다 탐색 시간은 조금 오래 걸릴지라도 모든 노드를 완전히 탐색할 수 있다.
+
+<details>
+<summary>그림으로 확인하기</summary>
+<div markdown="1">
+<img src = "https://user-images.githubusercontent.com/75058239/126772603-59ac48a5-eaa4-4d17-bba1-6052d7452f9f.gif"/>
+</div>
+</details>
 
 </br>
 
