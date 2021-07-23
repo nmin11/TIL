@@ -14,6 +14,11 @@
 
 루트에서 시작해 왼쪽의 노드들을 순차적으로 둘러본 뒤, 왼쪽의 노드 탐색이 끝나면 오른쪽 노드를 탐색한다.
 
+<details>
+  <summary>전위 순회</summary>
+  ![전위 순회](https://user-images.githubusercontent.com/75058239/126772216-582aa7b4-2fb9-4338-918c-98114ce05f2c.gif)
+</details>
+
 </br>
 
 ## 중위 순회 (Inorder)
