@@ -182,3 +182,7 @@ F (int[] n) {
 ```
 
 위와 같은 O(2n²)도 그냥 O(n²)으로 표시한다.
+
+</br>
+
+※ 출처 : [엔지니어대한민국 님의 Big-O 표기법](https://www.youtube.com/watch?v=6Iq5iMCVsXA&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
