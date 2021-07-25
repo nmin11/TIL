@@ -68,6 +68,16 @@ public class Test {
         System.out.println(s.isEmpty());
     }
 }
+
+/*
+4
+3
+2
+2
+false
+1
+true
+*/
 ```
 
 </br>
