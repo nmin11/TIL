@@ -69,3 +69,7 @@ public class Test {
     }
 }
 ```
+
+</br>
+
+※ 출처 : [엔지니어대한민국 - Stack 구현하기 in Java](https://www.youtube.com/watch?v=whVUYv0Leg0&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
