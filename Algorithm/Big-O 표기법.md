@@ -18,7 +18,7 @@ F (int[] n) {
 
 </br>
 
-(이미지 첨부 O(1) 표기법)
+![O(1) 표기법](https://user-images.githubusercontent.com/75058239/126889275-a4b4b5ad-19e8-4214-8a50-ab7083c39322.png)
 
 </br>
 
@@ -35,7 +35,7 @@ F (int[] n) {
 
 </br>
 
-(이미지 첨부 O(n))
+![O(n)](https://user-images.githubusercontent.com/75058239/126889279-04b2e891-00cb-4a63-8a2f-bee0c04fb2fd.png)
 
 </br>
 
@@ -53,7 +53,7 @@ n을 루프를 돌리면서, 그 안에서 n을 루프로 또 돌릴 때 n²이 
 
 </br>
 
-(이미지 첨부 O(n²))
+![O(n²)](https://user-images.githubusercontent.com/75058239/126889284-077cf012-0734-43a5-826c-4cbf46baf9c0.png)
 
 </br>
 
@@ -88,7 +88,7 @@ n 스퀘어에 비해서 데이터 처리 시간이 급격하게 늘어난다.
 
 </br>
 
-(이미지 첨부 O(n³))
+![O(n³)](https://user-images.githubusercontent.com/75058239/126889288-4d154af2-4a39-425c-9fe2-d183773fdad0.png)
 
 </br>
 
@@ -110,11 +110,11 @@ F (n, r) {
 
 </br>
 
-(이미지 첨부 Fibonacci 재귀 호출 방식)
+![Fibonacci 재귀 호출 방식](https://user-images.githubusercontent.com/75058239/126889292-e308fe0b-b88e-42b7-975b-237560f0689e.png)
 
 </br>
 
-(이미지 첨부 O(2ⁿ))
+![O(2ⁿ)](https://user-images.githubusercontent.com/75058239/126889302-4492ca12-2d04-469b-aab8-90d82e55c032.png)
 
 </br>
 
@@ -139,7 +139,7 @@ F (key, arr, start, end) {
 
 </br>
 
-(이미지 첨부 O(log n))
+![O(log n)](https://user-images.githubusercontent.com/75058239/126889295-b58b038a-a048-47d8-93f2-252c168cf9e0.png)
 
 </br>
 
@@ -149,7 +149,7 @@ sqrt는 제곱근을 구한다는 뜻이다.
 
 </br>
 
-(이미지 첨부 O(sqrt(n)))
+![O(sqrt(n))](https://user-images.githubusercontent.com/75058239/126889306-a9f30a21-0936-4bb7-acff-7b6006945e4f.png)
 
 </br>
 
