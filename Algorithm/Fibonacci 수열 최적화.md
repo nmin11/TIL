@@ -23,7 +23,7 @@ F (n, r) {
 
 </br>
 
-(이미지 첨부 Fibonacci 최적화)
+![Fibonacci 최적화](https://user-images.githubusercontent.com/75058239/126898093-595eb120-b50a-4ce9-9739-46fc140c28f8.png)
 
 </br>
 
