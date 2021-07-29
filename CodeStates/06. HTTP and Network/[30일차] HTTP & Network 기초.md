@@ -261,7 +261,7 @@ Start line에는 3가지 요소가 있다.
 
 </br>
 
-(이미지 첨부 Request headers 예시)
+![Request headers 예시](https://user-images.githubusercontent.com/75058239/127469436-5a379db7-b208-4dd2-808c-e4d5297672ef.png)
 
 </br>
 
@@ -297,7 +297,7 @@ body는 다음과 같이 두 종류로 나눌 수 있다.
 
 </br>
 
-(이미지 첨부 Response headers 예시)
+![Response headers 예시](https://user-images.githubusercontent.com/75058239/127469457-8d685fa6-5ea6-47e9-a1a8-b78013892717.png)
 
 </br>
 
