@@ -41,7 +41,7 @@ Balanced Tree의 대표적인 예는 다음과 같다.
 
 </br>
 
-(이미지 첨부 완전 이진 트리 예시)
+![완전이진트리 예시](https://user-images.githubusercontent.com/75058239/128025002-db7a193f-e19a-45b0-8078-e98d67d79453.png)
 
 </br>
 
@@ -52,7 +52,7 @@ Balanced Tree의 대표적인 예는 다음과 같다.
 
 </br>
 
-(이미지 첨부 Full Binary Tree 예시)
+![Full Binary Tree 예시](https://user-images.githubusercontent.com/75058239/128025024-bd61c06e-fa49-4d2d-8139-69ed827de549.png)
 
 </br>
 
@@ -62,3 +62,7 @@ Balanced Tree의 대표적인 예는 다음과 같다.
 한국에서는 이를 포화 이진 트리라고 부르기도 한다.  
 하지만 포화 이진 트리를 다시 영어로 하면 Full Binary Tree가 되기 때문에 헷갈리게 된다.  
 이럴 때는 차라리 원래 영어로 구분하는 편을 선택하도록 하자.
+
+</br>
+
+※ 출처 : [엔지니어대한민국 님의 Big-O 표기법](https://www.youtube.com/watch?v=LnxEBW29DOw&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
