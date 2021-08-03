@@ -77,9 +77,36 @@ class Tree {
     }
 }
 
+
+/*
+        (1)
+    (2)     (3)
+  (4) (5)
+*/
+
 public class Test {
     public static void main (String[] args) {
-
+        Tree t = new Tree();
+        //마지막 Node부터 생성
+        Node n4 = t.makeNode(null, 4, null);
+        Node n5 = t.makeNode(null, 5, null);
+        Node n2 = t.makeNode(n4, 2, n5);
+        Node n3 = t.makeNode(null, 3, null);
+        Node n1 = t.makeNode(n2, 1, n3);
+        t.setRoot(n1);
+        t.inorder(t.getRoot());
+        t.preorder(t.getRoot());
+        t.postorder(t.getRoot());
     }
 }
+
+/*
+4 2 5 1 3
+1 2 4 5 3
+4 5 2 3 1
+*/
 ```
+
+</br>
+
+※ 출처 : [엔지니어대한민국 님의 Binary Tree의 3가지 순회방법 구현하기](https://www.youtube.com/watch?v=QN1rZYX6QaA&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
