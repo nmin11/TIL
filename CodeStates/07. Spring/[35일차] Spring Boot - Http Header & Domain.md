@@ -91,7 +91,7 @@ public class LoginController {
 단순히 HttpServletResponse 객체를 엔드포인트에 파라미터로 추가한 다음, addHeader() 메소드를 사용하여 헤더를 설정할 수 있다.
 
 ```java
-@GetMapping(value = "/login")
+@GetMapping("/login")
 public ArrayList<LoginDTO> GetLoginData(@RequestParam(required = false) String name, HttpServletResponse response){
     filterLoginData.clear();
     if(name != null){
@@ -121,7 +121,7 @@ public ArrayList<LoginDTO> GetLoginData(@RequestParam(required = false) String n
 사용 방법은 다음과 같다.
 
 ```java
-@GetMapping(value = "/")
+@GetMapping("/")
 public ResponseEntity<String> UsingResponseEntityToSettingHeaders() {
     HttpHeaders responseHeader = new HttpHeaders();
     responseHeader.set("Test-Header", "Value-ResponseHeader");
