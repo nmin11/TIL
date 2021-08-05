@@ -250,6 +250,15 @@ Spring에서 HTTP 요청을 수행할 때 사용하는 어노테이션이다.
 
 </br>
 
+※ 추가적으로, @Controller와 @RestController를 구분해 둘 필요가 있다.  
+@Controller는 View를 리턴한다.  
+모듈 객체를 받을 때 사용할 수 있다.  
+그리고 이러한 @Controller와 @ResponseBody를 함께 사용할 경우, JSON과 Row 타입을 처리할 수 있게 된다.  
+마지막으로 @RestController는 @Controller와 @ResponseBody가 이미 함께 구현되어 있는 어노테이션으로, View, JSON, Row 등 다 구현 가능하다.  
+하지만 용도에 맞게 명시적으로 시의적절하게 활용해주는 것이 중요하다.
+
+</br>
+
 ## @GetMapping
 
 GET 요청은 주로 데이터를 조회하거나 짧은 데이터를 전달할 때 사용된다.  
