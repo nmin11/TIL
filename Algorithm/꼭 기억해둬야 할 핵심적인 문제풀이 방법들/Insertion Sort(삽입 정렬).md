@@ -104,3 +104,7 @@ arr[prev] > temp 조건 미충족
 arr[4] = 29;
 arr = [-11, -10, 2, 20, 29]
 ```
+
+</br>
+
+※ [참고한 블로그 글](https://gyoogle.dev/blog/algorithm/Insertion%20Sort.html)
