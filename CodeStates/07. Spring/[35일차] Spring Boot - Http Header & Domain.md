@@ -233,6 +233,9 @@ public class CorsConfig implements WebMvcConfigurer {
 - allowedMethods : 허용할 메소드를 선택할 수 있다.
 - maxAge : preflight 유지 시간을 작성할 수 있다.
 
+※ maxAge 속성은 preflight 결과의 캐시를 일정 기간 동안 저장한다.  
+이 캐시 정보가 살아있는 시간 동안에는 cross-origin 요청에 대해서 preflight를 생략하고 바로 요청 전송이 가능하다.
+
 </br>
 
 ## Domain
