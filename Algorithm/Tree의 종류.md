@@ -65,4 +65,4 @@ Balanced Tree의 대표적인 예는 다음과 같다.
 
 </br>
 
-※ 출처 : [엔지니어대한민국 님의 Tree의 종류](https://www.youtube.com/watch?v=LnxEBW29DOw&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
+※ 출처 : [엔지니어대한민국 - Tree의 종류](https://www.youtube.com/watch?v=LnxEBW29DOw&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
