@@ -197,7 +197,7 @@ ReactDOM.render(
 
 </br>
 
-## hitory를 이용해서 뒤로가기 버튼 만들기
+## history를 이용해서 뒤로가기 버튼 만들기
 
 useHistory() 메소드를 이용해서 브라우저의 뒤로가기 버튼을 따로 만들어 줄 수도 있다.
 
