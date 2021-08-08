@@ -224,7 +224,7 @@ const Sidebar = () => {
 export default Sidebar;
 ```
 
-useHistory()메소드를 사용하는 hitory라는 변수를 지정하고 특정 버튼에 onClick 이벤트로 goBack() 메소드를 다시 호출해주는 방식이다.
+useHistory()메소드를 사용하는 history라는 변수를 지정하고 특정 버튼에 onClick 이벤트로 goBack() 메소드를 다시 호출해주는 방식이다.
 
 </br>
 
