@@ -500,3 +500,17 @@ public class UserService{
 ## Component Scan 범위
 
 Application 클래스가 있는 폴더부터 그 하위 폴더까지 탐색한다.
+
+</br>
+</br>
+
+## ※ Sprint Review 시간을 통해 추가적으로 알게 된 것들
+
+1. RESTful API  
+   사실 GET, POST 만으로도 작업을 다 처리할 수 있지만 URI를 번잡하게 사용하지 않고 효율적으로 사용하기 위해서 다른 HTTP 메소드들을 사용해야 하는 것이다.
+2. POJO (Plain Old Java Object)  
+   가장 간단한 자바 오브젝트를 뜻한다.  
+   개발을 진행할 때 POJO에 따라서 직관적이며 이해하기 쉬운 코드를 짜는 것이 중요하다.
+3. 인터페이스를 사용해야 하는 이유  
+   인터페이스에 내장된 메소드 사용을 강제할 수 있다.  
+   뿐만 아니라 메소드 이름, 변수 이름 등을 다 지켜야 한다.
