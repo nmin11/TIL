@@ -91,3 +91,9 @@ function quickSort(array, left = 0, right = array.length - 1) {
 
 - Worst Case : O(n²)
 - Best Case : O(nlog₂n)
+
+</br>
+
+</br>
+
+※ 출처 : https://im-developer.tistory.com/135
