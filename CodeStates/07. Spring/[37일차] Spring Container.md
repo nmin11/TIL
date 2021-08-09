@@ -284,7 +284,7 @@ Spring Container를 사용하면 Spring 프레임워크가 싱글톤도 적용�
 Spring Container에서 관리하는 어플리케이션 객체를 Bean이라고 부른다.  
 우리가 만든 클래스를 Bean으로 만들어 주려면 Spring Container에 어떤 클래스를 Bean으로 관리해주었으면 하는지 알려줘야 한다.  
 그 방법에는 2가지가 있다.  
-바로 @Configuration 클래스에 @Bean 메소드를 통해 인스턴스를 등록하는 방법과, @Component 클래스에 직접 명시하여 설정하는 방법이다.
+바로 @Configuration 클래스에서 @Bean 메소드를 사용해서 인스턴스를 등록하는 방법과, @Component 클래스에 직접 명시하여 설정하는 방법이다.
 
 </br>
 
