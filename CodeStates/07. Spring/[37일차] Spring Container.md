@@ -159,7 +159,7 @@ DI는 Spring Container를 통해 의존 관계를 설정하는 방식을 뜻한�
 
 </br>
 
-(이미지 첨부 DI)
+![DI](https://user-images.githubusercontent.com/75058239/128686077-7facc837-1160-4ddf-8277-2f95a3bc7ce1.png)
 
 </br>
 </br>
@@ -188,7 +188,7 @@ class UserController {
 
 </br>
 
-(이미지 첨부 new 키워드의 문제점)
+![new 키워드의 문제점](https://user-images.githubusercontent.com/75058239/128686106-d2b4f4ff-1af9-46da-afd5-8556ead85535.png)
 
 </br>
 
@@ -200,7 +200,7 @@ class UserController {
 
 </br>
 
-(이미지 첨부 new 키워드 문제 해결)
+![new 키워드 문제 해결](https://user-images.githubusercontent.com/75058239/128686127-cfc5099b-16c9-4b37-8233-4af7c1d72064.png)
 
 </br>
 
