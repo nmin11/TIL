@@ -461,7 +461,7 @@ setter 주입이나 필드 주입은 순환 참조를 해도 서버가 정상 �
 public class UserService{
 	private UserRepository userRepository;
 
-    @Autowired
+    	@Autowired
 	private setUserRepository(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
