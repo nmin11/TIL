@@ -5,6 +5,10 @@
 
 </br>
 
+(이미지 첨부 Quick Sort 재귀 호출)
+
+</br>
+
 ## Quick Sort의 시간 복잡도
 
 평균적으로 O(n log n)이라고 볼 수 있다.  
