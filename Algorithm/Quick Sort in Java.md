@@ -5,7 +5,7 @@
 
 </br>
 
-(이미지 첨부 Quick Sort 재귀 호출)
+![Quick Sort 재귀 호출 방식](https://user-images.githubusercontent.com/75058239/128834719-553f007d-c379-472a-809e-5b5708e3c78b.png)
 
 </br>
 
