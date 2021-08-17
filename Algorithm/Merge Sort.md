@@ -104,3 +104,10 @@ const merge = function (left, right) {
   return [...result, ...left, ...right];
 };
 ```
+
+</br>
+
+## 출처
+
+- [엔지니어대한민국 님 - Merge Sort 구현하기](https://www.youtube.com/watch?v=QAyl79dCO_k&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
+- [춤추는 개발자 님 - JavaScript로 Merge Sort 구현하기](https://jun-choi-4928.medium.com/javascript%EB%A1%9C-merge-sort-%EB%B3%91%ED%95%A9%EC%A0%95%EB%A0%AC-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-c13c3eee6570)
