@@ -177,7 +177,7 @@ Greedy Algorithm의 문제 해결법을 단계적으로 나누어보면 다음�
 <details>
 <summary>도로 건설 최적화 과정 확인하기</summary>
 <div markdown="1">
-![도로 건설 최적화](https://user-images.githubusercontent.com/75058239/130593593-5b88c4c9-317b-4144-82d8-3da853757407.gif)
+<img src = "https://user-images.githubusercontent.com/75058239/130593593-5b88c4c9-317b-4144-82d8-3da853757407.gif"/>
 </details>
 
 </br>
