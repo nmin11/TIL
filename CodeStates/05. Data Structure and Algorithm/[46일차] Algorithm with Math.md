@@ -23,7 +23,7 @@
 순열은 영어로 Permutaion이라고 하며, 약자 P로 표현한다.
 
 - 5장에서 3장을 선택하는 모든 순열의 수 : (5 X 4 X 3 X 2 X 1) / (2 X 1) = 60
-- 일반식 : (이미지 첨부 순열 일반식)
+<img width="192" alt="순열 일반식" src="https://user-images.githubusercontent.com/75058239/130763827-ddb2797b-93a6-4483-a201-4af13c883979.png">
 
 </br>
 
@@ -44,7 +44,7 @@
 </br>
 
 - 5장에서 3장을 선택하는 모든 조합의 수 : 5! / (3! \* 2!) = 10
-- 일반식 : (이미지 첨부 조합 일반식)
+<img width="218" alt="조합 일반식" src="https://user-images.githubusercontent.com/75058239/130763912-575c473a-1ca1-4b61-8815-a548b0cf045c.png">
 
 </br>
 
