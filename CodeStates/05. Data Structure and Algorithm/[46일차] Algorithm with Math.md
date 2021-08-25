@@ -71,7 +71,7 @@
 
 </br>
 
-(이미지 첨부 멱집합)
+![멱집합](https://user-images.githubusercontent.com/75058239/130783693-122b87a4-1c16-43d6-9478-73e9eaea4229.jpeg)
 
 </br>
 
