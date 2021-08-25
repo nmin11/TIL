@@ -20,7 +20,7 @@ Algorithm 문제들을 풀 때는 문제에 대한 해답을 찾는 것도 중�
 
 </br>
 
-(이미지 첨부 Big-O 표기법)
+![Big-O Complexity Chart](https://user-images.githubusercontent.com/75058239/130593522-108a0a7b-6a10-4305-acb2-7f7ffd316c7c.png)
 
 </br>
 
@@ -155,7 +155,7 @@ Greedy Algorithm의 문제 해결법을 단계적으로 나누어보면 다음�
 
 </br>
 
-(이미지 첨부 최나무의 도로 연결)
+![시장 최나무의 도로 연결](https://user-images.githubusercontent.com/75058239/130593571-d2def4e0-c31e-4e1c-8d86-61cb1b5c88db.png)
 
 </br>
 
@@ -177,7 +177,7 @@ Greedy Algorithm의 문제 해결법을 단계적으로 나누어보면 다음�
 <details>
 <summary>도로 건설 최적화 과정 확인하기</summary>
 <div markdown="1">
-(이미지 첨부 도로 건설 최적화)
+<img src = "https://user-images.githubusercontent.com/75058239/130593593-5b88c4c9-317b-4144-82d8-3da853757407.gif"/>
 </details>
 
 </br>
@@ -234,7 +234,7 @@ function fib(n) {
 
 </br>
 
-(이미지 첨부 피보나치 수열)
+![피보나치 수열 그림](https://user-images.githubusercontent.com/75058239/130593616-2c0a7bb1-1b73-4461-ad79-77539eb8e718.jpeg)
 
 </br>
 
