@@ -448,7 +448,7 @@ Entity 간의 관계는 다음 중 하나일 것이다.
 
 </br>
 
-(이미지 첨부 1대1 관계)
+![1대1 관계](https://user-images.githubusercontent.com/75058239/130955002-5205cac3-b115-48f7-96aa-8f9c39591faf.png)
 
 </br>
 
@@ -463,7 +463,7 @@ Entity 간의 관계는 다음 중 하나일 것이다.
 
 </br>
 
-(이미지 첨부 1대N 관계)
+![1대N 관계](https://user-images.githubusercontent.com/75058239/130955026-d6ae712a-ac21-47b3-a7a0-3fd233241bec.png)
 
 </br>
 
@@ -480,7 +480,7 @@ N:N 관계를 위해 스키마를 디자인할 때 join 테이블을 만들어�
 
 </br>
 
-(이미지 첨부 N대N 관계)
+![N대N 관계](https://user-images.githubusercontent.com/75058239/130955051-98c4d877-3c2e-4d24-8f57-c3559bd01ded.png)
 
 </br>
 
@@ -495,7 +495,7 @@ N:N 관계를 위해 스키마를 디자인할 때 join 테이블을 만들어�
 
 </br>
 
-(이미지 첨부 Self Referencing 관계)
+![Self Referencing 관계](https://user-images.githubusercontent.com/75058239/130955075-76fd7a17-efea-4f4a-9106-c85b6e9e5d13.png)
 
 </br>
 
