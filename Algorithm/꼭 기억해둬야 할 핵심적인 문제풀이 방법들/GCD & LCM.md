@@ -19,7 +19,7 @@
 ```javascript
 const greatestCommonDivisor = (a, b) => {
   if (b === 0) return a;
-  return greatestCommonDivisor;
+  return greatestCommonDivisor(b, a % b);
 };
 const leastCommonMultiple = (a, b) => (a * b) / greatestCommonDivisor(a, b);
 ```
