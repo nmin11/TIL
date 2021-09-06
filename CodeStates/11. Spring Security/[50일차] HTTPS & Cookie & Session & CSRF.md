@@ -56,7 +56,7 @@ HTTPS의 또 다른 특징 중 하나는 브라우저가 응답과 함께 전달
 
 </br>
 
-(이미지 첨부 HTTPS 인증서)
+![HTTPS 인증서](https://user-images.githubusercontent.com/75058239/132177014-93e364c7-9c2d-48a5-855b-badc92495b25.png)
 
 </br>
 
