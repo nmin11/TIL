@@ -41,4 +41,4 @@ OAuth는 Authentication(인증)을 다른 서비스에 맡길 뿐, Authorization
 
 ## 소셜 로그인 로직 플로우
 
-(이미지 첨부 소셜 로그인 로직 플로우)
+![소셜 로그인 로직 플로우](https://user-images.githubusercontent.com/75058239/132483801-363584ba-e902-456a-8b6a-fec2128dc91e.jpeg)
