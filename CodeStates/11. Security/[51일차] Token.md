@@ -46,7 +46,7 @@ Access Token은 보호된 정보들에 접근할 수 있는 권한 부여 용도
 
 </br>
 
-(이미지 첨부 JWT 구조)
+![JWT 구조](https://user-images.githubusercontent.com/75058239/132324896-0c26de7c-bec1-43d6-ade6-3a53958d0429.png)
 
 </br>
 
@@ -108,7 +108,7 @@ JWT는 **권한 부여**에 굉장히 유용하다.
 
 </br>
 
-(이미지 첨부 토큰 기반 인증 절차)
+![토큰 기반 인증 절차](https://user-images.githubusercontent.com/75058239/132324876-8c5ff229-d66a-4702-9060-76b153763970.jpg)
 
 </br>
 
