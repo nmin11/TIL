@@ -58,3 +58,7 @@ public class Test {
     }
 }
 ```
+
+## Reference
+
+- [엔지니어대한민국 님 - Selection Sort Java로 구현하기](https://www.youtube.com/watch?v=uCUu3fF5Dws&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
