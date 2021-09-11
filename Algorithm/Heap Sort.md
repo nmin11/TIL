@@ -1,7 +1,8 @@
 ## What is Heap?
 
 최대값이나 최소값을 찾아내는 연산을 빠르게 찾아내기 위해 고안된, **완전이진트리** 를 기본으로 한 자료구조이다.  
-Heap에는 Min-Heap과 Max-Heap이 있다.  
+완전이진트리는 노드의 맨 마지막 리프 부분을 제외하고는 모든 level이 완전하게 채워져 있으며, 가능하면 왼쪽부터 채워진 구조이다.  
+그리고 Heap에는 **Min-Heap**과 **Max-Heap**이 있다.  
 Min-Heap은 부모 노드에 자신보다 작은 값을 둬서 트리의 루트에는 가장 작은 값이 오게 한다.  
 반대로 Max-Heap은 부모 노드에 자신보다 큰 값을 둬서 트리의 루트에는 가장 큰 값이 오게 한다.  
 Min-Heap에 대해서 알면 Max-Heap의 구현도 간단해지니 Min-Heap을 위주로 살펴볼 것이다.
@@ -29,6 +30,18 @@ Min-Heap은 가장 작은 값을 루트에 두기 때문에 최소값을 빼내�
 
 </br>
 
+## Heap Sort에 Binary Heap이 필요한 이유
+
+Binary Heap은 배열로 쉽게 표현이 가능하며, 공간 활용에도 효율적이다.  
+부모 노드가 인덱스 i에 저장되어 있다면 왼쪽 자식의 인덱스는 `2 * i + 1`로 계산할 수 있고, 오른쪽 자식은 `2 * i + 2`로 계산할 수 있다.
+
+</br>
+
+## 오름차순 정렬을 위한 Heap Sort Algorithm
+
+</br>
+
 ## Reference
 
 - [엔지니어대한민국 - Binary Heaps (Min-Heaps and Max-Heaps)](https://www.youtube.com/watch?v=jfwjyJvbbBI&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
+- [GeeksforGeeks - Heap Sort](https://www.geeksforgeeks.org/heap-sort/)
