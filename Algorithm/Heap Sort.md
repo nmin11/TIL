@@ -54,15 +54,19 @@ public class HeapSort {
     public void sort(int arr[]) {
         int n = arr.length;
 
+        //Build heap (rearrange array)
         for (int i = n / 2 - 1; i >= 0; i--) {
             heapify(arr, n, i);
         }
 
+        //heap으로부터 하나씩 요소를 추출
         for (int i = n - 1; i > 0; i--) {
+            //현재의 루트를 맨 끝으로 이동
             int temp = arr[0];
             arr[0] = arr[i];
             arr[i] = temp;
 
+            //줄어든 heap에서 max heapify 호출
             heapify(arr, i, 0);
         }
     }
@@ -72,10 +76,10 @@ public class HeapSort {
         int l = 2 * i + 1;
         int r = 2 * i + 2;
 
-        if (l < n && arr[l] < arr[largest]) {
+        if (l < n && arr[l] > arr[largest]) {
             largest = l;
         }
-        if (r < n && arr[r] < arr[largest]) {
+        if (r < n && arr[r] > arr[largest]) {
             largest = r;
         }
 
@@ -84,6 +88,7 @@ public class HeapSort {
             arr[i] = arr[largest];
             arr[largest] = swap;
 
+            //재귀적으로 sub-tree에도 heapify 호출
             heapify(arr, n, largest);
         }
 
@@ -121,3 +126,4 @@ public class HeapSort {
 
 - [엔지니어대한민국 - Binary Heaps (Min-Heaps and Max-Heaps)](https://www.youtube.com/watch?v=jfwjyJvbbBI&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
 - [GeeksforGeeks - Heap Sort](https://www.geeksforgeeks.org/heap-sort/)
+- [st-lab - Heap Sort](https://st-lab.tistory.com/225)
