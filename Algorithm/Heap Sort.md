@@ -5,7 +5,7 @@
 그리고 Heap에는 **Min-Heap**과 **Max-Heap**이 있다.  
 Min-Heap은 부모 노드에 자신보다 작은 값을 둬서 트리의 루트에는 가장 작은 값이 오게 한다.  
 반대로 Max-Heap은 부모 노드에 자신보다 큰 값을 둬서 트리의 루트에는 가장 큰 값이 오게 한다.  
-Min-Heap에 대해서 알면 Max-Heap의 구현도 간단해지니 Min-Heap을 위주로 살펴볼 것이다.
+Min-Heap에 대해서 알면 Max-Heap의 구현도 간단해지니 Min-Heap을 한 번 살펴보자.
 
 </br>
 
@@ -38,6 +38,82 @@ Binary Heap은 배열로 쉽게 표현이 가능하며, 공간 활용에도 효�
 </br>
 
 ## 오름차순 정렬을 위한 Heap Sort Algorithm
+
+1. 입력받은 데이터를 통해서 Max-Heap을 만든다.
+2. Heap에서 가장 큰 값이 루트에 있게 된다.  
+   루트의 값을 마지막 값과 교체하고 Heap의 사이즈를 1씩 줄인다.  
+   마지막으로 Heapify, 즉, 변경된 루트 값을 위해 다시 Max-Heap으로 만들어주는 작업을 한다.
+3. Heap의 사이즈가 1보다 클 때까지 위의 작업을 반복한다.
+
+</br>
+
+## Max Heap으로 오름차순 정렬하기 (Java)
+
+```java
+public class HeapSort {
+    public void sort(int arr[]) {
+        int n = arr.length;
+
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(arr, n, i);
+        }
+
+        for (int i = n - 1; i > 0; i--) {
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+
+            heapify(arr, i, 0);
+        }
+    }
+
+    void heapify(int arr[], int n, int i) {
+        int largest = i;
+        int l = 2 * i + 1;
+        int r = 2 * i + 2;
+
+        if (l < n && arr[l] < arr[largest]) {
+            largest = l;
+        }
+        if (r < n && arr[r] < arr[largest]) {
+            largest = r;
+        }
+
+        if (largest != i) {
+            int swap = arr[i];
+            arr[i] = arr[largest];
+            arr[largest] = swap;
+
+            heapify(arr, n, largest);
+        }
+
+        static void printArray(int arr[]) {
+            int n = arr.length;
+            for (int i = 0; i < n; i++) {
+                System.out.print(arr[i] + " ");
+            }
+            System.out.println();
+        }
+
+        public static void main(String[] args) {
+            int arr[] = {12,11,13,5,6,7};
+            int n = arr.length;
+
+            HeapSort ob = new HeapSort();
+            ob.sort(arr);
+
+            System.out.println("Sorted array is");
+            printArray(arr);
+
+            /*
+            출력 결과
+            Sorted array is
+            5 6 7 11 12 13
+            */
+        }
+    }
+}
+```
 
 </br>
 
