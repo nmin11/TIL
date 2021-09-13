@@ -265,10 +265,6 @@ chunked 방식의 인코딩은 많은 양의 데이터를 분할하여 보내기
 
 ## HTTP 주요 헤더
 
-![HTTP 주요 헤더](https://user-images.githubusercontent.com/75058239/133057467-56d1c0e8-c21c-43f2-9b2f-e4ebc8c7b684.png)
-
-</br>
-
 ### Form - 유저 에이전트의 이메일 정보
 
 - 일반적으로 잘 사용하지 않음
