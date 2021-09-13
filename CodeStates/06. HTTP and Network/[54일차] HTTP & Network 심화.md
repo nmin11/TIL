@@ -169,7 +169,7 @@ TCP/IP의 경우 기본적으로 연결을 유지한다.
 
 </br>
 
-(이미지 첨부 HTTP 초기)
+![HTTP 초기](https://user-images.githubusercontent.com/75058239/133057768-e2f0be93-9506-4d66-930b-7162146fa74a.png)
 
 </br>
 
@@ -177,7 +177,7 @@ HTTP 초기에는 각각의 자원을 다운로드하기 위해 연결과 종료
 
 </br>
 
-(이미지 첨부 HTTP 지속 연결)
+![HTTP 지속연결](https://user-images.githubusercontent.com/75058239/133057786-8260cccc-4cd7-4ee8-a5cb-2ce7788dfcb8.png)
 
 </br>
 
@@ -188,7 +188,7 @@ HTTP 지속 연결에서는 연결이 이루어지고 난 뒤 각각의 자원�
 
 # HTTP 헤더
 
-(이미지 첨부 표현 헤더와 표현 데이터)
+![표현 헤드와 표현 데이터](https://user-images.githubusercontent.com/75058239/133057825-70f23759-3967-41fb-be79-db2ac4024597.png)
 
 </br>
 
