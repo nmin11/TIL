@@ -1,6 +1,6 @@
 2021 / 09 / 13
 
-(이미지 첨부 OSI 7계층과 TCP/IP 4계층)
+<img width="790" alt="OSI 7계층과 TCP 및 IP 4계층" src="https://user-images.githubusercontent.com/75058239/133056645-e70c1a74-3c19-470a-b6da-ff4c5fa64e2d.png">
 
 </br>
 
@@ -44,7 +44,7 @@ Transmission Control Protocol : 전송 제어 프로토콜
 
 </br>
 
-(이미지 첨부 프로토콜 계층 작동 방식)
+![프로토콜 계층 작동방식](https://user-images.githubusercontent.com/75058239/133056677-de26f369-6d33-4181-87af-239fcc400df2.png)
 
 TCP/IP 4계층의 작동 방식을 간단하게 살펴보자면, 우선 **어플리케이션 계층**에서 HTTP 메시지를 생성하고, 이를 Socket 라이브러리를 통해서 전달한다.  
 여기서 Socket은, "네트워크 환경에 연결할 수 있게 만들어진 연결부"이다.  
@@ -54,14 +54,7 @@ TCP/IP 4계층의 작동 방식을 간단하게 살펴보자면, 우선 **어플
 
 </br>
 
-이번에는 TCP/IP Packet을 살펴보자.
-
-</br>
-
-(이미지 첨부 TCP/IP Packet)
-
-</br>
-
+이번에는 TCP/IP Packet을 살펴보자.  
 우선 TCP 세그먼트는 IP Packet의 출발지 IP와 목적지 IP를 보완해주는 출발지 PORT와 목적지 PORT, 전송 제어, 순서, 검증 정보 등을 포함한다.
 
 </br>
@@ -77,7 +70,7 @@ TCP/IP 4계층의 작동 방식을 간단하게 살펴보자면, 우선 **어플
 
 #### TCP 3 way handshake
 
-(이미지 첨부 TCP 3 way handshake)
+![TCP 3 way](https://user-images.githubusercontent.com/75058239/133057392-dc4782d2-b82b-497d-bda1-a3b6459ed915.png)
 
 TCP는 장치들 사이에 논리적인 접속을 성립하기 위해서 3 way handshake를 사용하는 연결지향형 프로토콜이다.  
 연결 방식을 살펴보자면 우선 클라이언트는 서버에 접속을 요청하는 SYN(Syncronize) Packet을 보낸다.  
@@ -206,7 +199,7 @@ HTTP 메시지는 헤더와 바디로 구분할 수 있다.
 
 </br>
 
-(이미지 첨부 HTTP 헤더)
+![HTTP 헤더](https://user-images.githubusercontent.com/75058239/133057431-a47b68ad-571a-4ba4-9320-06039b17c1e7.png)
 
 </br>
 
@@ -272,7 +265,7 @@ chunked 방식의 인코딩은 많은 양의 데이터를 분할하여 보내기
 
 ## HTTP 주요 헤더
 
-(이미지 첨부 HTTP 주요 헤더)
+![HTTP 주요 헤더](https://user-images.githubusercontent.com/75058239/133057467-56d1c0e8-c21c-43f2-9b2f-e4ebc8c7b684.png)
 
 </br>
 
@@ -331,7 +324,7 @@ chunked 방식의 인코딩은 많은 양의 데이터를 분할하여 보내기
 
 </br>
 
-(이미지 첨부 HTTP HOST 헤더)
+<img width="829" alt="HTTP HOST 헤더" src="https://user-images.githubusercontent.com/75058239/133057510-9092a20c-0e74-44a9-9c74-5a335157bbff.png">
 
 </br>
 
