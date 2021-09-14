@@ -19,7 +19,7 @@
 
 </br>
 
-(이미지 첨부 git graph)
+![git graph](https://user-images.githubusercontent.com/75058239/133204339-69e016c2-80f0-4d52-b5f0-a6a1f6ff8e2a.png)
 
 </br>
 
@@ -138,7 +138,7 @@ Merge의 경우, 변경 내용의 이력이 모두 그대로 남아 있기 때�
 
 </br>
 
-(이미지 첨부 merge와 rebase)
+![merge와 rebase](https://user-images.githubusercontent.com/75058239/133204368-2e0766d8-8fdc-476e-9b1a-80f2823b355c.png)
 
 </br>
 
