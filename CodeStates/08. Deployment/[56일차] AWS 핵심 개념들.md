@@ -64,7 +64,7 @@
 
 </br>
 
-### 1. Deployment
+### 1. Development
 
 - Local 환경에서 개발 및 테스트
 - Sample Data 사용
