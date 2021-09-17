@@ -55,7 +55,7 @@ VirtualBox, VMware와 같은 가상 머신은 개발 환경이나 사용 환경�
 
 </br>
 
-(이미지 첨부 Docker와 Virtual Machine)
+<img width="982" alt="Docker와 Virtual Machine" src="https://user-images.githubusercontent.com/75058239/133765644-3cf43654-8ede-4362-b90c-6df0b415609a.png">
 
 </br>
 
@@ -74,7 +74,7 @@ Docker와 Virtual Machine은 격리성을 제공하기 때문에, 각 애플리�
 
 ## Docker Container Lifecycle
 
-(이미지 첨부 Docker Container Lifecycle)
+<img width="961" alt="Docker Container Lifecycle" src="https://user-images.githubusercontent.com/75058239/133765661-a226c1fa-66f1-4b5f-8c01-7a75ba64b239.png">
 
 </br>
 
