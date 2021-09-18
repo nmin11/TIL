@@ -119,6 +119,33 @@ class GFG {
 
 </br>
 
+## JavaScript 최적화 코드 (By Codestates)
+
+```javascript
+let bubbleSort = function (arr) {
+  const swap = function (idx1, idx2, arr) {
+    [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]];
+  };
+  let N = arr.length;
+
+  for (let i = 0; i < N; i++) {
+    let isSwap = false;
+    // 이미 정렬된 요소는 고려할 필요가 없기에  N - 1 - i 까지 비교
+    for (let j = 0; j < N - 1 - i; j++) {
+      if (arr[j] > arr[j + 1]) {
+        isSwap = true;
+        swap(j, j + 1, arr);
+      }
+    }
+    if (!isSwap) break;
+  }
+
+  return arr;
+};
+```
+
+</br>
+
 ## Reference
 
 - [엔지니어대한민국 님 - Bubble Sort Java로 구현하기](https://www.youtube.com/watch?v=YbsQiiubO74&ab_channel=%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD)
