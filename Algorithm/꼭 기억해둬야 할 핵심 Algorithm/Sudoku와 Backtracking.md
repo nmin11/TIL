@@ -29,6 +29,7 @@
 
 ```java
 class GFG {
+	//스도쿠 규칙에 대한 유효성 검증
     public static boolean isValid(int[][] board, int row, int col, int num) {
         for (int d = 0; d < board.length; d++) {
             if (board[row][d] == num) {
@@ -56,6 +57,7 @@ class GFG {
         return true;
     }
 
+	//모든 칸이 채워질 때까지 검증하면서 값을 채우는 함수
     public static boolean solveSudoku(int[][] board, int n) {
         int row = -1;
         int col = -1;
@@ -86,6 +88,7 @@ class GFG {
         return false;
     }
 
+	//스도쿠 출력 함수
     public static void print(int[][] board, int N) {
         for (int r = 0; r < N; r++) {
             for (int d = 0; d < N; d++) {
