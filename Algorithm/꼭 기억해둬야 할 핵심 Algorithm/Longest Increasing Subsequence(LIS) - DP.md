@@ -11,7 +11,7 @@ Longest Increasing Subsequence(LIS) 문제는 주어진 배열의 subsequence들
 
 ## Example
 
-(이미지 첨부 LIS)
+![Longest-Increasing-Subsequence](https://user-images.githubusercontent.com/75058239/133959406-72ed2f53-4857-4920-bdbb-f01eabb5fce0.png)
 
 위와 같은 배열이 주어졌을 때, LIS는 {10, 22, 33, 50, 60, 80}이 되고, 그 길이는 6이 된다.
 
