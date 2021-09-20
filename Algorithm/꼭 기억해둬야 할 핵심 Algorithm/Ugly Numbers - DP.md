@@ -222,3 +222,9 @@ class GFG {
 
 - Time Complexity : O(N log N)
 - Auxiliary Space : O(N)
+
+</br>
+
+## Reference
+
+- [GeeksforGeeks - Ugly Numbers](https://www.geeksforgeeks.org/ugly-numbers/)
