@@ -215,5 +215,5 @@ LIS 문제를 O(N log N)의 시간복잡도로 해결할 수 있다고도 한다
 
 ## References
 
-- [Longest Increasing Subsequence | DP-3](https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3/)
-- [Longest Increasing Subsequence Size (N log N)](https://www.geeksforgeeks.org/longest-monotonically-increasing-subsequence-size-n-log-n/)
+- [GeeksforGeeks - Longest Increasing Subsequence | DP-3](https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3/)
+- [GeeksforGeeks - Longest Increasing Subsequence Size (N log N)](https://www.geeksforgeeks.org/longest-monotonically-increasing-subsequence-size-n-log-n/)
