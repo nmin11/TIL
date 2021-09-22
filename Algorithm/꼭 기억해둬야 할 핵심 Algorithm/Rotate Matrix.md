@@ -11,7 +11,7 @@ N X N의 2차원 배열이 있다.
 
 </br>
 
-(이미지 첨부 rotate matrix 외곽부터)
+![rotate matrix 외곽부터 해결](https://user-images.githubusercontent.com/75058239/134282979-410ea8f6-1897-45a6-8cfe-0599a0cfd4e7.png)
 
 </br>
 
@@ -20,7 +20,7 @@ swap해주는 방식은 다음과 같이 임시 변수를 활용해서 하나씩
 
 </br>
 
-(이미지 첨부 rotate matrix 임시 변수 활용)
+![rotate matrix 임시변수를 활용해서 자리 바꿔주기](https://user-images.githubusercontent.com/75058239/134282993-51107cb0-1e81-47f1-88e0-9612d8a33f89.png)
 
 </br>
 
@@ -29,7 +29,7 @@ swap해주는 방식은 다음과 같이 임시 변수를 활용해서 하나씩
 
 </br>
 
-(이미지 첨부 rotate matrix 내 바꿀 배열들의 위치)
+![rotate matrix 내 바꿀 배열들의 위치](https://user-images.githubusercontent.com/75058239/134283007-9c7be571-9d85-48f9-a44c-526df87d05d0.png)
 
 </br>
 
@@ -37,7 +37,7 @@ swap해주는 방식은 다음과 같이 임시 변수를 활용해서 하나씩
 
 </br>
 
-(이미지 첨부 rotate matrix 서로 바꿀 요소들)
+![rotate matrix 서로 바꿀 요소들](https://user-images.githubusercontent.com/75058239/134283026-f6e37582-5ee3-4e32-ac17-d01a33cdd97c.png)
 
 </br>
 
