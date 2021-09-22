@@ -9,7 +9,7 @@ n개의 아이템의 무게와 가치가 주어지고, 이 아이템들을 `W` �
 
 ## Example
 
-(이미지 첨부 )
+![knapsack-problem](https://user-images.githubusercontent.com/75058239/134356295-c783b559-5d36-46e3-8e92-72ddbe04561f.png)
 
 </br>
 
