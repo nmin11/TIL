@@ -296,3 +296,9 @@ class GFG {
 
 - Time Comlexity : O(N \* W)
 - Auxiliary Space : O(N \* W)
+
+</br>
+
+## Reference
+
+- [GeeksforGeeks - 0-1 Knapsack Problem | DP-10](https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/)
