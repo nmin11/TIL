@@ -41,7 +41,7 @@ HTTP 규격은 CORS 적용이나 인증 과정 등을 기존과 동일하게 가
 
 ## WebSocket 접속 과정
 
-(이미지 첨부 웹소켓 접속 과정)
+![웹소켓 접속 과정](https://user-images.githubusercontent.com/75058239/139177164-713502b1-ce9f-434f-8c08-5a3e2c2ff35a.png)
 
 웹 소켓 접속 과정은 크게 2가지로 나눌 수 있다.
 
@@ -59,8 +59,8 @@ TCP/IP 접속 이후에는 서버와 클라이언트의 웹 소켓 열기 HandSh
 서버와 클라이언트는 HTTP 1.1 프로토콜을 사용하여 요청과 응답을 보낸다.  
 다음은 Request와 Response의 예시이다.
 
-(이미지 첨부 HandShake Request)
+![HandShake Request](https://user-images.githubusercontent.com/75058239/139177172-cae5208f-16a7-4104-bde7-9365fd198aaa.png)
 
 <br>
 
-(이미지 첨부 HandShake Response)
+![HandShake Response](https://user-images.githubusercontent.com/75058239/139177184-e9fdcb9d-3c11-46a9-8deb-ea7b9be1c792.png)
