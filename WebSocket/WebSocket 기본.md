@@ -64,3 +64,9 @@ TCP/IP 접속 이후에는 서버와 클라이언트의 웹 소켓 열기 HandSh
 <br>
 
 ![HandShake Response](https://user-images.githubusercontent.com/75058239/139177184-e9fdcb9d-3c11-46a9-8deb-ea7b9be1c792.png)
+
+<br>
+
+## Reference
+
+[개발하는 고라니 님 - WebSocket과 채팅](https://dev-gorany.tistory.com/212?category=901854)
