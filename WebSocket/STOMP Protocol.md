@@ -79,3 +79,9 @@ public class GreetingController {
 - 연결 주소마다 새로 핸들러를 구현하고 설정할 필요 없음
 - 외부 Messaging Queue 사용 가능 (RabbitMQ, 카프카 등)
 - Spring Security 사용 가능
+
+<br>
+
+## Reference
+
+- [[10분 테코톡] ✨ 아론의 웹소켓&스프링](https://www.youtube.com/watch?v=rvss-_t6gzg&ab_channel=%EC%9A%B0%EC%95%84%ED%95%9CTech)
