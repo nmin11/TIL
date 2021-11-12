@@ -82,6 +82,12 @@ public class GreetingController {
 
 <br>
 
+## 유의할 점
+
+- 사실 STOMP Protocol은 WebSocket 통신을 위해서만 만들어진 것은 아님 → WebSocket과 같은 몇몇 양방향 통신 프로토콜에서 함께 사용 가능
+
+<br>
+
 ## Reference
 
 - [[10분 테코톡] ✨ 아론의 웹소켓&스프링](https://www.youtube.com/watch?v=rvss-_t6gzg&ab_channel=%EC%9A%B0%EC%95%84%ED%95%9CTech)
