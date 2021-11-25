@@ -20,7 +20,7 @@
 - 인스턴스 : 클래스를 바탕으로 실제로 만들어진 실체
 
 ```java
-public class SampleData{
+public class SampleData {
    //클래스 상태
 }
 
@@ -223,14 +223,14 @@ public class SportsCar extends Car {
 ```java
 //Calculator.java
 public class Calculator {
-    public double areaCircle(double r){
+    public double areaCircle(double r) {
         System.out.println("Calculator 객체의 원주율 계산하기");
         return 3.14 * r * r;
     }
 }
 
 //Computing.java
-public class Computing extends Calculator{
+public class Computing extends Calculator {
     @Override
     public double areaCircle(double r){
         System.out.println("Computing 객체의 원의 넓이 구하기");
@@ -272,21 +272,21 @@ Computing 객체의 원의 넓이 구하기
 ```java
 /OverloadingMethods.java
 
-public void print(){
+public void print() {
         System.out.println("오버로딩1");
     }
 
-    public String print(Integer a){ **//매개변수 존재**
+    public String print(Integer a) { **//매개변수 존재**
         System.out.print("오버로딩2");
         return a.toString();
     }
 
-    public void print(String a){ //**오버로딩2와 매개변수 타입이 다름**
+    public void print(String a) { //**오버로딩2와 매개변수 타입이 다름**
         System.out.println("오버로딩3");
         System.out.println(a);
     }
 
-    public String print(Integer a, Integer b){
+    public String print(Integer a, Integer b) {
 				//오버로딩2, 오버로딩3과 매개변수 개수가 다름
         System.out.println("오버로딩4");
         return a.toString() + b.toString();
