@@ -114,7 +114,7 @@
   - JVM은 운영체제에 종속적이므로, 운영체제에 맞게 설치되어야 함
   - JVM은 JDK 또는 JRE를 설치하면 자동으로 설치됨
 
-(이미지 첨부 JVM 작동 과정)
+![JVM 작동 과정](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/JVM%20%EC%9E%91%EB%8F%99%20%EA%B3%BC%EC%A0%95.png)
 
 - 작동 과정
   1. 확장자가 .java인 파일을 작성
