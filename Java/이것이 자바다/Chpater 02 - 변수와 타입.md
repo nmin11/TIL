@@ -244,3 +244,145 @@ n : 지수 (exponent)
 
 - 2가지 상태값을 저장할 필요성이 있을 경우에 사용됨
   - 상태값에 따라 조건문과 제어문의 흐름을 변경하는 데에 주로 사용됨
+
+<br>
+<br>
+
+## 타입 변환
+
+### 자동 타입 변환 (Promotion)
+
+- byte 크기가 작은 타입의 값이, byte 크기가 보다 큰 타입의 변수에 저장될 때 발생
+- `byte(1) < short(2) < int(4) < long(8) < float(4) < double(8)`
+  - float이 long 보다 큰 이유는 표현할 수 있는 값의 범위가 더 크기 때문
+  - 실수 타입 변수의 정수 값은 무조건 자동 변환
+    - `.0`이 붙은 실수값이 됨
+- 변환 이전의 값과 변환 이후의 값은 동일
+
+```java
+byte byteValue = 10;
+int intValue = byteValue;
+double doubleValue = intValue;  //10.0
+```
+
+- char 타입이 int 타입으로 자동 변환될 경우, 유니코드 값이 int 타입에 저장됨
+
+```java
+char charValue = 'A';
+int intValue = charValue; //65
+```
+
+- 예외적으로, char 타입에는 음수가 저장될 수 없으므로 byte 타입은 보다 큰 타입인 char 타입으로 자동 변환 불가능
+
+```java
+byte byteValue = 65;
+char charValue = byteValue;       //컴파일 에러 발생
+char charData = (char) byteValue; //강제 타입 변환은 가능
+```
+
+<br>
+
+### 강제 타입 변환 (Casting)
+
+- 큰 크기의 타입을 작은 크기의 타입으로 쪼개어 저장하는 방법
+- 타입 뿐 아니라 실제 저장해야 하는 값도 타입의 범위를 넘어설 경우, 저장할 수 있는 byte 단위만 저장하게 됨
+
+```java
+int intValue = 103029770;
+byte byteValue = (byte) intValue;
+```
+
+103029770을 int 타입의 4byte로 나누면 다음과 같다.
+
+`| 00000110 | 00100100 | 00011100 | 00001010 |`
+
+byte 타입은 1byte만 저장할 수 있기 때문에 앞에 3byte는 모두 0으로 채워지고 나머지 맨 끝의 `00001010`, 10진법으로는 10인 숫자가 byte 타입에 저장된다.
+
+<br>
+
+- 반면에 큰 타입의 값을 작은 타입의 변수에서도 충분히 표현할 수 있다면 온전한 값이 그대로 저장됨
+- 실수 타입을 정수 타입으로 강제 타입 변환할 경우, 소수점 이하 부분은 버려지고 정수 부분만 저장됨
+- 정수를 char 타입으로 강제 변환하면 해당 유니코드에 맞는 문자가 저장됨
+
+```java
+int intValue = 44032;
+char charValue = (char) intValue; //'가'
+```
+
+- Java에서 제공하는 기본 타입에 대한 최대값 및 최소값 상수를 값의 손실을 피하는 데에 활용할 수도 있음
+
+| 기본 타입 | 최대값 상수       | 최소값 상수       |
+| :-------: | :---------------- | :---------------- |
+|   byte    | Byte.MAX_VALUE    | Byte.MIN_VALUE    |
+|   short   | Short.MAX_VALUE   | Short.MIN_VALUE   |
+|    int    | Integer.MAX_VALUE | Integer.MIN_VALUE |
+|   long    | Long.MAX_VALUE    | Long.MIN_VALUE    |
+|   float   | Float.MAX_VALUE   | Float.MIN_VALUE   |
+|  double   | Double.MAX_VALUE  | Double.MIN_VALUE  |
+
+- **정수 타입에서 실수 타입으로 변환할 때 정밀도 손실을 고려해야 함**
+
+```java
+public class FromIntToFloat {
+  public static void main(String[] args) {
+
+    int num1 = 123456780;
+    int num2 = 123456780;
+
+    float num3 = num2;  //float으로 자동 타입 변환
+    num2 = (int) num3;  //그 값을 그대로 다시 int로 강제 타입 변환
+
+    int result = num1 - num2;
+    System.out.println(result);
+
+  }
+}
+```
+
+타입만 2번 변환했지, 추가적인 연산은 없었기 때문에 두 값을 빼면 0이 되는 것이 맞다.  
+하지만 콘솔 창을 확인하면 `-4` 라는 값이 나온다.  
+그 이유는 다음과 같다.  
+우선 float 타입의 bit 수 할당은 `부호 1bit + 지수 8bit + 가수 23bit`이다.  
+하지만 **123456780** 은 23bit로 표현할 수 없기 때문에 근사치로 변환된다.  
+즉 정밀도 손실이 발생한다.  
+그렇기 때문에 이 float 값을 다시 int 타입으로 변환하면 원래의 int 값을 얻지 못하게 되는 것이다.  
+이 문제는, double 타입을 사용하면 해결 가능하다.  
+double 타입의 bit 수 할당은 `부호 1bit + 지수 11bit + 가수 52bit`이다.  
+그리고 int 타입은 **32bit** 이다.  
+따라서 어떠한 int 값이라도 정밀도 손실 없이 double 타입으로 변환될 수 있다.
+
+<br>
+
+### 연산식에서의 자동 타입 변환
+
+- 연산은 기본적으로 같은 타입의 피연산자(operand) 간에만 수행됨
+- 서로 다른 타입의 피연산자가 있다면 두 피연산자 중 큰 타입으로 자동 변환된 후 연산 수행
+
+```java
+int intValue = 10;
+double doubleValue = 5.5;
+double result = intValue + doubleValue; //double 자동 타입 변환
+```
+
+- 만약 int 타입으로 꼭 연산을 해야 한다면 강제 타입 변환을 해야 함
+
+```java
+int intValue = 10;
+double doubleValue = 5.5;
+int result = intValue + (int) doubleValue;  //15
+```
+
+- 정수 연산은 int 타입을 기본으로 함
+  - byte, char, short 타입에서의 연산은 int 타입으로 자동 변환
+  - 만약 피연산자 중 하나가 long 타입이라면 다른 피연산자도 long 타입으로 자동 타입 변환되고 연산 결과도 long 타입이 됨
+  - char 타입에서 연산할 경우에도 int 타입으로 변환되니, 이 결과를 다시 문자로 저장하기 위해서는 강제 타입 변환 필요
+
+```java
+char ai = 'A';
+int result = ai + 1;
+char na = (char) result;  //'B'
+```
+
+- 실수 연산은 double 타입을 기본으로 함
+  - float 타입끼리의 연산 결과는 float 타입
+  - 피연산자 중 실수 리터럴이나 double 타입이 있다면 연산 결과는 double 타입
