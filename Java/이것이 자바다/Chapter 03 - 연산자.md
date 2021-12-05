@@ -198,3 +198,106 @@ Java에서 리터럴 간의 연산은 타입 변환 없이 해당 타입으로 �
 ```java
 char c3 = (char) (c2 + 1);
 ```
+
+<br>
+
+### 오버플로우 탐지
+
+- 산술 연산을 할 때 연산 후 산출값이 산출 타입으로 충분히 표현 가능한지 살펴봐야 함
+  - 표현할 수 없는 값일 경우, 오버플로우 발생 및 쓰레기값 산출
+- try-catch 예외 처리를 통해 이를 방지할 수 있음
+
+```java
+public class CheckOverflowExample {
+
+  public static void main(String[] args) {
+    try {
+      int result = safeAdd(2000000000, 2000000000);
+      System.out.println(result);
+    } catch(ArithmeticException e) {
+      System.out.println("오버플로우가 발생하여 정확하게 계산할 수 없음");
+    }
+  }
+
+  public static int safeAdd(int left, int right) {
+    if (right > 0) {
+      if (left > Integer.MAX_VALUE - right) {
+        throw new ArithmeticException("오버플로우 발생");
+      }
+    } else {
+      if (left < Integer.MIN_VALUE - right) {
+        throw new ArithmeticException("오버플로우 발생");
+      }
+    }
+    return left + right;
+  }
+
+}
+```
+
+※ ArithmeticException은 **연산 예외** 를 뜻함
+
+<br>
+
+### 정확한 계산은 정수 사용
+
+- 정확한 계산이 필요하다면 부동소수점 타입은 피할 것
+
+```java
+public class AccuracyExample1 {
+  public static void main(String[] args) {
+    int apple = 1;
+    double pieceUnit = 0.1;
+    int number = 7;
+
+    double result = apple - number * pieceUnit;
+
+    System.out.println("사과 한개에서 ");
+    System.out.println("0.7 조각을 빼면, ");
+    System.out.println(result + "조각이 남는다.");
+  }
+}
+
+/*
+사과 한개에서
+0.7 조각을 빼면,
+0.29999999999999993 조각이 남는다.
+*/
+```
+
+이진 포맷의 가수를 사용하는 부동소수점 타입(float, double)은 0.1을 정확히 표현할 수 없으므로 근사치로 처리한다.  
+정확한 계산이 필요하다면 정수 연산으로 변경해서 계산해야 한다.
+
+```java
+public class AccuracyExample2 {
+  public static void main(String[] args) {
+    int apple = 1;
+
+    int totalPieces = apple * 10;
+    int number = 7;
+    int temp = totalPieces - number;
+
+    double result = temp / 10.0;
+
+    System.out.println("사과 한개에서 ");
+    System.out.println("0.7 조각을 빼면, ");
+    System.out.println(result + "조각이 남는다.");
+  }
+}
+
+/*
+사과 한개에서
+0.7 조각을 빼면,
+0.3 조각이 남는다.
+*/
+```
+
+<br>
+
+### NaN과 Infinity 연산
+
+- `/` 또는 `%` 연산자를 사용할 때 주의해야 할 점
+  - 좌측 피연산자가 정수이고 우측 피연산자가 `0`이라면 **ArithmeticException** 발생
+  - 실수 타입인 `0.0` 또는 `0.0f`로 나눌 경우 예외가 발생하지 않고, `/` 연산의 결과는 **Infinity** 값을 가지고, `%` 연산의 결과는 **NaN** 을 갖게 됨
+    - Infinity와 NaN에 대해서는 다음 연산을 수행하면 안 됨 (어떤 수와 연산하더라도 Infinity와 NaN 산출)
+    - `Double.isInfinite` 와 `Double.isNaN` 을 활용해서 값을 확인해볼 수 있음
