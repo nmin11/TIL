@@ -550,7 +550,7 @@ public class ContinueExample {
 
 ```java
 public class CodeRunner{
-	public static void main(String[] args){
+    public static void main(String[] args){
         int x = 0;
         int y = 0;
 
@@ -560,7 +560,7 @@ public class CodeRunner{
 
             System.out.println("(" + x + ", " + y + ")");
         }
-	}
+    }
 }
 ```
 
