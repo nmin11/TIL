@@ -549,7 +549,7 @@ public class ContinueExample {
 ### 1. while문과 Math.random() 함수를 이용해서 두 개의 주사위를 던졌을 때 나오는 눈을 `(눈1, 눈2)` 형태로 출력하고, 눈의 합이 5가 아니면 계속 주사위를 던지고 눈의 합이 5이면 실행을 멈추는 코드를 작성해보세요.
 
 ```java
-public class CodeRunner{
+class CodeRunner{
     public static void main(String[] args){
         int x = 0;
         int y = 0;
@@ -569,8 +569,8 @@ public class CodeRunner{
 ### 2. 중첩 for문을 이용해서 방정식 `4x + 5y = 60`의 모든 해를 구해서 `(x, y)` 형태로 출력해보세요. 단, x와 y는 10 이하의 자연수입니다.
 
 ```java
-public class CodeRunner{
-	public static void main(String[] args){
+class CodeRunner{
+    public static void main(String[] args){
 
         for (int x = 1; x <= 10; x++) {
             for (int y = 1; y <= 10; y++) {
@@ -580,7 +580,7 @@ public class CodeRunner{
             }
         }
 
-	}
+    }
 }
 ```
 
@@ -601,8 +601,8 @@ public class CodeRunner{
 ```
 
 ```java
-public class CodeRunner{
-	public static void main(String[] args){
+class CodeRunner{
+    public static void main(String[] args){
 
         for (int i = 1; i <= 5; i++) {
             for (int j = 1; j <= i; j++) {
@@ -611,7 +611,7 @@ public class CodeRunner{
             System.out.println();
         }
 
-	}
+    }
 }
 ```
 
@@ -632,8 +632,8 @@ public class CodeRunner{
 ```
 
 ```java
-public class CodeRunner{
-	public static void main(String[] args){
+class CodeRunner{
+    public static void main(String[] args){
 
         int x = 4, y = 1;
 
@@ -651,7 +651,7 @@ public class CodeRunner{
             y += 2;
         }
 
-	}
+    }
 }
 ```
 
@@ -662,8 +662,8 @@ public class CodeRunner{
 ```java
 import java.util.Scanner;
 
-public class CodeRunner{
-	public static void main(String[] args){
+class CodeRunner{
+    public static void main(String[] args){
 
         boolean run = true;
         int balance = 0;
@@ -701,7 +701,7 @@ public class CodeRunner{
 
         System.out.println("프로그램 종료");
         scanner.close();
-	}
+    }
 }
 
 /*
