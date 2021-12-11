@@ -138,3 +138,169 @@ hobby = null;
 ```
 
 참조를 잃은 String 객체("여행")는 JVM에서 참조되지 않은 쓰레기 객체로 취급하여 Garbage Collector를 구동하고 메모리에서 자동 제거함
+
+<br>
+<br>
+
+# 배열 타입
+
+## 배열이란?
+
+- 같은 타입의 데이터를 연속된 공간에 나열시키고, 각 데이터에 index를 부여해 놓은 자료구조
+- 같은 타입의 많은 양의 데이터를 효율적으로 다루기 위한 방법
+- 선언과 동시에 저장할 수 있는 데이터 타입이 결정되며, 이 때 결정된 타입과 같은 타입의 데이터만 저장 가능
+  - 만약 다른 타입의 값을 저장하려고 하면 `Type mismatch` 컴파일 오류 발생
+- 한 번 생성된 배열은 길이를 늘리거나 줄일 수 없음
+  - 만약 더 많이 저장해야 할 필요가 있다면 그 길이만큼의 배열을 새로 생성하고, 기존 배열 항목을 새 배열로 복사해야 함
+
+<br>
+<br>
+
+## 배열 선언
+
+- 배열 변수 선언은 2가지 형태로 작성 가능
+
+```java
+타입[] 변수;
+```
+
+```java
+타입 변수[];
+```
+
+- 배열도 객체이므로 힙 영역에 생성되고 배열 변수는 힙 영역의 배열 객체를 참조
+- 참조할 배열 객체가 없다면 null 값으로 초기화될 수 있음
+
+<br>
+
+## 값 목록으로 배열 생성
+
+- 배열 항목에 저장될 값의 목록이 있다면 다음과 같이 간단하게 배열 객체를 만들 수 있음
+
+```java
+String[] names = { "남궁민", "로코", "셰르디" };
+```
+
+`{ }`는 주어진 값들을 항목으로 가지는 배열 객체를 힙에 생성하고, 배열 객체의 번지를 리턴한다.  
+배열 변수는 리턴된 번지를 저장함으로써 참조가 이루어진다.
+
+그리고 위에 생성된 배열에서 names[0]는 "남궁민", names[1]는 "로코", names[2]는 "셰르디"로 읽을 수 있다.  
+만약 names[2]의 "셰르디"를 "존잘남"으로 바꾸고 싶다면 다음과 같이 대입 연산자를 사용하면 된다.
+
+```java
+names[2] = "존잘남";
+```
+
+<br>
+
+- 값의 목록으로 배열 객체를 생성할 때, **배열 변수를 이미 선언한 후에 다른 실행문에서 중괄호를 사용한 배열 생성 및 저장은 허용되지 않음**
+
+```java
+타입[] 변수;
+변수 = { 값0, 값1, 값2, 값3, ··· }; //컴파일 에러
+```
+
+만약 배열 변수를 미리 선언한 후, 값 목록들이 나중에 결정되는 상황이라면 다음과 같이 **new 연산자** 를 사용해서 값 목록을 지정해주면 된다.
+
+```java
+String[] names = null;
+names = new String[] { "남궁민", "로코", "자바왕" };
+```
+
+메소드의 매개값이 배열인 경우에도 매개값에 new 연산자를 사용해야 한다.
+
+```java
+public class ArrayCreateByValueListExample {
+  public static void main(String[] args) {
+
+    int sum = add(new int[] { 83, 90, 87 });
+    System.out.println("총합 : " + sum);
+
+  }
+
+  public static int add(int[] scores) {
+    int sum = 0;
+    for (int i = 0; i < scores.length; i++) {
+      sum += scores[i];
+    }
+    return sum;
+  }
+}
+```
+
+<br>
+
+## new 연산자로 배열 생성
+
+- 값의 목록을 가지고 있지 않지만, 향후 값들을 저장할 배열을 미리 만들고 싶을 때는 new 연산자를 사용
+
+```java
+int[] intArray = new int[5];
+```
+
+위의 변수 선언 및 저장 과정에서는 길이가 5인 int[] 배열을 생성한다.
+
+<br>
+
+- 지정된 값이 없기 때문에 초기에는 모든 index의 값들이 타입별 초기값으로 설정됨
+
+|   분류    | 데이터 타입 |  초기값  |
+| :-------: | :---------: | :------: |
+| 정수 타입 |   byte[]    |    0     |
+| 정수 타입 |   char[]    | '\u0000' |
+| 정수 타입 |   short[]   |    0     |
+| 정수 타입 |    int[]    |    0     |
+| 정수 타입 |   long[]    |    0L    |
+| 실수 타입 |   float[]   |   0.0F   |
+| 실수 타입 |  double[]   |   0.0    |
+| 논리 타입 |   boolean   |  false   |
+| 참조 타입 |   class[]   |   null   |
+| 참조 타입 | interface[] |   null   |
+
+<br>
+
+## 배열 길이
+
+- 배열의 길이란 배열에 저장할 수 있는 전체 항목 수를 뜻함
+- 코드에서 배열의 길이를 얻으려면 배열 객체의 length 필드를 읽으면 됨
+
+```java
+int[] intArray = { 10, 20, 30 };
+int num = intArray.length;
+```
+
+- length 필드는 읽기 전용 필드이기 때문에 값을 바꿀 수 없음
+
+```java
+intArray.length = 10; //컴파일 에러
+```
+
+- 배열의 length 필드는 for문을 사용해서 배열 전체를 루핑할 때 매우 유용하게 사용됨
+
+```java
+public class ArrayLengthExample {
+  public static void main(String[] args) {
+
+    int[] scores = { 70, 80, 90 };
+    int sum = 0;
+
+    for (int i = 0; i < scores.length; i++) {
+      sum += scores[i];
+    }
+    System.out.println("총합 : " + sum);
+
+    double avg = (double) sum / scores.length;
+    System.out.println("평균 : " + avg);
+
+  }
+}
+
+/*
+총합 : 240
+평균 : 80.0
+*/
+```
+
+for문의 조건식에서 `<` 연산자를 사용한 이유는 배열의 마지막 인덱스는 배열의 길이보다 `1`이 적기 때문이다.  
+배열의 index의 범위는 0~(길이-1)이다.  
+만약 index를 초과해서 사용하면 `ArrayIndexOutOfBoundsException`이 발생한다.
