@@ -461,3 +461,166 @@ public class AdvancedForExample {
   }
 }
 ```
+
+<br>
+<br>
+
+# 열거 타입
+
+- 데이터 중에는 몇 가지로 한정된 값만 갖는 경우가 흔하게 있음
+  - ex) 요일, 계절
+- 열거 타입(enumeration type)은 몇 개의 열거 상수(enumeration constant) 중에서 하나의 상수를 저장하는 데이터
+
+<br>
+<br>
+
+## 열거 타입 선언
+
+- 열거 타입 이름을 정하고, 정한 이름으로 소스 파일(.java)을 생성해야 함
+- 열거 타입 이름은 관례적으로 첫 문자를 대문자로 하고 나머지는 소문자로 구성
+  - 만약 여러 단어로 구성된 이름이라면 각 단어의 첫 문자를 대문자로 하는 것이 관례
+
+```java
+Week.java
+MemberGrade.java
+ProductKind.java
+```
+
+- 소스 파일은 열거 타입 선언 및 열거 상수 선언으로 채워짐
+
+```java
+public enum Week {
+  MONDAY,
+  TUESDAY,
+  WEDNESDAY,
+  THURSDAY,
+  FRIDAY,
+  SATURDAY,
+  SUNDAY
+}
+```
+
+`public enum` 키워드는 열거 타입을 선언하기 위한 키워드이다.  
+열거 타입 안에 나열하게 되는 열거 상수들은 모두 대문자로 작성하는 것이 관례이다.  
+만약 열거 상수가 여러 단어로 구성될 경우에는 `_`로 연결하는 것이 관례이다.
+
+```java
+public enum LoginResult { LOGIN_SUCCESS, LOGIN_FAILED }
+```
+
+<br>
+<br>
+
+## 열거 타입 변수
+
+- 열거 타입도 하나의 데이터 타입이므로 변수를 선언하고 사용할 수 있음
+
+```java
+Week today = Week.SUNDAY;
+Week birthday = null;
+```
+
+열거 상수는 단독으로 사용할 수 없고 반드시 `열거타입.열거상수`로 사용해야만 한다.  
+그리고 열거 타입도 참조 타입이기 때문에 null 값을 저장할 수 있다.
+
+<br>
+
+- 열거 타입도 참조 타입이고, 참조 타입 변수는 객체를 참조하는 변수
+  - 그러므로 열거 상수 또한 객체 → 열거 상수는 열거 객체로 생성됨
+
+```java
+Week today = Week.MONDAY;
+today == Week.MONDAY        //true
+
+Week week1 = Week.SATURDAY;
+Week week2 = Week.SATURDAY;
+week1 == week2              //true
+```
+
+<br>
+<br>
+
+## 열거 객체의 메소드
+
+- 열거 객체는 java.lang.Enum 클래스에 선언된 메소드들을 사용할 수 있음
+  - 모든 열거 타입이 컴파일 시에 Enum 클래스를 상속하기 때문에 사용 가능
+
+| return 타입 |        메소드        | 설명                                  |
+| :---------: | :------------------: | :------------------------------------ |
+|   String    |        name()        | 열거 객체의 문자열 리턴               |
+|     int     |      ordinal()       | 열거 객체의 순번 리턴 (0부터 시작)    |
+|     int     |     compareTo()      | 열거 객체를 비교해서 순번 차이를 리턴 |
+|  열거 타입  | valueOf(String name) | 주어진 문자열의 열거 객체 리턴        |
+|  열거 배열  |        values        | 모든 열거 객체들을 배열로 리턴        |
+
+<br>
+
+### name() 메소드
+
+- 열거 객체가 가지고 있는 문자열 리턴
+- 리턴되는 문자열은 열거 타입을 정의할 때 사용한 상수 이름과 동일
+
+```java
+Week today = Week.MONDAY;
+String name = today.name();   //"MONDAY"
+```
+
+<br>
+
+### ordinal() 메소드
+
+- 전체 열거 객체 중 몇 번째 열거 객체인지 알려줌
+- 열거 객체 순번은 열거 타입을 정의할 때 주어진 순번이며, 0번부터 시작함
+
+```java
+public enum Week {
+  MONDAY,
+  TUESDAY,
+  WEDNESDAY,
+  THURSDAY,
+  FRIDAY,
+  SATURDAY,
+  SUNDAY
+}
+```
+
+```java
+Week today = Week.SUNDAY;
+int ordinal = today.ordinal()   //6
+```
+
+<br>
+
+### compareTo() 메소드
+
+- 매개값으로 주어진 열거 객체를 기준으로 전후로 몇 번째 위치하는지 비교
+- 열거 객체가 매개값의 열거 객체보다 순번이 빠르다면 음수가, 순번이 늦다면 양수가 리턴됨
+
+```java
+Week day1 = Week.MONDAY;
+Week day2 = Week.WEDNESDAY;
+
+int result1 = day1.compareTo(day2);   //-2
+int result2 = day2.compareTo(day1);   //2
+```
+
+<br>
+
+### valueOf() 메소드
+
+- 매개값으로 주어지는 문자열과 동일한 문자열을 가지는 열거 객체를 리턴
+- 외부로부터 문자열을 입력받아 열거 객체로 변환할 때 유용하게 사용 가능
+
+```java
+Week weekDay = Week.valueOf("SATURDAY");
+```
+
+<br>
+
+### values() 메소드
+
+- 열거 타입의 모든 열거 객체들을 배열로 만들어서 리턴
+
+```java
+Week[] days = Week.values();
+```
