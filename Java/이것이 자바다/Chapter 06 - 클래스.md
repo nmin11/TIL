@@ -596,3 +596,150 @@ int[] values = { 1, 2, 3 };
 int result = sum2(values);
 int result = sum2(new int[] { 1, 2, 3, 4, 5 });
 ```
+
+<br>
+<br>
+
+## return문
+
+### 리턴값이 있는 메소드
+
+- 메소드 선언에 리턴 타입이 있는 메소드는 반드시 return문을 사용해서 리턴값을 지정해야 함
+- return문의 리턴값은 리턴 타입이거나 리턴 타입으로 변환될 수 있어야 함
+
+```java
+int plus(int x, int y) {
+  byte result = (byte) (x + y);
+  return result;
+}
+```
+
+- return문 이후에 실행문이 오면 `Unreachable code`라는 컴파일 오류 발생
+
+```java
+int plus(int x, int y) {
+  int result = x + y;
+  return result;
+  System.out.println(result);   //Unreachable code
+}
+```
+
+- 하지만 if문과 같은 조건문을 사용할 경우에는 조건문 안의 return문과 상관 없이, 조건문 이후에 다른 실행문을 작성할 수 있음
+
+```java
+boolean isLeftGas() {
+  if(gas == 0) {
+    return false;
+  }
+  return true;
+}
+```
+
+<br>
+
+### 리턴값이 없는 메소드 (void)
+
+- void로 선언된 리턴값이 없는 메소드에서도 return문을 사용할 수 있음
+
+```java
+void run() {
+  while(true) {
+    if(gas > 0) {
+      gas -= 1;
+    } else {
+      return;
+    }
+  }
+}
+```
+
+`return;`을 활용해서 메소드 실행을 강제 종료시킬 수 있다.  
+그런데 위 예제와 같이 while문을 사용할 때에는 while문을 종료시키는 `break;`와 메소드 전체를 종료시키는 `return;`의 차이를 명확히 구분하여 사용해야 한다.
+
+<br>
+<br>
+
+## 메소드 호출
+
+- 메소드는 클래스 내 · 외부의 호출에 의해 실행됨
+  - 클래스 내부에서 호출할 경우에는 단순하게 메소드 이름으로 호출하면 됨
+  - 클래스 외부에서 호출할 경우에는 우선 클래스로부터 객체를 생성한 뒤, 참조 변수를 이용해서 메소드를 호출해야 함
+    - 객체가 존재해야 메소드도 존재하기 때문
+
+<br>
+
+### 객체 내부에서 호출
+
+```java
+public class Calculator {
+  int plus(int x, int y) {
+    int result = x + y;
+    return result;
+  }
+
+  double avg(int x, int y) {
+    double sum = plus(x, y);
+    double result = sum / 2;
+    return result;
+  }
+
+  void execute() {
+    double result = avg(7, 10);
+    System.out.println("실행 결과 : " + result);
+  }
+}
+```
+
+<br>
+
+### 객체 외부에서 호출
+
+- 객체 생성 이후 참조 변수와 함께 `.` 연산자를 사용해서 메소드 호출 가능
+
+```java
+Car myCar = new Car();
+myCar.keyTurnOn();
+myCar.run();
+int speed = myCar.getSpeed();
+```
+
+<br>
+<br>
+
+## 메소드 오버로딩
+
+- 클래스 내에 같은 이름의 메소드를 여러 개 선언하는 것을 뜻함
+  - 오버로딩의 사전적 의미는 **많이 싣는 것**
+- 메소드 오버로딩의 조건은 매개 변수의 타입, 개수, 순서 중 하나라도 달라야 함
+- 오버로딩된 메소드를 호출할 경우 JVM은 매개값의 타입을 보고 메소드를 선택함
+
+```java
+int plus(int x, int y) {
+  int result = x + y;
+  return result;
+}
+
+double plus(double x, double y) {
+  double result = x + y;
+  return result;
+}
+```
+
+```java
+int x = 10;
+double y = 20.3;
+plus(x, y);
+```
+
+위 연산은 컴파일 오류가 날 것 같지만 `plus(double x, double y)` 메소드가 실행된다.  
+JVM은 일차적으로 매개 변수 타입을 보지만, 매개 변수 타입이 일치하지 않을 경우, 자동 타입 변환이 가능한지를 검사한다.
+
+<br>
+
+- 주의할 점 1 : 매개 변수의 타입과 개수, 순서가 똑같을 경우 매개 변수 이름만 바꾸는 것은 메소드 오버로딩이 아님
+- 주의할 점 2 : 리턴 타입만 다르고 매개 변수가 동일하다면 메소드 오버로딩이 아님
+
+```java
+int divide(int x, int y) { ··· }
+double divide(int a, int b) { ··· }   //컴파일 오류 발생
+```
