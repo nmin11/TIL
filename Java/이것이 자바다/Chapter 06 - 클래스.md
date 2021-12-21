@@ -743,3 +743,180 @@ JVM은 일차적으로 매개 변수 타입을 보지만, 매개 변수 타입�
 int divide(int x, int y) { ··· }
 double divide(int a, int b) { ··· }   //컴파일 오류 발생
 ```
+
+<br>
+<br>
+
+# 인스턴스 멤버와 this
+
+- 인스턴스 멤버란 객체를 생성한 후 사용할 수 있는 필드와 메소드를 가리키며, 이들을 각각 인스턴스 필드, 인스턴스 메소드라고 부름
+- 객체 외부에서 인스턴스 멤버에 접근하기 위해 참조 변수를 사용할 수 있음
+- 객체 내부에서 인스턴스 멤버에 접근하기 위해 `this`를 사용할 수 있음
+
+```java
+public class Car {
+  String model;
+  int speed;
+
+  Car(String model) {
+    this.model = model;
+  }
+
+  void setSpeed(int speed) {
+    this.speed = speed;
+  }
+}
+```
+
+<br>
+<br>
+
+# 정적 멤버와 static
+
+- 정적 멤버란 클래스에 고정된 멤버로서 객체를 생성하지 않고 사용할 수 있는 필드와 메소드를 가리키며, 이들을 각각 정적 필드, 정적 메소드라고 부름
+- 정적 멤버는 객체(인스턴스)에 소속된 멤버가 아니라 클래스에 소속된 멤버이기 때문에 클래스 멤버라고도 함
+
+<br>
+<br>
+
+## 정적 멤버 선언
+
+- 필드나 메소드 선언 시 `static` 키워드를 추가적으로 붙이면 됨
+- 정적 멤버는 클래스에 고정된 멤버이므로 클래스 로더가 클래스(바이트 코드)를 로딩해서 메소드 메모리 영역에 적재할 때 클래스별로 관리됨
+  - 따라서 클래스 로딩이 끝나면 바로 사용 가능
+
+![정적 멤버 생성](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/JVM%20%EC%9E%91%EB%8F%99%20%EA%B3%BC%EC%A0%95.png)
+
+- 필드 선언 시 인스턴스 필드로 선언할 것인지, 정적 필드로 선언할 것인지에 대한 판단 기준
+  - 객체마다 가지고 있어야 할 데이터라면 인스턴스 필드로 선언
+  - 객체마다 가지고 있을 필요성이 없는 데이터라면 정적 필드로 선언
+
+```java
+public class Calculator {
+  String color;                 //계산기 별로 색깔이 다를 수 있음
+  static double pi = 3.141592;  //계산기에서 사용하는 π 값은 동일함
+}
+```
+
+```java
+public class Calculator {
+  String color;
+
+  void setColor(String color) { this.color = color; }
+  static int plus(int x, int y) { return x + y; }
+  static int minus(int x, int y) { return x - y; }
+}
+```
+
+<br>
+<br>
+
+## 정적 멤버 사용
+
+- 클래스가 메모리로 로딩되면 정적 멤버를 바로 사용할 수 있음
+- 클래스 이름과 함께 `.` 연산자로 접근하면 됨 (참조 변수를 따로 만들 필요가 없음)
+- 원칙적으로는 클래스 이름으로 접근해야 하지만 객체 참조 변수로도 접근이 가능하기는 함
+  - 하지만 객체 참조 변수로 접근하는 방식은 권장되지 않음
+
+<br>
+<br>
+
+## 정적 초기화 블록
+
+```java
+static double pi = 3.141592;
+```
+
+- 정적 필드는 위와 같이 필드 선언과 동시에 초기값을 주는 것이 일반적임
+- 그러나 계산이 필요한 초기화 작업이 있을 수도 있음
+  - 인스턴스 필드는 생성자에서 초기화하지만, 정적 필드는 객체 생성 없이도 사용해야 하므로 생성자에서 초기화 작업을 할 수 없음
+- Java는 정적 필드의 복잡한 초기화 작업을 위해서 **static block** 을 제공함
+  - 정적 블록은 클래스가 메모리로 로딩될 때 자동적으로 실행됨
+  - 정적 블록은 클래스 내부에 여러 개가 선언되어도 상관없음
+    - 클래스가 메모리로 로딩될 때 선언된 순서대로 실행됨
+
+```java
+public class Television {
+  static String company = "Samsung";
+  static String model = "LCD";
+  static String info;
+
+  static {
+    info = company + "-" + model;
+  }
+}
+```
+
+<br>
+<br>
+
+## 정적 메소드와 블록 선언 시 주의할 점
+
+- 객체가 없어도 실행되기 때문에 내부의 인스턴스 필드나 인스턴스 메소드 사용 불가
+- 객체 자신의 참조인 `this` 키워드 사용 불가
+
+```java
+public class ClassName {
+  int field1;
+  void method1() { ··· }
+
+  static int field2;
+  static void method2() { ··· }
+
+  static {
+    field1 = 10;      //컴파일 에러
+    method1();        //컴파일 에러
+    field2 = 10;
+    method2();
+  }
+
+  static void method3() {
+    this.field = 10;  //컴파일 에러
+    this.method1();   //컴파일 에러
+    field2 = 10;
+    method2();
+  }
+}
+```
+
+- `main()` 메소드도 정적 메소드이므로 객체 생성 없이 인스턴스 필드와 메소드를 `main()` 메소드에서 바로 사용할 수 없음
+
+<br>
+<br>
+
+## Singleton
+
+- 전체 프로그램에서 단 하나만 있도록 보장된 객체
+- 싱글톤을 만들려면 클래스 외부에서 `new` 연산자로 생성자를 호출할 수 없도록 막아야 함
+  - 이를 위해 생성자 앞에 `private` 접근 제한자를 붙여줘야 함
+  - 그리고 외부에서 호출할 수 있는 `getInstance()`를 선언하고 정적 필드에서 참조하고 있는 자신의 객체를 리턴
+- 외부에서 객체를 얻는 유일한 방법은 `getInstance()` 메소드를 호출하는 방법 뿐
+  - 몇 번을 호출해도 단 하나의 같은 객체를 리턴
+
+```java
+public class Singleton {
+  private static Singleton singleton = new Singleton();
+
+  private Singleton() {}
+
+  static Singleton getInstance() {
+    return singleton;
+  }
+}
+```
+
+```java
+public class SingletonExample {
+  public static void main(String[] args) {
+    Singleton obj1 = new Singleton();           //컴파일 에러
+    Singleton obj2 = Singleton.getInstance();
+    Singleton obj3 = Singleton.getInstance();
+
+    return obj2 == obj3;
+  }
+}
+
+/*
+true
+*/
+```
