@@ -920,3 +920,165 @@ public class SingletonExample {
 true
 */
 ```
+
+<br>
+<br>
+
+# final 필드와 상수
+
+## final 필드
+
+- final 필드는 초기값이 저장되면 그 값이 최종적인 값이 되어서 프로그램 실행 도중에 수정할 수 없음
+- final 필드의 초기값을 줄 수 있는 2가지 방법 - 1. 필드 선언 시 주는 방법 / 2. 생성자에서 주는 방법
+  - 단순 값이라면 필드 선언 시 주는 방법 이용
+  - 복잡한 초기화 코드가 필요하거나 외부 데이터로 초기화해야 한다면 생성자에서 주는 방법 이용
+- 생성자는 final 필드의 최종 초기화를 마쳐야 함
+  - 초기화되지 않은 final 필드가 남아있을 경우 컴파일 에러 발생
+
+```java
+public class Person {
+  final String nation = "Korea";
+  final String ssn;
+  String name;
+
+  public Person(String ssn, String name) {
+    this.ssn = ssn;
+    this.name = name;
+  }
+}
+```
+
+<br>
+<br>
+
+## 상수 (static final)
+
+- 불변의 값을 저장하는 필드를 Java에서는 상수(constant)라고 부름
+- 그냥 final 필드는 객체마다 저장되고, 생성자의 매개값을 통해서 여러 가지 값을 가질 수 있기 때문에 상수가 될 수 없음
+- 핵심은 객체마다 저장할 필요가 없는 **공용성** 을 띤다는 점
+- 초기값이 단순 값이라면 선언 시에 주는 것이 일반적이지만, 복잡한 초기화일 경우 정적 블록에서도 초기화 가능
+
+```java
+static final 타입 상수;
+static {
+  상수 = 초기값;
+}
+```
+
+- 상수 이름은 모두 대문자로 작성하는 것이 관례이고, 만약 서로 다른 단어가 혼합된 이름이라면 `_`로 단어를 연결해줌
+
+```java
+public class Earth {
+  static final double EARTH_RADIUS = 6400;
+  static final double EARTH_SURFACE_AREA;
+
+  static {
+    EARTH_SURFACE_AREA = 4 * Math.PI * EARTH_RADIUS * EARTH_RADIUS;
+  }
+}
+```
+
+```java
+public class EarthExample {
+  public static void main(String[] args) {
+    System.out.println("지구의 반지름 : " + Earth.EARTH_RADIUS + " km");
+    System.out.println("지구의 표면적 : " + Earth.EARTH_SURFACE_AREA + " km²");
+  }
+}
+```
+
+<br>
+<br>
+
+# package
+
+- Java에서는 클래스를 체계적으로 관리하기 위해 패키지를 사용함
+- 폴더를 만들어 파일을 저장 관리하듯이 패키지를 만들어 클래스를 저장 관리할 수 있게 해줌
+- 패키지의 물리적 형태는 파일 시스템의 폴더
+- 클래스의 일부분이며, 클래스를 유일하게 만들어주는 식별자 역할
+  - 클래스 이름이 동일하더라도 패키지가 다르면 다른 클래스로 인식
+- 클래스 전체 이름은 `상위패키지.하위패키지.클래스`로 표현됨
+- 패키지 안에 클래스만 따로 복사해서 다른 곳으로 이동하면 클래스는 사용할 수 없게 됨
+  - 클래스를 이동할 경우에는 패키지 전체를 이동시켜야 함
+
+<br>
+<br>
+
+## 패키지 선언
+
+```java
+package 상위패키지.하위패키지;
+
+public class ClassName { ··· }
+```
+
+- 패키지는 클래스를 컴파일하는 과정에서 자동으로 생성되는 폴더
+  - 컴파일러는 클래스에 포함되어 있는 패키지 선언을 보고 파일 시스템의 폴더로 자동 생성시킴
+- 패키지의 이름을 지을 때 지켜야 할 규칙들
+  - 숫자로 시작해서는 안 되고, `_`와 `$`를 제외한 특수 문자를 사용해서는 안 됨
+  - `java`로 시작하는 패키지는 Java 표준 API에서만 사용하므로 사용해서는 안 됨
+  - 모두 소문자로 작성하는 것이 관례
+- 여러 개발 회사가 함께 참여하는 대규모 프로젝트나, 다른 회사의 패키지를 이용해서 개발할 경우, 패키지 이름이 중복될 가능성이 있으므로 흔히 회사의 도메인 이름으로 패키지를 만듦
+  - 도메인은 등록 기관에서 유일한 이름이 되도록 검증되었기 때문에
+  - 도메인 이름으로 패키지 이름을 만들 경우, 도메인 역순으로 패키지 이름을 지어줌 (포괄적인 이름이 상위 패키지가 되도록 하기 위해서)
+  - `com.samsung.projectname`
+  - `com.lg.projectname`
+
+<br>
+<br>
+
+## 패키지 선언이 포함된 클래스 파일
+
+- 패키지 선언이 포함된 클래스를 명령 프롬프트에서 컴파일할 경우, 단순히 `javac ClassName.java`로 컴파일하면 패키지 폴더가 생성되지 않음
+- 패키지 폴더가 자동으로 생성되려면 `javac` 명령어 다음에 `-d` 옵션을 추가하고 패키지가 생성될 경로를 지정해야 함
+
+```bash
+javac -d .            ClassName.java
+javac -d ..\bin       ClassName.java
+javac -d C:\temp\bin  ClassName.java
+```
+
+`ClassName.java`를 `C:\temp`에 저장했다면 cmd 창에서 C:\temp 폴더로 이동하여 java 명령어를 통해 실행할 수 있음
+
+```bash
+C:\temp> java com.example.ClassName
+```
+
+<br>
+<br>
+
+## import문
+
+- 같은 패키지에 속하는 클래스들은 아무런 조건 없이 다른 클래스 사용 가능
+- 다른 패키지에 속하는 클래스를 사용할 수 있게 해주는 첫 번째 방법 : **패키지와 클래스 모두 기술하기**
+  - 패키지 이름이 길거나 이런 코드가 많아지면 전체 코드가 난잡해 보임
+  - 서로 다른 패키지에 동일한 클래스 이름이 존재하고, 두 패키지 모두 import되어 있을 경우에는 패키지 이름 전체를 기술해야 함
+
+```java
+package com.mycompany;
+
+public class Car {
+  com.hankook.Tire tire = new com.hankook.Tire();
+}
+```
+
+- 다른 패키지에 속하는 클래스를 사용할 수 있게 해주는 두 번째 방법 : **import문 사용하기**
+
+```java
+package com.mycompany;
+
+import com.hankook.Tire;
+
+public class Car {
+  Tire tire = new Tire();
+}
+```
+
+- import문의 위치는 패키지 선언과 클래스 선언 사이
+- 패키지에 포함된 다수의 클래스를 사용해야 한다면 개별 클래스 이름 대신 `*` 사용
+  - 주의할 점 : `*`로 지정한 패키지의 하위 패키지는 import 대상이 아니며, 하위 패키지의 클래스들도 사용하고 싶다면 import문을 하나 더 작성해야 함
+
+```java
+import com.mycompany.*;
+import com.mycompany.project.*;
+```
