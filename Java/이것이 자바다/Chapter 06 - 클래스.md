@@ -1129,3 +1129,127 @@ import com.mycompany.project.*;
 ## 필드와 메소드의 접근 제한
 
 - `public` `protected` `default` `private` 모두 가질 수 있음
+
+<br>
+<br>
+
+# Getter와 Setter 메소드
+
+- 객체 지향 프로그래밍에서 객체의 데이터는 외부에서 직접 접근할 경우 무결성이 깨질 수 있음
+- 그러므로 객체 지향 프로그래밍에서는 외부에서 메소드를 통해 데이터를 변경하는 방법을 선호
+- 메소드를 통해 값을 받아오고, 설정하기 위해서 `Getter`와 `Setter` 메소드 사용
+
+```java
+private 타입 fieldName;
+
+public 리턴 타입 getFieldName() {
+  return fieldName;
+}
+
+public void setFieldName(타입 fieldName) {
+  this.fieldName = fieldName;
+}
+```
+
+- 필드 타입이 boolean일 경우 Getter는 `get`이 아닌 `is`로 시작하는 것이 관례
+
+```java
+private boolean stop;
+
+public boolean isStop() {
+  return stop;
+}
+
+public void setStop(boolean stop) {
+  this.stop = stop;
+}
+```
+
+<br>
+<br>
+
+# Annotation
+
+- Annotation은 metadata
+  - 메타데이터란, 컴파일 과정과 실행 과정에서 코드를 어떻게 컴파일하고 처리할 것인지 알려주는 정보
+- 사용 방법 : `@AnnotationName`
+- 어노테이션의 3가지 용도
+  - 컴파일러에게 코드 문법 에러를 체크하도록 정보 제공
+  - 소프트웨어 개발 툴이 빌드나 배치 시 코드를 자동으로 생성할 수 있도록 정보 제공
+  - 런타임 시 특정 기능을 실행하도록 정보 제공
+- 대표적인 예는 `@Override`
+  - 메소드가 재정의된 것임을 컴파일러에게 알려주어, 컴파일러가 오버라이드 검사를 하도록 해줌
+    - 정확히 오버라이드되지 않았다면 컴파일 에러 발생
+- 빌드 시 자동으로 XML 설정 파일을 생성하거나, 배포를 위해 JAR 압축 파일을 생성하는데에도 사용됨
+- 런타임 시 클래스의 역할을 정의하기도 함
+
+<br>
+<br>
+
+## 어노테이션 타입 정의와 적용
+
+- 인터페이스를 정의하는 것과 유사함
+- `@interface`를 사용해서 정의
+- 엘리먼트의 타입으로는 기본 타입 데이터 타입이나 String, 열거 타입, Class 타입, 그리고 이들의 배열 타입 사용 가능
+- 엘리먼트의 이름 뒤에는 메소드를 작성하는 것처럼 `()`를 붙여야 함
+- 어노테이션은 기본 엘리먼트인 `value`를 가질 수 있음
+
+```java
+public @interface AnnotationName {
+  String value();
+  int elementName() default 5;
+}
+```
+
+```java
+@AnnotationName("값");
+```
+
+`default`를 통해 기본값이 정해진 경우 생략 가능하다.  
+이 값은 기본 엘리먼트인 value 값으로 자동 설정된다.
+
+```java
+@AnnotationName(value="값", elementName=3);
+```
+
+<br>
+<br>
+
+## 어노테이션 적용 대상
+
+- 어노테이션을 적용할 수 있는 대상은 `java.lang.annotation.ElementType` 열거 상수
+
+| ElementType 열거 상수 |           적용 대상           |
+| :-------------------: | :---------------------------: |
+|         TYPE          | 클래스, 인터페이스, 열거 타입 |
+|    ANNOTATION_TYPE    |          어노테이션           |
+|         FIELD         |             필드              |
+|      CONSTRUCTOR      |            생성자             |
+|        METHOD         |            메소드             |
+|    LOCAL_VARIABLE     |           로컬 변수           |
+|        PACKAGE        |            패키지             |
+
+- 어노테이션 적용 대상을 지정할 때에는 `@Target` 어노테이션 사용
+  - `@Target`의 기본 엘리먼트인 `value`는 ElementType 배열을 값으로 가짐
+    - 어노테이션이 적용될 대상을 복수 개로 지정하기 위해서
+
+```java
+@Target( {ElementType.TYPE, ElementType.FIELD, ElementType.METHOD} )
+public @interface AnnotationName {}
+```
+
+```java
+@AnnotationName
+public class ClassName {
+  @AnnotationName
+  private String fieldName;
+
+  /*  @Target에 Element.CONSTRUCTOR가 없기 때문에 사용 불가능
+  @AnnotationName
+  public ClassName() { }
+  */
+
+  @AnnotationName
+  public void methodName() { }
+}
+```
