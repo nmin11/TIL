@@ -1253,3 +1253,131 @@ public class ClassName {
   public void methodName() { }
 }
 ```
+
+<br>
+<br>
+
+## 어노테이션 유지 정책
+
+- 어노테이션 정의 시 사용 용도에 따라 어노테이션을 어느 범위까지 유지할 것인지 추가로 지정해야 함
+  - 소스 상에만 유지할 건지, 컴파일된 클래스까지 유지할 건지, 런타임 시에도 유지할 건지
+- 어노테이션 유지 정책은 `java.lang.annotation.RetentionPolicy` 열거 상수로 이루어져 있음
+
+| RetentionPolicy 열거 상수 | 설명                                                                                                                  |
+| :-----------------------: | :-------------------------------------------------------------------------------------------------------------------- |
+|          SOURCE           | 소스 상에서만 어노테이션 정보 유지<br>소스 코드 분석 때만 의미가 있고, 바이트 코드 파일에는 정보가 남지 않음          |
+|           CLASS           | 바이트 코드 파일까지 어노테이션 정보 유지<br>리플렉션을 이용해서 어노테이션 정보를 얻을 수 없음                       |
+|          RUNTIME          | 바이트 코드 파일까지 어노테이션 정보를 유지하면서<br>리플렉션을 이용해서 런타임 중에도 어노테이션 정보를 얻을 수 있음 |
+
+- **Reflection** 이란 런타임 시에 클래스의 메타 정보를 얻는 기능을 뜻함
+  - 클래스가 어떤 필드를 가지고 있는지, 어떤 생성자를 가지고 있는지, 어떤 메소드를 가지고 있는지, 적용된 어노테이션이 무엇인지
+- 어노테이션 유지 정책을 지정할 때에는 `@Retention` 어노테이션 사용
+  - `@Retention`의 기본 엘리먼트인 `value`는 RetentionPolicy 타입이므로 위의 3가지 상수 중 하나를 지정하면 됨
+- 코드 자동 생성 툴을 개발하지 않는 이상 우리가 작성하는 어노테이션은 대부분 런타임 시점에서 사용하기 위한 용도로 만들어짐
+
+```java
+@Target( {ElementType.TYPE, ElementType.FIELD, ElementType.METHOD} )
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AnnotationName {}
+```
+
+<br>
+<br>
+
+## 런타임 시 어노테이션 정보 사용하기
+
+- 어노테이션 자체는 아무런 동작을 가지지 않는 표식일 뿐이지만, 리플렉션을 이용해서 어노테이션의 적용 여부 및 엘리먼트 값을 읽고 적절히 처리할 수 있음
+- 클래스에 적용된 어노테이션 정보를 얻으려면 `java.lang.Class` 이용
+- 필드, 생성자, 메소드에 적용된 어노테이션 정보를 얻으려면 아래에 있는 Class의 메소드를 통해서 `java.lang.reflect` 패키지의 Field, Constructor, Method 타입의 배열을 얻어야 함
+
+|   리턴 타입   |        메소드        | 설명                                  |
+| :-----------: | :------------------: | :------------------------------------ |
+|    Field[]    |     getFields()      | Field 정보를 Field 배열로 리턴        |
+| Constructor[] |  getConstructors()   | 생성자 정보를 Constructor 배열로 리턴 |
+|   Method[]    | getDeclaredMethods() | Method 정보를 Method 배열로 리턴      |
+
+- Field, Constructor, Method 타입의 배열을 얻은 이후 이들이 가지고 있는 메소드를 호출해서 적용된 어노테이션 정보를 얻을 수 있음
+
+|  리턴 타입   |                              메소드                              | 설명                                                                                                                                                   |
+| :----------: | :--------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   boolean    | isAnnotationPresent(Class<? extends Annotation> annotationClass) | 지정한 어노테이션이 적용되었는지 여부<br>Class에서 호출했을 때 상위 클래스에 적용된 경우에도 `true` 반환                                               |
+|  Annotation  |             getAnnotation(Class\<T> annotationClass)             | 지정한 어노테이션이 적용되어 있으면 어노테이션 반환<br>그렇지 않다면 null 반환<br>Class에서 호출했을 때 상위 클래스에 적용된 경우에도 어노테이션 반환  |
+| Annotation[] |                         getAnnotations()                         | 적용된 모든 어노테이션 반환<br>적용된 어노테이션이 없을 경우 길이가 0인 배열 반환<br>Class에서 호출했을 때 상위 클래스에 적용된 어노테이션도 모두 포함 |
+| Annotation[] |                     getDeclaredAnnotations()                     | 직접 적용된 모든 어노테이션 반환<br>Class에서 호출했을 때 상위 클래스에 적용된 어노테이션은 포함되지 않음                                              |
+
+```java
+@Target( {ElementType.METHOD} )
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PrintAnnotation {
+  String value() default "-";
+  int number() default 15;
+}
+```
+
+```java
+public class Service {
+  @PrintAnnotation
+  public void method1() {
+    System.out.println("실행 내용 1");
+  }
+
+  @PrintAnnotation("*")
+  public void method2() {
+    System.out.println("실행 내용 2");
+  }
+
+  @PrintAnnotation(value="#", number=20)
+  public void method3() {
+    System.out.println("실행 내용 3");
+  }
+}
+```
+
+```java
+public class PrintAnnotationExample {
+  public static void main(String[] args) {
+    //Service 클래스로부터 메소드 정보 획득
+    Method[] declaredMethods = Service.class.getDeclaredMethods();
+
+    //Method 객체 하나씩 처리
+    for(Method method : declaredMethods) {
+      //PrintAnnotation 적용 여부 확인
+      if(method.isAnnotationPresent(PrintAnnotation.class)) {
+        //PrintAnnotation 객체 얻기
+        PrintAnnotation printAnnotation = method.getAnnotation(PrintAnnotation.class);
+
+        //메소드 이름 출력
+        System.out.println("[" + method.getName() + "]");
+
+        //구분선 출력
+        for(int i = 0; i < printAnnotation.number(); i++) {
+          System.out.print(printAnnotation.value());
+        }
+        System.out.println();
+
+        try {
+          //Service 객체를 생성하고 생성된 Service 객체의 메소드 호출
+          method.invoke(new Service());
+        } catch(Exception e) {
+          System.out.println("Exception : " + e);
+        }
+        System.out.println();
+      }
+    }
+  }
+}
+
+/*
+[method1]
+---------------
+실행 내용 1
+
+[method2]
+***************
+실행 내용 2
+
+[method3]
+####################
+실행 내용 3
+*/
+```
