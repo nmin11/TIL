@@ -79,3 +79,117 @@ public class Student extends People {
 ```
 
 만약 `super(name, ssn)` 부분을 주석 처리하고 실행하면 `Implicit super constructor People() is undefined. Must explicitly invoke another constructor` 라는 컴파일 오류가 발생한다.
+
+<br>
+<br>
+
+# 메소드 재정의
+
+- 부모 클래스의 특정 메소드는 자식 클래스가 사용하기에 적합하지 않을 수 있음
+- Java는 상속된 일부 메소드를 자식 클래스에서 다시 수정해서 사용할 수 있도록 **Overriding** 기능 제공
+
+<br>
+<br>
+
+## 메소드 재정의 (@Override)
+
+- 메소드 오버라이딩은 상속된 메소드의 내용이 자식 클래스에 맞지 않을 경우, 자식 클래스에서 동일한 메소드를 재정의하는 것
+- 메소드가 오버라이딩되었다면 부모 객체의 메소드는 숨겨짐
+  - 자식 객체를 통해 해당 메소드를 호출하면 오버라이딩된 자식 메소드가 호출됨
+- 메소드 오버라이딩 규칙
+  - 부모의 메소드와 동일한 시그니처(리턴 타입, 메소드 이름, 매개 변수 리스트)를 가져야 함
+  - 접근 제한을 더 강하게 오버라이딩할 수 없음
+    - 만약 부모 메소드가 `public` 접근 제한을 가지고 있다면 오버라이딩하는 자식 메소드는 `default`나 `private` 접근 제한을 가질 수 없음
+    - 만약 부모 메소드가 `default` 접근 제한을 가지고 있다면 오버라이딩하는 자식 메소드는 `default`나 `public` 접근 제한을 가질 수 있음
+  - 새로운 `Exception`을 `throw`할 수 없음
+- `@Override` 어노테이션은 생략할 수 있지만 이 어노테이션이 있으면 컴파일러는 메소드가 정확히 오버라이딩되었는지 체크해줌
+
+```java
+public class Calculator {
+  double areaCircle(double r) {
+    return 3.141592 * r * r;
+  }
+}
+```
+
+```java
+public class Computer extends Calculator {
+  @Override
+  double areaCircle(double r) {
+    return Math.PI * r * r;
+  }
+}
+```
+
+<br>
+<br>
+
+## 부모 메소드 호출 (super)
+
+- 오버라이딩 이후에도 부모 클래스의 원본 메소드를 사용하고 싶다면 `super` 키워드 사용
+
+```java
+public class Airplane {
+  public void land() {
+    System.out.println("착륙합니다.");
+  }
+
+  public void fly() {
+    System.out.println("일반 비행합니다.");
+  }
+
+  public void takeOff() {
+    System.out.println("이륙합니다.");
+  }
+}
+```
+
+```java
+public class SupersonicAirplane extends Airplane {
+  public static final int NORMAL = 1;
+  public static final int SUPERSONIC = 2;
+
+  public int flyMode = NORMAL;
+
+  @Override
+  public void fly() {
+    if(flyMode == SUPERSONIC) {
+      System.out.println("초음속 비행합니다.");
+    } else {
+      super.fly();
+    }
+  }
+}
+```
+
+<br>
+<br>
+
+# final 클래스와 final 메소드
+
+- final 필드는 초기값 설정 후 더 이상 값을 변경할 수 없다는 사실을 이미 학습했음
+- final 클래스와 final 메소드는 상속과 관련되어 있음
+
+<br>
+<br>
+
+## 상속할 수 없는 final 클래스
+
+- final 클래스는 부모 클래스가 될 수 없어서 자식 클래스를 만들 수 없음
+- 대표적인 예는 Java 표준 API에서 제공하는 `String` 클래스
+
+<br>
+<br>
+
+## 오버라이딩할 수 없는 final 메소드
+
+- 부모 클래스의 final 메소드는 자식 클래스에서 오버라이딩을 통한 재정의를 할 수 없음
+
+<br>
+<br>
+
+# protected 접근 제한자
+
+- `public`과 `default` 접근 제한의 중간쯤에 해당
+- 같은 패키지에서는 `default`와 같이 접근 제한이 없고, 다른 패키지에서는 자식 클래스만 접근 허용
+- 필드, 생성자, 메소드 선언에 사용 가능
