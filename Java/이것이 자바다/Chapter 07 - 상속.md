@@ -193,3 +193,131 @@ public class SupersonicAirplane extends Airplane {
 - `public`과 `default` 접근 제한의 중간쯤에 해당
 - 같은 패키지에서는 `default`와 같이 접근 제한이 없고, 다른 패키지에서는 자식 클래스만 접근 허용
 - 필드, 생성자, 메소드 선언에 사용 가능
+
+<br>
+<br>
+
+# 타입 변환과 다형성
+
+- 다형성은 같은 타입이지만 실행 결과가 다양한 객체를 이용할 수 있는 성질
+  - 하나의 타입에 여러 객체를 대입함으로써 다양한 기능을 이용할 수 있도록 해줌
+- 다형성을 위해 Java는 부모 클래스로 타입 변환을 허용함
+  - 부모 타입에 모든 자식 객체가 대입될 수 있음
+  - **객체의 부품화**
+
+```java
+public class Car {
+  Tire t1 = new HankookTire();
+  Tire t2 = new KumhoTire();
+}
+```
+
+자식 타입은 부모 타입으로 자동 타입 변환된다.
+
+<br>
+<br>
+
+## 자동 타입 변환 (Promotion)
+
+- 자동 타입 변환 조건 : `부모클래스 변수 = 자식클래스타입;`
+- 자동 타입 변환 개념 : 자식은 부모의 특징과 기능을 상속받기 때문에 부모와 동일하게 취급될 수 있음
+- 상속 관계가 있을 때만 가능함
+
+```java
+Cat cat = new Cat();
+Animal animal = cat;
+
+cat == animal   //true
+```
+
+`animal` 변수는 `cat` 변수와 동일한 `Cat` 객체를 참조한다.
+
+- 부모 타입으로 자동 타입 변환된 이후에는 부모 클래스에 선언된 필드와 메소드만 접근 가능
+  - 변수는 자식 객체를 참조하지만 변수로 접근 가능한 멤버는 부모 클래스 멤버로만 한정됨
+  - 그러나 예외적으로 메소드가 자식 클래스에서 오버라이딩되었다면 자식 클래스의 메소드가 대신 호출됨
+    - 이는 다형성과 관련이 있는 매우 중요한 성질
+
+```java
+public class Parent {
+  public void method1() {
+    System.out.println("Parent-method1");
+  }
+
+  public void method2() {
+    System.out.println("Parent-method2");
+  }
+}
+```
+
+```java
+public class Child extends Parent {
+  @Override
+  public void method2() {
+    System.out.println("Child-method2");
+  }
+
+  public void method3() {
+    System.out.println("Child-method3");
+  }
+}
+```
+
+```java
+public class ChildExample {
+  public static void main(String[] args) {
+    Child child = new Child();
+    Parent parent = child;  //자동 타입 변환
+
+    parent.method1();
+    parent.method2();   //재정의된 메소드 호출
+    parent.method3();   //호출 불가능
+  }
+}
+
+/*
+Parent-method1
+Child-method2
+*/
+```
+
+<br>
+<br>
+
+## 필드의 다형성
+
+- 그냥 자식 타입으로 사용하면 될 것을 부모 타입으로 변환해서 사용하는 이유 : 다형성을 구현하는 기술적 방법 때문
+- 다형성은 주로 필드의 값을 다양화함으로써 실행 결과가 다르게 나오도록 구현
+- 필드의 타입은 변함이 없지만 실행 도중 어떤 객체를 필드로 저장하느냐에 따라 실행 결과가 달라질 수 있게 하는 것이 다형성
+
+<br>
+<br>
+
+## 하나의 배열로 객체 관리
+
+```java
+class Car {
+  Tire frontLeftTire = new Tire("앞왼쪽", 6);
+  Tire frontRightTire = new Tire("앞오른쪽", 2);
+  Tire backLeftTire = new Tire("뒤왼쪽", 6);
+  Tire backRightTire = new Tire("뒤오른쪽", 6);
+}
+```
+
+이 코드를 보다 깔끔하게 만들기 위해서 배열을 사용해줄 수 있다.
+
+```java
+class Car {
+  Tire[] tires = {
+    new Tire("앞왼쪽", 6),
+    new Tire("앞오른쪽", 2),
+    new Tire("뒤왼쪽", 3),
+    new Tire("뒤오른쪽", 4)
+  };
+}
+```
+
+tires 배열의 각 항목에도 자식 객체를 대입하여 자동 타입 변환이 발생하게 할 수 있다.
+
+```java
+tires[1] = new KumhoTire("앞오른쪽", 13);
+```
