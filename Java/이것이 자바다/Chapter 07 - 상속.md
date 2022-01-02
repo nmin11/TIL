@@ -321,3 +321,164 @@ tires 배열의 각 항목에도 자식 객체를 대입하여 자동 타입 변
 ```java
 tires[1] = new KumhoTire("앞오른쪽", 13);
 ```
+
+<br>
+<br>
+
+## 매개 변수의 다형성
+
+- 자동 타입 변환은 필드의 값을 대입할 때에도 발생하지만, 메소드를 호출할 때 주로 발생함
+- 메소드의 매개 변수의 타입이 클래스일 경우, 해당 클래스의 객체뿐만 아니라 자식 객체까지도 매개값으로 사용할 수 있음
+- 매개값으로 어떤 자식 객체가 제공되느냐에 따라 메소드의 실행 결과는 다양해질 수 있음 (매개 변수의 다형성)
+- 자식 객체가 메소드를 재정의했다면 메소드 내부에서 오버라이딩된 메소드를 호출함
+
+```java
+public class Vehicle {
+  public void run() {
+    System.out.println("차량이 달립니다.");
+  }
+}
+```
+
+```java
+public class Driver {
+  public void drive(Vehicle vehicle) {
+    vehicle.run();
+  }
+}
+```
+
+```java
+public class Bus extends Vehicle {
+  @Override
+  public void run() {
+    System.out.println("버스가 달립니다.");
+  }
+}
+```
+
+```java
+public class Taxi extends Vehicle {
+  @Override
+  public void run() {
+    System.out.println("택시가 달립니다.");
+  }
+}
+```
+
+```java
+public class DriverExample {
+  public static void main(String[] args) {
+    Driver driver = new Driver();
+    Bus bus = new Bus();
+    Taxi taxi = new Taxi();
+
+    driver.drive(bus);
+    driver.drive(taxi);
+  }
+}
+
+/*
+버스가 달립니다.
+택시가 달립니다.
+*/
+```
+
+<br>
+<br>
+
+## 강제 타입 변환 (Casting)
+
+- 강제 타입 변환 사용 방법 : `자식클래스 변수 = (자식클래스) 부모클래스타입`
+- 부모 타입을 자식 타입으로 변환하는 것을 뜻함
+- 모든 부모 타입을 자식 타입으로 강제 변환할 수는 없음
+  - 자식 타입이 부모 타입으로 자동 변환한 후, 다시 자식 타입으로 변환할 때 강제 타입 변환 사용 가능
+- 부모 타입으로 자동 타입 변환 시, 부모 타입에 선언된 필드와 메소드만 사용 가능
+  - 만약 자식 타입에 선언된 필드와 메소드를 꼭 사용해야 한다면 강제 타입 변환 이후에 사용해야 함
+
+```java
+public class Parent {
+  public String field1;
+
+  public void method1() {
+    System.out.println("Parent-method1");
+  }
+
+  public void method2() {
+    System.out.println("Parent-method2");
+  }
+}
+```
+
+```java
+public class Child extends Parent {
+  public String field2;
+
+  public void method3() {
+    System.out.println("Child-method3");
+  }
+}
+```
+
+```java
+public class ChildExample {
+  public static void main(String[] args) {
+    Parent parent = new Child();
+    parent.field1 = "data1";
+    parent.method1();
+    parent.method2();
+
+    /*
+    parent.field2 = "data2";  //필드 사용 불가능
+    parent.method3();         //메소드 호출 불가능
+    */
+
+    Child child = (Child) parent;
+    child.field2 = "로코";
+    child.method3();
+  }
+}
+
+/*
+Parent-method1
+Parent-method2
+Child-method3
+*/
+```
+
+<br>
+<br>
+
+## 객체 타입 확인 (instanceof)
+
+- 객체가 어떤 클래스의 인스턴스인지 확인하기 위해 `instanceof` 연산자 사용 가능
+- `instanceof` 사용 방법 : `boolean result = 객체 instanceof 타입`
+
+```java
+public class InstanceofExample {
+  public static void method(Parent parent) {
+    if(parent instanceof Child) {
+      Child child = (Child) parent;
+      System.out.println("Child 변환 성공");
+    } else {
+      System.out.println("Child 변환 실패");
+    }
+  }
+
+  public static void main(String[] args) {
+    Parent parentA = new Child();
+    method(parentA);
+
+    Parent parentB = new Parent();
+    method(parentB);
+  }
+}
+
+/*
+Child 변환 성공
+Child 변환 실패
+*/
+```
+
+만약에 `instanceof`가 있는 if-else문을 작성하지 않았다면 `ClassCastException`이 발생하고 프로그램이 종료된다.  
+그러므로 강제 타입 변환을 하기 전에는 `instanceof` 연산자로 변환시킬 타입의 객체인지 조사해서 잘못된 매개값으로 인해 프로그램이 종료되는 것을 막아야 한다.
