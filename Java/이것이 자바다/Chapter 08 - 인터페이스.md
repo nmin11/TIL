@@ -33,11 +33,11 @@
 
 ```java
 interface 인터페이스명 {
-    타입 상수명 = 값;
+  타입 상수명 = 값;
 
-    타입 메소드명(매개변수);
-    default 타입 메소드명(매개변수) { ··· }
-    static 타입 메소드명(매개변수) { ··· }
+  타입 메소드명(매개변수);
+  default 타입 메소드명(매개변수) { ··· }
+  static 타입 메소드명(매개변수) { ··· }
 }
 ```
 
@@ -103,6 +103,7 @@ interface 인터페이스명 {
   - 생략하더라도 컴파일 과정에서 자동으로 붙게 됨
 
 <br>
+<br>
 
 ## 정적 메소드 선언
 
@@ -113,22 +114,145 @@ interface 인터페이스명 {
 
 ```java
 public interface RemoteControl {
-    //상수
-    int MAX_VOLUME = 10;
-    int MIN_VOLUME = 0;
+  //상수
+  int MAX_VOLUME = 10;
+  int MIN_VOLUME = 0;
 
-    //추상 메소드
-    void turnOn();
-    void turnOff();
-    void setVolume(int volume);
+  //추상 메소드
+  void turnOn();
+  void turnOff();
+  void setVolume(int volume);
 
-    //디폴트 메소드
-    default void setMute(boolean mute) {
-        if(mute) { System.out.println("무음 처리합니다."); }
-        else { System.out.println("무음 해제합니다."); }
-    }
+  //디폴트 메소드
+  default void setMute(boolean mute) {
+    if(mute) { System.out.println("무음 처리합니다."); }
+    else { System.out.println("무음 해제합니다."); }
+  }
 
-    //정적 메소드
-    static void changeBattert() { System.out.println("건전지를 교환합니다."); }
+  //정적 메소드
+  static void changeBattert() { System.out.println("건전지를 교환합니다."); }
 }
 ```
+
+<br>
+<br>
+
+# 인터페이스 구현
+
+- 개발 코드가 인터페이스 메소드를 호출하면 인터페이스는 객체의 메소드를 호출
+- 그러므로 객체는 인터페이스에서 정의된 추상 메소드와 동일한 메소드 이름, 매개 타입, 리턴 타입을 가진 실체 메소드를 가지고 있어야 함
+- 이러한 객체를 인터페이스의 구현(implement) 객체라고 하며, 구현 객체를 생성하는 클래스를 구현 클래스라고 함
+
+<br>
+<br>
+
+## 구현 클래스
+
+```java
+public class 구현클래스명 implements 인터페이스명 { ··· }
+```
+
+- 인터페이스 타입으로 사용할 수 있음을 알려주기 위해 클래스 선언부에 `implements` 키워드를 추가하고 인터페이스명을 명시해야 함
+- `{}` 안에 인터페이스에 선언된 추상 메소드의 실체 메소드를 선언해야 함
+- ⭐ 주의할 점 : 인터페이스의 모든 메소드는 기본적으로 `public` 접근 제한을 갖기 때문에 `public` 보다 낮은 접근 제한으로 작성할 수 없음
+  - `public` 생략 시, `Cannot reduce the visibility of the inherited method` 라는 컴파일 에러 발생
+- 인터페이스의 추상 메소드에 대응하는 구현 클래스의 실체 메소드가 작성되지 않았을 경우, 구현 클래스는 자동적으로 추상 클래스가 됨
+
+```java
+public class Television implements RemoteControl {
+  private int volume;
+
+  public void turnOn() { System.out.println("TV를 켭니다."); }
+  public void turnOff() { System.out.println("TV를 끕니다."); }
+  public void setVolume(int volume) {
+    if(volume > RemoteControl.MAX_VOLUME) {
+      this.volume = RemoteControl.MAX_VOLUME;
+    } else if(volume < RemoteControl.MIN_VOLUME) {
+      this.volume = RemoteControl.MIN_VOLUME;
+    } else {
+      this.volume = volume;
+    }
+    System.out.println("현재 TV 볼륨 : " + this.volume);
+  }
+}
+```
+
+```java
+public class Audio implements RemoteControl {
+  private int volume;
+
+  public void turnOn() { System.out.println("Audio를 켭니다."); }
+  public void turnOff() { System.out.println("Audio를 끕니다."); }
+  public void setVolume(int volume) {
+    if(volume > RemoteControl.MAX_VOLUME) {
+      this.volume = RemoteControl.MAX_VOLUME;
+    } else if(volume < RemoteControl.MIN_VOLUME) {
+      this.volume = RemoteControl.MIN_VOLUME;
+    } else {
+      this.volume = volume;
+    }
+    System.out.println("현재 Audio 볼륨 : " + this.volume);
+  }
+}
+```
+
+- 인터페이스로 구현 객체를 사용하려면 인터페이스 변수를 선언하고 구현 객체를 대입해야 함
+
+```java
+public class RemoteControlExample {
+  public static void main(String[] args) {
+    RemoteControl rc;
+    rc = new Television();
+    rc = new Audio();
+  }
+}
+```
+
+<br>
+<br>
+
+## 익명 구현 객체
+
+```java
+인터페이스 변수 = new 인터페이스() {
+  //인터페이스에 선언된 추상 메소드에 대응하는 실체 메소드 작성
+};
+```
+
+- 구현 클래스를 만들어 사용하는 방법은 일반적이며 클래스를 재사용할 수 있기 때문에 편리함
+- 하지만 일회성의 구현 객체를 만들기 위해 소스 파일을 만들고 클래스를 선언하는 것은 비효율적
+- Java는 소스 파일을 만들지 않고도 구현 객체를 만들 수 있는 방법을 제공하는데, 이를 **익명 구현 객체** 라고 함
+- Java는 UI 프로그래밍에서 이벤트를 처리하기 위해, 임시 작업 쓰레드를 만들기 위해 익명 구현 객체를 많이 활용함
+- 하나의 실행문이므로 끝에는 반드시 `;`을 붙여야 함
+- `{}` 안에는 인터페이스에 선언된 모든 추상 메소드들의 실체 메소드를 작성해야 함
+- 필드와 메소드를 선언할 수 있지만, 익명 객체 안에서만 사용할 수 있고 인터페이스 변수로 접근할 수 없음
+
+```java
+public class RemoteControlExample {
+  public static void main(String[] args) {
+    RemoteControl rc = new RemoteControl() {
+      public void turnOn() { /*실행문*/ }
+      public void turnOff() { /*실행문*/ }
+      public void setVolume(int volume) { /*실행문*/ }
+    };
+  }
+}
+```
+
+모든 객체는 클래스로부터 생성되는데, 익명 구현 객체도 예외는 아니다.  
+`RemoteControlExample.java`를 컴파일하면 `RemoteControlExample$1.class`라는 파일이 만들어진다.  
+만약 두 번째 익명 구현 객체를 만들었다면 `RemoteControlExample$2.class`라는 파일이 만들어진다.
+
+<br>
+<br>
+
+## 다중 인터페이스 구현 클래스
+
+```java
+public class 구현클래스명 implements 인터페이스A, 인터페이스B {
+  //인터페이스 A의 실체 메소드 선언
+  //인터페이스 B의 실체 메소드 선언
+}
+```
+
+- 모든 인터페이스의 추상 메소드에 대한 실체 메소드를 구현해야 하며, 하나라도 없을 경우 추상 클래스로 선언해야 함
