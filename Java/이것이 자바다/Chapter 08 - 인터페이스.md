@@ -328,3 +328,143 @@ rc.setMute(true);
 ```java
 RemoteConrol.changeBattery();
 ```
+
+<br>
+<br>
+
+# 타입 변환과 다형성
+
+- 상속과 마찬가지로 인터페이스도 다형성을 구현하는 기술이 사용됨
+  - 상속 : 같은 종류의 하위 클래스를 만드는 기술
+  - 인터페이스 : 사용 방법이 동일한 클래스를 만드는 기술
+- 오히려 요즘은 상속보다는 인터페이스를 통해서 다형성을 구현하는 경우가 더 많음
+  - 프로그램 소스 코드의 변경 없이 구현 객체만 교체함으로써 매우 손쉽고 빠르게 다형성을 적용할 수 있음
+- 인터페이스는 메소드의 매개 변수로 많이 등장함
+  - 메소드 호출 시 매개값으로 여러 가지 종류의 구현 객체를 줄 수 있기 때문에 메소드 실행 결과가 다양하게 나올 수 있음
+
+```java
+public void useRemoteControl(RemoteControl rc) { ··· }
+```
+
+매개값을 `Television` 객체 또는 `Audio` 객체 중에서 선택적으로 줄 수 있다.
+
+<br>
+<br>
+
+## 자동 타입 변환 (Promotion)
+
+- `인터페이스 변수 = 구현객체;`
+- 인터페이스 구현 클래스를 상속해서 자식 클래스를 만들었다면 자식 객체 역시 인터페이스 타입으로 자동 타입 변환시킬 수 있음
+
+<br>
+<br>
+
+## 필드의 다형성
+
+```java
+public interface Tire {
+  public void roll();
+}
+```
+
+```java
+public class HankookTire implements Tire {
+  @Override
+  public void roll() { System.out.println("한국 타이어가 굴러갑니다.") }
+}
+```
+
+```java
+public class KumhoTire implements Tire {
+  @Override
+  public void roll() { System.out.println("금호 타이어가 굴러갑니다.") }
+}
+```
+
+```java
+public class Car {
+  Tire frontLeftTire = new HankookTire();
+  Tire frontRightTire = new HankookTire();
+  Tire backLeftTire = new HankookTire();
+  Tire backRightTire = new HankookTire();
+
+  void run() {
+    frontLeftTire.roll();
+    frontRightTire.roll();
+    backLeftTire.roll();
+    backRightTire.roll();
+  }
+}
+```
+
+```java
+public class CarExample {
+  public static void main(String[] args) {
+    Car myCar = new Car();
+
+    myCar.run();
+
+    myCar.frontLeftTire = new KumhoTire();
+    myCar.frontRightTire = new KumhoTire();
+
+    myCar.run();
+  }
+}
+
+/*
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+금호 타이어가 굴러갑니다.
+금호 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+*/
+```
+
+<br>
+<br>
+
+## 인터페이스 배열로 구현 객체 관리
+
+```java
+public class Car {
+  Tire[] tires = {
+    new HankookTire(),
+    new HankookTire(),
+    new HankookTire(),
+    new HankookTire()
+  };
+
+  void run() {
+    for(Tire tire : tires) { tire.roll(); }
+  }
+}
+```
+
+```java
+public class CarExample {
+  public static void main(String[] args) {
+    Car myCar = new Car();
+
+    myCar.run();
+
+    myCar.tires[0] = new KumhoTire();
+    myCar.tires[1] = new KumhoTire();
+
+    myCar.run();
+  }
+}
+
+/*
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+금호 타이어가 굴러갑니다.
+금호 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+한국 타이어가 굴러갑니다.
+*/
+```
