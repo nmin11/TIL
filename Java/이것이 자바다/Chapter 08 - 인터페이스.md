@@ -130,7 +130,7 @@ public interface RemoteControl {
   }
 
   //정적 메소드
-  static void changeBattert() { System.out.println("건전지를 교환합니다."); }
+  static void changeBattery() { System.out.println("건전지를 교환합니다."); }
 }
 ```
 
@@ -256,3 +256,75 @@ public class 구현클래스명 implements 인터페이스A, 인터페이스B {
 ```
 
 - 모든 인터페이스의 추상 메소드에 대한 실체 메소드를 구현해야 하며, 하나라도 없을 경우 추상 클래스로 선언해야 함
+
+<br>
+<br>
+
+# 인터페이스 사용
+
+- 인터페이스의 구현 객체 사용 방법 : `인터페이스 변수 = 구현객체;`
+- 인터페이스는 클래스의 필드, 그리고 생성자 또는 메소드의 매개 변수 및 로컬 변수로 선언될 수 있음
+
+<br>
+<br>
+
+## 추상 메소드 사용
+
+- 구현 객체가 인터페이스 타입에 대입되면 인터페이스에 선언된 추상 메소드를 호출할 수 있음
+
+```java
+public class RemoteControlExample {
+  public static void main(String[] args) {
+    RemoteControl rc = null;
+
+    rc = new Television();
+    rc.turnOn();
+    rc.turnOff();
+
+    rc = new Audio();
+    rc.turnOn();
+    rc.turnOff();
+  }
+}
+
+/*
+TV를 켭니다.
+TV를 끕니다.
+Audio를 켭니다.
+Audio를 끕니다.
+*/
+```
+
+<br>
+<br>
+
+## 디폴트 메소드 사용
+
+- 디폴트 메소드는 인터페이스에 실행문까지 함께 선언되지만, 인터페이스에서 바로 사용할 수 없음
+- 디폴트 메소드는 추상 메소드가 아닌 인스턴스 메소드이므로 구현 객체가 있어야 함
+- 디폴트 메소드는 인터페이스의 모든 구현 객체가 가지고 있는 **기본 메소드**
+  - 디폴트 메소드를 재정의(오버라이딩)하는 것도 가능함
+
+※ `setMute(boolean mute)`라는 디폴트 메소드를 아래와 같은 방식으로는 호출할 수 없다.
+
+```java
+RemoteControl.setMute(true);
+```
+
+반드시 구현 객체를 인터페이스 변수에 대입한 이후에 디폴트 메소드를 호출해야 한다.
+
+```java
+RemoteControl rc = new Television();
+rc.setMute(true);
+```
+
+<br>
+<br>
+
+## 정적 메소드 사용
+
+- 인터페이스로 바로 호출 가능
+
+```java
+RemoteConrol.changeBattery();
+```
