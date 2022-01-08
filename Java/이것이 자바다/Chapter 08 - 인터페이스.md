@@ -468,3 +468,128 @@ public class CarExample {
 한국 타이어가 굴러갑니다.
 */
 ```
+
+<br>
+<br>
+
+## 매개 변수의 다형성
+
+- 자동 타입 변환은 필드의 값을 대입할 때에도 발생하지만, 주로 메소드를 호출할 때 많이 발생
+  - 매개 변수를 인터페이스 타입으로 선언하고 호출할 때는 구현 객체를 대입하게 되기 때문
+
+```java
+public class Driver {
+  public void drive(Vehicle vehicle) {
+    vehicle.run();
+  }
+}
+```
+
+```java
+public interface Vehicle {
+  public void run();
+}
+```
+
+```java
+public class Bus implements Vehicle {
+  @Override
+  public void run() { System.out.println("버스가 달립니다."); }
+}
+```
+
+```java
+public class Taxi implements Vehicle {
+  @Override
+  public void run() { System.out.println("택시가 달립니다."); }
+}
+```
+
+```java
+public class DriverExample {
+  public static void main(String[] args) {
+    Driver driver = new Driver();
+    Bus bus = new Bus();
+    Taxi taxi = new Taxi();
+
+    driver.drive(bus);    //자동 타입 변환 : Vehicle vehicle = bus;
+    driver.drive(taxi);   //자동 타입 변환 : Vehicle vehicle = taxi;
+  }
+}
+
+/*
+버스가 달립니다.
+택시가 달립니다.
+*/
+```
+
+<br>
+<br>
+
+## 강제 타입 변환 (Casting)
+
+- 구현 객체가 인터페이스 타입으로 자동 변환하면, 인터페이스에 선언된 메소드만 사용 가능
+- 그렇다면 구현 클래스에 선언된 필드와 메소드를 사용해야 할 경우에는 어떻게 해야 할까?  
+  → 강제 타입 변환을 해서 다시 인터페이스 변수를 구현 클래스 타입으로 변환하면 구현 클래스의 필드와 메소드를 사용할 수 있음
+
+```java
+public interface Vehicle {
+  public void run();
+}
+```
+
+```java
+public class Bus implements Vehicle {
+  @Override
+  public void run() { System.out.println("버스가 달립니다."); }
+
+  public void checkFare() { System.out.println("승차 요금을 체크합니다."); }
+}
+```
+
+```java
+public class VehicleExample {
+  public static void main(String[] args) {
+    Vehicle vehicle = new Bus();
+    vehicle.run();
+    //vehicle.checkFare();      //Vehicle 인터페이스에는 없는 메소드이므로 사용 불가
+
+    Bus bus = (Bus) vehicle;    //강제 타입 변환
+    bus.run();
+    bus.checkFare();            //Bus 클래스에 있는 메소드이므로 사용 가능
+  }
+}
+
+/*
+버스가 달립니다.
+버스가 달립니다.
+승차 요금을 체크합니다.
+*/
+```
+
+<br>
+<br>
+
+## 객체 타입 확인 (instanceof)
+
+- 강제 타입 변환은 구현 객체가 인터페이스 타입으로 변환되어 있는 상태에서만 가능함
+- 그러나 어떤 구현 객체가 변환되어 있는지 알 수 없는 상태에서 무작정 변환을 할 경우 `ClassCastException`이 발생할 수 있음
+
+```java
+Vehicle vehicle = new Taxi();
+Bus bus = (Bus) vehicle;        //ClassCastException 예외 발생
+```
+
+- 매개값이 어떤 객체인지 `instanceof` 연산자로 확인하고 안전하게 강제 타입 변환을 해야 함
+
+```java
+public Class Driver {
+  public void drive(Vehicle vehicle) {
+    if(vehicle instanceof Bus) {
+      Bus bus = (Bus) vehicle;
+      bus.checkFare();
+    }
+    vehicle.run();
+  }
+}
+```
