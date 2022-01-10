@@ -47,7 +47,7 @@ public class View {
 - 멤버 클래스는 클래스나 객체가 사용 중이라면 언제든지 재사용 가능
 - 로컬 클래스는 메소드 실행 시에만 사용되고, 메소드가 실행 종료되면 없어짐
 
-(이미지 첨부 - member class and local class)
+![멤버 클래스와 로컬 클래스](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/member%20class%20and%20local%20class.png)
 
 - 멤버 클래스도 하나의 클래스이기 때문에 컴파일하면 바이트 코드 파일(.class)이 별도로 생성됨
   - 바이트 코드 파일 이름 : `A$B.class`
