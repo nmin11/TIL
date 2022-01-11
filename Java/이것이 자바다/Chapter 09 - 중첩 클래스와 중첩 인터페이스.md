@@ -8,7 +8,7 @@
 
 ```java
 class ClassName {
-    class NestedClassName {}
+  class NestedClassName {}
 }
 ```
 
@@ -19,7 +19,7 @@ class ClassName {
 
 ```java
 class ClassName {
-    interface NestedInterfaceName {}
+  interface NestedInterfaceName {}
 }
 ```
 
@@ -30,9 +30,9 @@ class ClassName {
 
 ```java
 public class View {
-    public interface OnClickListener {
-        public void onClick(View v);
-    }
+  public interface OnClickListener {
+    public void onClick(View v);
+  }
 }
 ```
 
@@ -85,9 +85,9 @@ public class View {
 
 ```java
 void method() {
-    class DownloadThread extends Thread { ··· }
-    DownloadThread thread = new DownloadThread();
-    thread.start();
+  class DownloadThread extends Thread { ··· }
+  DownloadThread thread = new DownloadThread();
+  thread.start();
 }
 ```
 
@@ -98,62 +98,62 @@ void method() {
 ```java
 //바깥 클래스
 class A {
-    A() { System.out.println("A 객체가 생성됨"); }
+  A() { System.out.println("A 객체가 생성됨"); }
 
-    //인스턴스 멤버 클래스
-    class B {
-        B() { System.out.println("B 객체가 생성됨"); }
-        int field1;
-        //static int field2;
-        void method1() {}
-        //static void method2() {}
-    }
+  //인스턴스 멤버 클래스
+  class B {
+    B() { System.out.println("B 객체가 생성됨"); }
+    int field1;
+    //static int field2;
+    void method1() {}
+    //static void method2() {}
+  }
 
-    //정적 멤버 클래스
-    static class C {
-        C() { System.out.println("C 객체가 생성됨"); }
-        int field1;
-        static int field2;
-        void method1() {}
-        static void method2() {}
-    }
+  //정적 멤버 클래스
+  static class C {
+    C() { System.out.println("C 객체가 생성됨"); }
+    int field1;
+    static int field2;
+    void method1() {}
+    static void method2() {}
+  }
 
-    void method() {
-        //로컬 클래스
-        class D {
-            D() { System.out.println("D 객체가 생성됨"); }
-            int field1;
-            //static int field2;
-            void method1() {}
-            //static void method2() {}
-        }
-        D d = new D();
-        d.field1 = 3;
-        d.method1();
+  void method() {
+    //로컬 클래스
+    class D {
+      D() { System.out.println("D 객체가 생성됨"); }
+      int field1;
+      //static int field2;
+      void method1() {}
+      //static void method2() {}
     }
+    D d = new D();
+    d.field1 = 3;
+    d.method1();
+  }
 }
 ```
 
 ```java
 public class Main {
-    public static void main(String[] args) {
-        A a = new A();
+  public static void main(String[] args) {
+    A a = new A();
 
-        //인스턴스 멤버 클래스 객체 사용
-        A.B b = a.new B();
-        b.field1 = 3;
-        b.method1();
+    //인스턴스 멤버 클래스 객체 사용
+    A.B b = a.new B();
+    b.field1 = 3;
+    b.method1();
 
-        //정적 멤버 클래스 객체 사용
-        A.C c = new A.C();
-        c.field1 = 3;
-        c.method1();
-        A.C.field2 = 3;
-        A.C.method2();
+    //정적 멤버 클래스 객체 사용
+    A.C c = new A.C();
+    c.field1 = 3;
+    c.method1();
+    A.C.field2 = 3;
+    A.C.method2();
 
-        //로컬 클래스 객체 사용
-        a.method();
-    }
+    //로컬 클래스 객체 사용
+    a.method();
+  }
 }
 
 /*
@@ -161,5 +161,182 @@ A 객체가 생성됨
 B 객체가 생성됨
 C 객체가 생성됨
 D 객체가 생성됨
+*/
+```
+
+<br>
+<br>
+
+# 중첩 클래스의 접근 제한
+
+## 바깥 필드와 메소드에서 사용 제한
+
+- 멤버 클래스가 인스턴스로 선언되었는지, 정적으로 선언되었는지에 따라 바깥 클래스의 필드와 메소드에도 사용 제한이 생김
+  - 인스턴스 멤버 클래스는 바깥 클래스의 인스턴스 필드의 초기값이나 인스턴스 메소드에서 객체를 생성할 수 있음
+  - 인스턴스 멤버 클래스는 정적 필드의 초기값이나 정적 메소드에서 객체를 생성할 수 없음
+  - 정적 멤버 클래스는 모든 필드의 초기값이나 모든 메소드에서 객체를 생성할 수 있음
+
+```java
+public class A {
+  //인스턴스 멤버 클래스
+  class B {}
+
+  //정적 멤버 클래스
+  static class C {}
+
+  //인스턴스 필드
+  B field1 = new B();
+  C field2 = new C();
+
+  //인스턴스 메소드
+  void method1() {
+    B var1 = new B();
+    C var2 = new C();
+  }
+
+  //정적 필드 초기화
+  //static B field3 = new B();
+  static C field4 = new C();
+
+  //정적 메소드
+  static void method2() {
+    //B var1 = new B();
+    C var2 = new C();
+  }
+}
+```
+
+<br>
+<br>
+
+## 멤버 클래스에서 사용 제한
+
+- 멤버 클래스 내부에서 바깥 클래스의 필드와 메소드에 접근할 때에도 제한이 따름
+  - 인스턴스 멤버 클래스 안에서는 바깥 클래스의 모든 필드와 모든 메소드에 접근 가능
+  - 정적 멤버 클래스 안에서는 바깥 클래스의 정적 필드와 정적 메소드에 접근 가능
+  - 정적 멤버 클래스 안에서는 인스턴스 필드와 인스턴스 메소드에 접근 불가능
+
+```java
+public class A {
+  int field1;
+  void method1() {}
+
+  static int field2;
+  static void method2() {}
+
+  class B {
+    void method() {
+      field1 = 10;
+      method1();
+
+      field2 = 10;
+      method2();
+    }
+  }
+
+  static class C {
+    void method() {
+      //field1 = 10;
+      //method1();
+
+      field2 = 10;
+      method2();
+    }
+  }
+}
+```
+
+<br>
+<br>
+
+## 로컬 클래스에서 사용 제한
+
+- 로컬 클래스 내부에서는 바깥 클래스의 필드나 메소드를 제한 없이 사용 가능
+- 문제점 : 로컬 클래스의 객체는 메소드 실행이 끝나도 힙 메모리에 존재하므로 계속 사용할 수 있지만,  
+  매개 변수나 로컬 변수는 메소드 실행이 끝나면 스택 메모리에서 사라지기 때문에 로컬 객체에서 사용할 경우 문제가 발생함
+- Java의 해결 방법 : 컴파일 시 로컬 클래스에서 사용하는 매개 변수나 로컬 변수의 값을 로컬 클래스 내부에 복사해두고 사용하게 함
+  - 매개 변수나 로컬 변수가 수정되어 값이 변경되어 로컬 클래스에 복사해 둔 값과 달라지는 문제를 해결하기 위해  
+    매개 변수나 로컬 변수를 `final`로 선언하여 수정을 막음
+- Java 7 이하 버전에서는 `final` 키워드 없이 선언된 매개 변수나 로컬 변수를 로컬 클래스에서 사용하면 컴파일 에러가 발생했음
+- Java 8부터는 `final` 키워드 없이 선언된 매개 변수와 로컬 변수를 사용해도 컴파일 에러가 발생하지 않음
+  - 그 이유는 `final`을 선언하지 않아도 `final`의 특성을 가지기 때문
+  - `final` 키워드의 존재 여부의 차이점은 로컬 클래스의 복사 위치
+    - `final` 키워드가 있다면 로컬 클래스의 메소드 내부에 지역 변수로 복사
+    - `final` 키워드가 없다면 로컬 클래스의 필드로 복사
+
+→ 로컬 클래스의 내부 복사 위치에 신경 쓸 필요 없이 로컬 클래스에서 사용된 매개 변수와 로컬 변수는 모두 `final` 특성을 갖는다는 것만 알면 됨
+
+```java
+public class Outter {
+  //Java 7 이하
+  public void method1(final int arg) {
+    final int localVariable = 1;
+    //arg = 100;
+    //localVariable = 100;
+
+    class Inner {
+      public void method() {
+        int result = arg + localVariable;
+      }
+    }
+  }
+
+  //Java 8 이상
+  public void method2(int arg) {
+    int localVariable = 1;
+    //arg = 100;
+    //localVariable = 100;
+
+    class Inner {
+      public void method() {
+        int result = arg + localVariable;
+      }
+    }
+  }
+}
+```
+
+<br>
+<br>
+
+## 중첩 클래스에서 바깥 클래스 참조 얻기
+
+- 중첩 클래스에서의 `this` 키워드는 바깥 클래스의 객체 참조가 아닌, 중첩 클래스의 객체 참조
+- 중첩 클래스 내부에서 `this.field`, `this.method()`로 호출하면 중첩 클래스의 필드와 메소드가 사용됨
+- 중첩 클래스 내부에서 바깥 클래스의 객체 참조를 얻으려면 `Outter.this.field`, `Outter.this.method()`의 방식으로 호출하면 됨
+
+```java
+public class Outter {
+  String field = "Outter-field";
+  void method() { System.out.println("Outter-method"); }
+
+  class Nested {
+    String field = "Nested-field";
+    void method() { System.out.println("Nested-method"); }
+
+    void print() {
+      System.out.println(this.field);
+      this.method();
+      System.out.println(Outter.this.field);
+      Outter.this.method();
+    }
+  }
+}
+```
+
+```java
+public class OutterExample {
+  public static void main(String[] args) {
+    Outter outter = new Outter();
+    Outter.Nested nested = outter.new Nested();
+    nested.print();
+  }
+}
+
+/*
+Nested-field
+Nested-method
+Outter-field
+Outter-method
 */
 ```
