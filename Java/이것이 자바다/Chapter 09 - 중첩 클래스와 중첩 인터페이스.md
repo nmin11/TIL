@@ -340,3 +340,71 @@ Outter-field
 Outter-method
 */
 ```
+
+<br>
+<br>
+
+# 중첩 인터페이스
+
+```java
+class A {
+  interface I {
+    void method();
+  }
+}
+```
+
+- 중첩 인터페이스는 클래스의 멤버로 선언된 인터페이스를 뜻함
+- 인터페이스를 클래스 내부에 선언하는 이유는 해당 클래스와 긴밀한 관계를 맺는 구현 클래스를 만들기 위함
+- 특히 UI 프로그래밍에서 이벤트를 처리할 목적으로 많이 활용됨
+
+```java
+public class Button {
+  interface OnClickListener {
+    void onClick();
+  }
+
+  OnclickListener listener;
+
+  void setOnClickListener(OnClickListener listener) {
+    this.listener = listener;
+  }
+
+  void touch() {
+    listener.onClick();
+  }
+}
+```
+
+```java
+public class CallListener implements Button.OnClickListener {
+  @Override
+  public void onClick() { System.out.println("전화를 겁니다."); }
+}
+```
+
+```java
+public class MessageListener implements Button.OnClickListener {
+  @Override
+  public void onClick() { System.out.println("메시지를 보냅니다."); }
+}
+```
+
+```java
+public class ButtonExample {
+  public static void main(String[] args) {
+    Button btn = new Button();
+
+    btn.setOnClickListener(new CallListener());
+    btn.touch();
+
+    btn.setOnClickListener(new MessageListener());
+    btn.touch();
+  }
+}
+
+/*
+전화를 겁니다.
+메시지를 보냅니다.
+*/
+```
