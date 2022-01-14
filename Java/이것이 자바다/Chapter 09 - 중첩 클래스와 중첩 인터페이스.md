@@ -408,3 +408,95 @@ public class ButtonExample {
 메시지를 보냅니다.
 */
 ```
+
+<br>
+<br>
+
+# 익명 객체
+
+- 익명(anonymous) 객체란 이름이 없는 객체를 뜻함
+- 단독으로 생성할 수 없고 클래스를 상속하거나 인터페이스를 구현해야만 생성할 수 있음
+- 주로 필드의 초기값이나 로컬 변수의 초기값, 매개 변수의 매개값으로 대입됨
+
+<br>
+<br>
+
+## 익명 자식 객체 생성
+
+- 생성 방법 : `부모클래스 [필드|변수] = new 부모클래스(매개값들) { 필드 및 메소드들 };`
+  - 부모 클래스를 상속해서 `{}` 안의 내용으로 자식 클래스를 선언한다는 뜻
+  - `new` 연산자는 이렇게 선언된 자식 클래스를 객체로 생성함
+  - `부모클래스(매개값들)`는 부모 생성자를 호출하는 코드
+  - `{}` 내부에서 필드나 메소드를 선언하거나 부모 클래스의 메소드를 재정의(오버라이딩)
+  - 일반 클래스와 달리 생성자를 선언할 수 없음
+
+```java
+public class Person {
+  void wake() { System.out.println("7시에 일어납니다."); }
+}
+```
+
+```java
+public class Anonymous {
+  //필드 초기값으로 대입
+  Person field = new Person() {
+    void work() { System.out.println("출근합니다."); }
+
+    @Override
+    void wake() {
+      System.out.println("6시에 일어납니다.");
+      work();
+    }
+  };
+
+  void method1() {
+    //로컬 변수값으로 대입
+    Person localVar = new Person() {
+      void walk() { System.out.println("산책합니다."); }
+
+      @Override
+      void wake() {
+        System.out.println("7시에 일어납니다.");
+        walk();
+      }
+    };
+
+    //로컬 변수 사용
+    localVar.wake();
+  }
+
+  void method2(Person person) {
+    person.wake();
+  }
+}
+```
+
+```java
+public class AnonymousExample {
+  public static void main(String[] args) {
+    Anonymous anony = new Anonymous();
+    anony.field.wake();
+    anony.method1();
+    anony.method2(
+      new Person() {
+        void study() { System.out.println("공부합니다."); }
+
+        @Override
+        void wake() {
+          System.out.println("8시에 일어납니다.");
+          study();
+        }
+      }
+    );
+  }
+}
+
+/*
+6시에 일어납니다.
+출근합니다.
+7시에 일어납니다.
+산책합니다.
+8시에 일어납니다.
+공부합니다.
+*/
+```
