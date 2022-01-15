@@ -506,3 +506,140 @@ public class AnonymousExample {
 공부합니다.
 */
 ```
+
+<br>
+<br>
+
+## 익명 구현 객체 생성
+
+```java
+인터페이스 [필드|변수] = new 인터페이스() {
+  인터페이스의 추상 메소드의 실체 메소드들
+  필드들
+  메소드들
+};
+```
+
+- 구현 클래스가 재사용되지 않고 오로지 해당 필드와 변수의 초기값으로만 사용하는 경우, 익명 구현 객체를 초기값으로 대입하는 것이 좋음
+- `{}` 안에는 인터페이스에 선언된 모든 추상 메소드들의 실체 메소드를 작성해야 함
+- 필드와 메소드는 실체 메소드에서만 사용 가능
+
+```java
+public interface RemoteControl {
+  public void turnOn();
+  public void turnOff();
+}
+```
+
+```java
+public class Anonymous {
+  //필드 초기값으로 대입
+  RemoteControl field = new RemoteControl() {
+    @Override
+    public void turnOn() { System.out.println("TV를 켭니다."); }
+
+    @Override
+    public void turnOff() { System.out.println("TV를 끕니다."); }
+  };
+
+  void method1() {
+    //로컬 변수값으로 대입
+    RemoteControl localVar = new RemoteControl() {
+      @Override
+      public void turnOn() { System.out.println("Audio를 켭니다."); }
+
+      @Override
+      public void turnOff() { System.out.println("Audio를 끕니다."); }
+    };
+
+    //로컬 변수 사용
+    localVar.turnOn();
+  }
+
+  void method2(RemoteControl rc) { rc.turnOn(); }
+}
+```
+
+```java
+public class AnonymousExample {
+  public static void main(String[] args) {
+    Anonymous anony = new Anonymous();
+    anony.field.turnOn();
+    anony.method1();
+    anony.method2(
+      new RemoteControl() {
+        @Override
+        public void turnOn() { System.out.println("SmartTV를 켭니다."); }
+
+        @Override
+        public void turnOff() { System.out.println("SmartTV를 끕니다."); }
+      }
+    );
+  }
+}
+
+/*
+TV를 켭니다.
+Audio를 켭니다.
+SmartTV를 켭니다.
+*/
+```
+
+<br>
+<br>
+
+## 익명 객체의 로컬 변수 사용
+
+- 익명 객체 내부에서는 바깥 클래스의 필드나 메소드를 제한 없이 사용할 수 있음
+- 문제는 메소드의 매개 변수나 로컬 변수를 익명 객체에서 사용할 때
+  - 메소드 내에서 생성된 익명 객체는 메소드 실행이 끝나도 힙 메모리에 존재하기에 계속 사용할 수 있음
+  - 그러나 매개 변수나 로컬 변수는 메소드 실행이 끝나면 스택 메모리에서 사라지기 때문에 익명 객체에서 사용할 수 없게 되므로 문제가 발생함
+- 그러므로 익명 객체 내부에서 메소드의 매개 변수나 로컬 변수를 사용할 경우, 이 변수들은 `final` 특성을 가져야 함
+  - Java 8 부터는 명시하지 않아도 자동으로 `final` 특성을 가짐
+
+```java
+public interface Calculatable {
+  public int sum();
+}
+```
+
+```java
+public class Anonymous {
+  private int field;
+
+  public void method(final int arg1, int arg2) {
+    final int var1 = 0;
+    int var2 = 0;
+    field = 10;
+
+    /* 사용 불가 로직들
+    arg1 = 20;
+    arg2 = 20;
+    var1 = 30;
+    var2 = 30;
+    */
+
+    Calculatable calc = new Calculatable() {
+      @Override
+      public int sum() {
+        return field + arg1 + arg2 + var1 + var2;
+      }
+    };
+
+    System.out.println(calc.sum());
+  }
+}
+```
+
+```java
+public class AnonymousExample {
+  public static void main(String[] args) {
+    Anonymous anony = new Anonymous();
+    anony.method(0, 0);
+  }
+}
+
+/*
+10
+*/
+```
