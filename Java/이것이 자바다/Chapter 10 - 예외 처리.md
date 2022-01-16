@@ -1,0 +1,156 @@
+# 예외와 예외 클래스
+
+- 예외란 사용자의 잘못된 조작 또는 개발자의 잘못된 코딩으로 인해 발생하는 프로그램 오류를 뜻함
+- 예외는 예외 처리(Exception Handling)를 통해 프로그램을 종료하지 않고 정상 실행 상태가 유지되도록 할 수 있음
+- 예외의 2가지 종류
+  - 일반 예외(Exception)
+    - 컴파일러 체크 예외라고도 불림
+    - Java 소스를 컴파일하는 과정에서 예외 처리 코드가 필요한지 검사하기 때문
+  - 실행 예외(Runtime Exception)
+    - 컴파일하는 과정에서 예외 처리 코드를 검사하지 않는 예외
+  - 컴파일 시 예외 처리를 확인하는지 여부에 차이가 있을 뿐, 2가지 예외는 모두 예외 처리가 필요함
+- Java에서는 예외를 클래스로 관리함
+  - JVM은 프로그램 실행 도중 예외가 발생하면 해당 예외 클래스로 객체를 생성하고, 예외 처리 코드에서 예외 객체를 이용할 수 있도록 해줌
+  - 모든 예외 클래스들은 `java.lang.Exception` 클래스를 상속받음
+
+(이미지 첨부 Exception.png)
+
+<br>
+<br>
+
+# 실행 예외
+
+- 실행 예외는 Java 컴파일러가 체크하지 않기 때문에 오로지 개발자의 경험에 따라 예외 처리 코드를 삽입해야 함
+- 실행 예외에 대한 예외 처리 코드가 없을 경우, 해당 예외가 발생하면 프로그램은 곧바로 종료됨
+- 그러므로 자주 발생되는 실행 예외를 알아둘 필요가 있음
+
+<br>
+<br>
+
+## NullPointerException
+
+- 가장 빈번하게 발생하는 실행 예외
+- 객체가 없는 상태에서 객체를 사용하려 할 때 발생하는 예외
+
+```java
+public class NullPointerExceptionExample {
+    public static void main(String[] args) {
+        String data = null;
+        System.out.println(data.toString());
+    }
+}
+```
+
+<br>
+<br>
+
+## ArrayIndexOutOfBoundsException
+
+- 배열에서 인덱스 범위를 초과해서 사용할 경우 발생하는 실행 예외
+
+```java
+public class ArrayIndexOutOfBoundsExceptionExample {
+    public static void main(String[] args) {
+        String data1 = args[0];
+        String data2 = args[1];
+
+        System.out.println("args[0] : " + data1);
+        System.out.println("args[1] : " + data2);
+    }
+}
+```
+
+<br>
+<br>
+
+## NumberFormatException
+
+- 문자열 데이터를 숫자로 변경하는 경우가 자주 있으며, 그럴 경우 가장 많이 사용되는 코드는 다음과 같음
+
+| 반환 타입 |            메소드            | 설명                                 |
+| :-------: | :--------------------------: | :----------------------------------- |
+|    int    |  Integer.parseInt(String s)  | 주어진 문자열을 정수로 변환해서 리턴 |
+|  double   | Double.parseDouble(String s) | 주어진 문자열을 실수로 변환해서 리턴 |
+
+- 하지만 만약 숫자로 변경할 수 없는 문자열이라면 `java.lang.NumberFormatException` 발생
+
+```java
+public class NumberFormatExceptionExample {
+    public static void main(String[] args) {
+        String data = "a100";
+        int value = Integer.parseInt(data);
+    }
+}
+```
+
+<br>
+<br>
+
+## ClassCastException
+
+- 타입 변환은 상위 클래스와 하위 클래스 간에 발생하고 구현 클래스와 인터페이스 간에서도 발생함
+- 이러한 관계가 아니라면 클래스는 다른 클래스로 타입 변환할 수 없음
+- 억지로 타입 변환을 시도할 경우 `java.lang.ClassCastException` 발생
+- 타입 변환 전에 `instanceof` 연산자를 활용해서 타입 변환이 가능한지 확인해보는 것이 좋음
+
+```java
+public class ClassCastExceptionExample {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        changeDog(dog);
+
+        Cat cat = new Cat();
+        changeDog(cat);
+    }
+
+    public static void changeDog(Animal animal) {
+        if (animal instanceof Dog) Dog dog = (Dog) animal;
+    }
+}
+
+class Animal {}
+class Dog extends Animal {}
+class Cat extends Animal {
+```
+
+<br>
+<br>
+
+# 예외 처리 코드
+
+- 예외 처리 코드란 예외 발생 시 프로그램의 갑작스러운 종료를 막고 정상 실행을 유지할 수 있도록 처리하는 코드를 뜻함
+- Java 컴파일러는 소스 파일을 컴파일할 때 일반 예외가 발생할 가능성이 있는 코드를 발견하면 컴파일 오류를 발생시켜 개발자로 하여금 강제적으로 예외 처리 코드를 작성하도록 요구함
+- 실행 예외는 개발자의 경험을 바탕으로 예외 처리 코드를 작성해야 함
+
+```java
+try {
+    예외 발생 가능 코드
+} catch (예외 클래스 e) {
+    예외 처리
+} finally {
+    항상 실행되는 코드
+}
+```
+
+- 예외 처리 코드는 `try-catch-final` 블록을 이용함
+  - `try-catch-final` 블록은 생성자 내부와 메소드 내부에 작성되어 일반 예외와 실행 예외가 발생할 경우 예외 처리를 할 수 있도록 해줌
+  - `try` 블록에는 예외 발생 가능 코드가 위치함
+    - `try` 블록의 코드에서 예외가 발생하지 않으면 `catch` 블록의 코드는 실행되지 않고 `finally` 블록의 코드를 실행함
+    - `try` 블록의 코드에서 예외가 발생하면 `catch` 블록의 예외 처리 코드를 실행하고 `finally` 블록의 코드를 실행함
+  - `finally` 블록은 생략 가능
+    - 예외 발생 여부와 상관없이 항상 실행할 내용이 있을 경우에만 작성할 것
+    - `try` 블록과 `catch` 블록에서 `return`문을 사용하더라도 `finally` 블록은 항상 실행됨
+
+```java
+public class TryCatchFinallyExample {
+    public static void main(String[] args) {
+        try {
+            Class clazz = Class.forName("java.lang.String2");
+        } catch (ClassNotFoundException e) {
+            System.out.println("클래스가 존재하지 않습니다.");
+        } finally {
+            System.out.println("즐거운 하루 되십시오!");
+        }
+    }
+}
+```
