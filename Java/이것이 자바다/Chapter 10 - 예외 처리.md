@@ -125,7 +125,7 @@ class Cat extends Animal {
 ```java
 try {
     예외 발생 가능 코드
-} catch (예외 클래스 e) {
+} catch(예외 클래스 e) {
     예외 처리
 } finally {
     항상 실행되는 코드
@@ -146,11 +146,70 @@ public class TryCatchFinallyExample {
     public static void main(String[] args) {
         try {
             Class clazz = Class.forName("java.lang.String2");
-        } catch (ClassNotFoundException e) {
+        } catch(ClassNotFoundException e) {
             System.out.println("클래스가 존재하지 않습니다.");
         } finally {
             System.out.println("즐거운 하루 되십시오!");
         }
     }
+}
+```
+
+<br>
+<br>
+
+# 예외 종류에 따른 처리 코드
+
+## 다중 catch
+
+```java
+try {
+    예외 발생 가능 코드
+} catch(ArrayIndexOutOfBoundsException e) {
+    예외 처리 1
+} catch(NumberFormatException e) {
+    예외 처리 2
+}
+```
+
+- `try` 블록 내부에서 발생할 수 있는 다양한 종류의 예외에 대처하기 위해 **다중 catch** 블록을 작성할 수 있음
+- 예외가 발생하면 해당하는 예외의 `catch` 블록 실행
+- `catch` 블록이 여러 개라 할지라도 단 하나의 `catch` 블록만 실행됨
+  - 하나의 예외가 발생하면 즉시 실행을 멈추고 해당 `catch` 블록으로 이동하기 때문
+
+<br>
+<br>
+
+## catch 순서
+
+- 다중 catch 블록을 작성할 때 주의할 점 : 상위 예외 클래스가 하위 예외 클래스보다 아래쪽에 위치해야 함
+  - `catch` 블록은 위에서부터 아래로 차례대로 검색됨
+  - 상위 예외가 위에 있으면 하위 예외가 발생해도 상위 예외를 발생시키니, 다중 catch 블록을 작성하는 의미가 없어짐
+
+```java
+try {
+    예외 발생 가능 코드
+} catch(ArrayIndexOutOfBoundsException e) {
+    예외 처리 1
+} catch(Exception e) {
+    예외 처리 2
+}
+```
+
+<br>
+<br>
+
+## 멀티 catch
+
+- Java 7부터 하나의 `catch` 블록에서 여러 개의 예외를 처리할 수 있도록 **multi catch** 기능이 추가됨
+- `catch`의 괄호 안에 동일하게 처리하고 싶은 예외를 `|`로 연결하면 됨
+
+```java
+try {
+    예외 발생 가능 코드
+} catch(ArrayIndexOutOfBoundsException | NumberFormatException e) {
+    예외 처리 1
+} catch(Exception e) {
+    예외 처리 2
 }
 ```
