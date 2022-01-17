@@ -213,3 +213,39 @@ try {
     예외 처리 2
 }
 ```
+
+<br>
+<br>
+
+# 자동 리소스 닫기
+
+- Java 7에서 새로 추가된 `try-with-resources`를 사용하면 예외 발생 여부와 상관없이 사용했던 리소스 객체의 `close()` 메소드를 호출해서 안전하게 리소스를 닫아줌
+- 리소스의 대표적인 예 : `FileInputStream`, `FileOutputStream`
+
+※ Java 6 이하 버전의 코드
+
+```java
+FileInputStream fis = null;
+try {
+    fis = new FileInputStream("file.txt");
+} catch(IOException e) {
+
+} finally {
+    if(fis != null) {
+        try {
+            fis.close();
+        } catch(IOException e) {}
+    }
+}
+```
+
+※ Java 7 이상 버전의 코드
+
+```java
+try(FileInputStream fis = new FileInputStream("file.txt")) {
+
+} catch(IOException) {}
+```
+
+- Java 7 이상 버전의 코드에서는 예외가 발생하면 자동으로 `close()` 메소드를 호출해줌
+- `try-with-resources`를 구현하고자 하는 리소스는 `java.lang.AutoColseable` 인터페이스를 구현하고 있어야 함
