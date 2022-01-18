@@ -249,3 +249,41 @@ try(FileInputStream fis = new FileInputStream("file.txt")) {
 
 - Java 7 이상 버전의 코드에서는 예외가 발생하면 자동으로 `close()` 메소드를 호출해줌
 - `try-with-resources`를 구현하고자 하는 리소스는 `java.lang.AutoColseable` 인터페이스를 구현하고 있어야 함
+
+<br>
+<br>
+
+# 예외 떠넘기기
+
+- 경우에 따라서 메소드를 호출한 곳으로 예외를 떠넘길 수도 있음
+- 이때 사용하는 키워드가 `throws`
+- `throws` 키워드는 메소드 선언부 끝에 작성되어 메소드에서 처리하지 않은 예외를 호출한 곳으로 떠넘기는 역할을 함
+- `throws` 키워드 뒤에는 떠넘길 예외 클래스를 쉼표로 구분해서 나열해주면 됨
+
+```java
+리턴타입 메소드명(매개변수들) throws 예외클래스들 {}
+```
+
+- `throws Exception` 만으로 모든 예외를 간단하게 떠넘길 수도 있음
+- `throws` 키워드가 붙어있는 메소드는 반드시 `try` 블록 내에서 호출되고 `catch` 블록에서 떠넘겨 받은 예외를 처리해야 함
+
+```java
+public void method1() {
+    try {
+        method2();
+    } catch(ClassNotFoundException e) {
+        System.out.println("클래스가 존재하지 않습니다.");
+    }
+}
+
+public void method2() throws ClassNotFoundException {
+    Class clazz = Class.forName("java.lang.String2");
+}
+```
+
+- `throws` 키워드가 붙은 메소드를 사용하기 위해 `try-catch`를 사용하지 않고 `throws` 키워드로 다시 예외를 떠넘길 수도 있음
+  - 이 경우, 결국 예외를 떠넘긴 메소드를 호출할 때 `try-catch`를 사용해야 함
+- `main()` 메소드에서도 `throws` 키워드를 사용해서 예외를 떠넘길 수 있는데, 이 경우에는 결국 JVM이 최종적으로 예외 처리를 하게 됨
+  - JVM은 예외 내용을 콘솔에 출력하는 것으로 예외 처리를 함
+  - `main()` 메소드에서 `throws Exception`을 붙이는 것은 프로그램이 알 수 없는 예외 내용을 출력하고 종료될 수도 있으므로 좋지 못한 방법
+  - 그러므로 `main()` 메소드에서는 `try-catch` 블록으로 예외 처리를 하는 것이 권장됨
