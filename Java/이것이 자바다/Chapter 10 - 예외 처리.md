@@ -287,3 +287,55 @@ public void method2() throws ClassNotFoundException {
   - JVM은 예외 내용을 콘솔에 출력하는 것으로 예외 처리를 함
   - `main()` 메소드에서 `throws Exception`을 붙이는 것은 프로그램이 알 수 없는 예외 내용을 출력하고 종료될 수도 있으므로 좋지 못한 방법
   - 그러므로 `main()` 메소드에서는 `try-catch` 블록으로 예외 처리를 하는 것이 권장됨
+
+<br>
+<br>
+
+# 사용자 정의 예외와 예외 발생
+
+**프로그램을 개발하다 보면 Java 표준 API에서 제공하는 예외 클래스만으로는 다양한 종류의 예외를 표현할 수 없으므로,**  
+**애플리케이션 서비스와 관련된 예외를 직접 정의하게 되는데 이를 Application Exception이라고 한다.**
+
+<br>
+
+## 사용자 정의 예외 클래스 선언
+
+```java
+public class XXXException extends [ Exception | RuntimeException ] {
+    public XXXException() {}
+    public XXXException(String message) { super(message); }
+}
+```
+
+- 컴파일러가 체크하는 일반 예외로 선언할 수도 있고, 컴파일러가 체크하지 않는 실행 예외로 선언할 수도 있음
+  - 경우에 맞게 `Exception`이나 `RuntimeException`을 상속하면 됨
+- 이름은 `Exception`으로 끝나는 것이 좋음
+- 필드, 생성자, 메소드 선언을 포함할 수 있지만 대부분 생성자 선언만을 포함하도록 구현함
+  - 생성자는 2개를 선언하는 것이 일반적
+    - 매개 변수가 없는 기본 생성자
+    - 예외 발생 원인을 전달하기 위해 `String` 타입의 매개 변수를 갖는 생성자
+      - 예외 메시지의 용도는 `catch` 블록의 예외 처리 코드에서 사용하기 위함
+
+<br>
+<br>
+
+## 예외 발생시키기
+
+```java
+throw new XXXException();
+throw new XXXException("메시지");
+```
+
+- 예외 발생 코드를 가지고 있는 메소드에서 `try-catch` 블록으로 예외 처리를 할 수 있지만, 대부분은 자신을 호출한 곳에서 예외를 처리하도록 `thorws` 키워드로 예외를 떠넘김
+
+```java
+public void method() throws XXXException {
+    throw new XXXException("메시지");
+}
+```
+
+```java
+try {
+    method();
+} catch(XXXException e) {}
+```
