@@ -339,3 +339,41 @@ try {
     method();
 } catch(XXXException e) {}
 ```
+
+<br>
+<br>
+
+# 예외 정보 얻기
+
+- 예외 발생 시 예외 객체는 `catch` 블록의 매개 변수에서 참조하게 되므로 매개 변수를 이용하면 예외 객체의 정보를 알 수 있음
+- 모든 예외 객체는 `Exception` 클래스를 상속하기 때문에 `Exception`이 가지는 메소드들 호출 가능
+  - 가장 많이 사용되는 메소드는 `getMessage()`와 `printStackTrace()`
+- `String` 타입의 메시지를 갖는 생성자를 이용하면 메시지는 자동적으로 예외 객체 내부에 저장됨
+
+```java
+public class AccountExample {
+    public static void main(String[] args) {
+        Account account = new Account();
+        account.deposit(10000);
+        System.out.println("예금액 : " + account.getBalance());
+
+        try {
+            account.withdraw(30000);
+        } catch(BalanceInsufficientException e) {
+            String message = e.getMessage();
+            System.out.println(message);
+            System.out.println();
+            e.printStackTrace();
+        }
+    }
+}
+
+/*
+예금액 : 10000
+잔고 부족 : 20000
+
+BalanceInsufficientException: 잔고 부족: 20000
+    at Account.withdraw(···)
+    at AccountExample.main(AccountExample.java:8)
+*/
+```
