@@ -53,3 +53,190 @@
 |     Objects     | 객체를 비교하거나 null 여부를 조사하는 등의 용도 |
 | StringTokenizer | 특정 문자로 구분된 문자열을 뽑아낼 때            |
 |     Random      | 난수를 얻을 때                                   |
+
+<br>
+<br>
+
+# Object 클래스
+
+- Object는 Java의 최상위 부모 클래스
+- 클래스 선언 시 `extends` 키워드로 다른 클래스를 상속하지 않으면 암시적으로 `java.lang.Object` 클래스를 상속하게 됨
+- Object 클래스는 필드가 없으며, 메소드들로 구성되어 있음
+  - 모든 클래스에서 Object의 메소드들을 사용할 수 있음
+
+<br>
+<br>
+
+## equals() : 객체 비교
+
+```java
+public boolean equals(Object obj) { ··· }
+```
+
+- 매개 타입이 Object이므로 모든 객체가 매개값으로 대입될 수 있음
+- 두 객체가 동일하면 `true`를, 그렇지 않다면 `false`를 리턴함
+- `==` 비교가 객체의 참조 번지를 비교하는 것과 달리, 객체의 실제 값을 가지고 비교할 수 있음
+  - 만약 `Member`라는 클래스와 `User`라는 클래스의 필드값이 모두 동일하다면 이 때에도 `true`가 리턴될 수 있으니,  
+    `instanceof` 연산자를 추가로 활용하여 기준 객체와 동일한 타입인지도 확인해주면 좋음
+
+<br>
+<br>
+
+## hashCode() : 객체 해시코드
+
+- 객체 해시코드란 객체를 식별할 하나의 정수값을 뜻함
+- 객체의 메모리 번지를 이용해서 해시코드를 만들어 리턴하기 때문에 객체마다 다른 값을 가지고 있음
+- 컬렉션 프레임워크의 `HashSet`, `HashMap`, `HashTable`은 다음 방법으로 두 객체가 동등한지 비교함
+  1. `hashCode()` 메소드를 실행해서 리턴된 해시코드 값이 같은지 확인
+  2. 해시코드 값이 다르면 다른 객체로 판단, 같으면 `equals()` 메소드로 다시 비교
+  3. `equals()` 메소드로 비교했을 때에도 같으면 같은 객체로 판단, 아니면 다른 객체로 판단
+
+<br>
+<br>
+
+## toString() : 객체 문자 정보
+
+- 객체의 문자 정보란 객체를 문자열로 표현한 값을 뜻함
+- 기본적으로 Object 클래스의 `toString()` 메소드는 `클래스명@16진수해시코드`로 구성된 문자 정보를 리턴함
+
+```java
+Object obj = new Object();
+System.out.println(obj.toString());
+
+/*
+java.lang.Object@de6ced
+*/
+```
+
+- Object의 `toString()` 메소드의 리턴값은 Java 애플리케이션에서는 별 값어치가 없는 정보이므로,  
+  Object 하위 클래스는 `toString()` 메소드를 재정의하여 간결하고 유익한 정보를 리턴하도록 되어 있음
+  - 예를 들어 `java.util.Date` 클래스는 `toString()` 메소드를 재정의하여 현재 시스템의 날짜와 시간 정보를 리턴하도록 변경했음
+  - 우리가 만드는 클래스도 `toString()` 메소드를 재정의하여 활용해볼 수도 있음
+
+<br>
+<br>
+
+## clone() : 객체 복제
+
+- 객체 복제란 원본 객체의 필드값과 동일한 값을 가지는 새로운 객체를 생성하는 것을 뜻함
+- 객체를 복제하는 이유는 원본 객체를 안전하게 보호하기 위함
+- 객체를 복제하는 방법에는 **얕은 복제** 와 **깊은 복제** 가 있음
+
+<br>
+
+### 얕은 복제 (thin clone)
+
+- 얕은 복제란 단순히 필드값을 복사해서 객체를 복제하는 것을 뜻함
+- 필드가 기본 타입일 경우 값을 복사하고, 참조 타입일 경우 객체의 번지를 복사함
+- `clone()` 메소드는 자신과 동일한 필드값을 가진 얕은 복제된 객체를 리턴함
+  - 이 메소드로 객체를 복제하려면 원본 객체는 반드시 `java.lang.Cloneable` 인터페이스를 구현하고 있어야 함
+  - 그렇지 않을 경우 `clone()` 메소드를 호출할 때 `CloneNotSupportedException` 예외가 발생하여 복제에 실패함
+  - `clone()`은 위의 예외 처리가 필요한 메소드이기 때문에 `try-catch` 구문도 필요함
+
+```java
+public class Member implements Cloneable {
+  public String id;
+  public String name;
+  public String password;
+  public int age;
+  public boolean adult;
+
+  public Member(String id, String name, String password, int age, boolean adult) {
+    this.id = id;
+    this.name = name;
+    this.password = password;
+    this.age = age;
+    this.adult = adult;
+  }
+
+  public Member getMember() {
+    Member cloned = null;
+    try {
+      cloned = (Member) clone();  //clone()의 리턴 타입은 Object이므로 캐스팅 필요
+    } catch(CloneNotSupportedException e) {}
+    return cloned;
+  }
+}
+```
+
+```java
+public class MemberExample {
+  public static void main(String[] args) {
+    Member original = new Member("존잘남", "로코", "1124", 28, true);
+    Member cloned = original.getMember();
+  }
+}
+```
+
+<br>
+
+### 깊은 복제 (deep clone)
+
+- 얕은 복제의 단점 : 참조 타입 필드의 경우 번지만 복제되기 때문에 얕은 복제 이후 참조 타입 필드를 수정하면 원본 객체도 수정됨
+- 깊은 복제란 참조하고 있는 객체도 복제하는 것을 뜻함
+- 깊은 복제를 하려면 `clone()` 메소드를 재정의해서 참조 객체를 복제하는 코드를 직접 작성해야 함
+
+```java
+public class Member implements Cloneable {
+  public String name;
+  public int age;
+  public int[] scores;
+  public Car car;
+
+  public Member(String name, int age, int[] scores, Car car) {
+    this.name = name;
+    this.age = age;
+    this.scores = scores;
+    this.car = car;
+  }
+
+  @Override
+  protected Object clone() throws CloneNotSupportedException {
+    Member cloned = (Member) super.clone();
+    cloned.scores = Arrays.copyOf(this.scores, this.scores.length);
+    cloned.car = new Car(this.car.model);
+    return cloned;
+  }
+
+  public Member getMember() {
+    Member cloned = null;
+    try {
+      cloned = (Member) clone();
+    } catch(CloneNotSupportedException e) {
+      e.printStackTrace();
+    }
+    return cloned;
+  }
+}
+```
+
+```java
+public class Car {
+  public String model;
+
+  public Car(String model) {
+    this.model = model;
+  }
+}
+```
+
+```java
+public class MemberExample {
+  public static void main(String[] args) {
+    Member original = new Member("로코", 28, new int[] {100, 100}, new Car("페라리"));
+    Member cloned = original.getMember();
+  }
+}
+```
+
+<br>
+<br>
+
+## finalize() : 객체 소멸자
+
+- 참조하지 않는 배열이나 객체는 **Garbage Collector** 가 힙 영역에서 자동적으로 소멸시킴
+- Garbage Collector는 객체를 소멸하기 직전에 마지막으로 `finalize()`를 실행시킴
+- Object의 `finalize()`는 기본적으로 실행 내용이 없음
+- 만약 객체가 소멸되기 전에 마지막으로 사용했던 자원을 닫고 싶거나, 중요한 데이터를 저장하고 싶다면 `finalize()`를 재정의하면 됨
+- Garbage Collector는 메모리가 부족할 때, CPU가 한가할 때 JVM에 의해 자동 실행되므로 `finalize()`의 호출 시점이 명확하지 않음
+  - 즉시 자원을 해제하거나 즉시 데이터를 최종적으로 저장해야 한다면 프로그램이 종료될 때 명시적으로 메소드를 호출할 것
