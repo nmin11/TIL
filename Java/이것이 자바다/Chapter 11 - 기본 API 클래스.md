@@ -240,3 +240,77 @@ public class MemberExample {
 - 만약 객체가 소멸되기 전에 마지막으로 사용했던 자원을 닫고 싶거나, 중요한 데이터를 저장하고 싶다면 `finalize()`를 재정의하면 됨
 - Garbage Collector는 메모리가 부족할 때, CPU가 한가할 때 JVM에 의해 자동 실행되므로 `finalize()`의 호출 시점이 명확하지 않음
   - 즉시 자원을 해제하거나 즉시 데이터를 최종적으로 저장해야 한다면 프로그램이 종료될 때 명시적으로 메소드를 호출할 것
+
+<br>
+<br>
+
+# Objects 클래스
+
+- Object와 유사한 이름을 가진 `java.util.Objects` 클래스는 정적 메소드들로 구성된 Object의 유틸리티 클래스
+
+| 리턴 타입 | 메소드                                                   | 설명                                                                       |
+| :-------: | :------------------------------------------------------- | :------------------------------------------------------------------------- |
+|    int    | compare(T a, T b, Comparator\<T> c)                      | 두 객체를 `Comparator`를 사용해서 비교                                     |
+|  boolean  | deepEquals(Object a, Object b)                           | 두 객체의 깊은 비교                                                        |
+|  boolean  | equals(Object a, Object b)                               | 두 객체의 얕은 비교                                                        |
+|    int    | hash(Object... values)                                   | 매개값이 저장된 배열의 해시코드 생성                                       |
+|    int    | hashCode(Object o)                                       | 객체의 해시코드 생성                                                       |
+|  boolean  | isNull(Object o)                                         | 객체가 null인지 조사                                                       |
+|  boolean  | nonNull(Object o)                                        | 객체가 null이 아닌지 조사                                                  |
+|     T     | requireNonNull(T obj)                                    | 객체가 null인 경우 예외 발생                                               |
+|     T     | requireNonNull(T obj, String message)                    | 객체가 null인 경우 메시지를 포함한 예외 발생                               |
+|     T     | requireNonNull(T obj, Supplier\<String> messageSupplier) | 객체가 null인 경우 람다식이 만든 메시지를 포함한 예외 발생                 |
+|  String   | toString(Object o)                                       | 객체의 `toString()` 값 리턴                                                |
+|  String   | toString(Object o, String nullDefault)                   | 첫 번째 매개값이 null이면 두 번째 매개값 리턴, 아니면 `toString()` 값 리턴 |
+
+<br>
+<br>
+
+## compare(T a, T b, Compare\<T> c) : 객체 비교
+
+```java
+public interface Comparator<T> {
+  int compare(T a, T b);
+}
+```
+
+- `Objects.compare(T a, T b, Comparator<T> c)` 메소드는 두 객체를 `Comparator`로 비교해서 int 값을 리턴함
+- `java.util.Comparator<T>`는 제네릭 인터페이스 타입으로, 두 객체를 비교하는 `compare(T a, T b)` 메소드가 내장되어 있음
+- a가 b보다 작으면 음수, 같으면 0, 크면 양수를 리턴하도록 구현 클래스를 만들어야 함
+
+```java
+class StudentComparator implements Comparator<Student> {
+  @Override
+  public int compare(Student a, Student b) {
+    if (a.sno < b.sno) return -1;
+    else if (a.sno == b.sno) return 0;
+    else return 1;
+    // return Integer.compare(a.sno, b.sno);
+  }
+}
+```
+
+<br>
+<br>
+
+## equals() / deepEquals() : 동등 비교
+
+- `Objects.equals(Object a, Object b)`는 두 객체의 동등을 비교하여 다음과 같은 결과를 리턴함
+
+|    a     |    b     |  Objects.equals(a, b)  |
+| :------: | :------: | :--------------------: |
+| not null | not null | `a.equals(b)`의 리턴값 |
+|   null   | not null |         false          |
+| not null |   null   |         false          |
+|   null   |   null   |          true          |
+
+- `Objects.deepEquals(Object a, Object b)` 역시 두 객체의 동등을 비교하지만,<br>a와 b가 서로 다른 배열일 경우 항목 값이 모두 같아야 `true`를 리턴함
+  - 이 경우 `Arrays.deepEquals(Object[] a, Object[] b)`와 동일함
+
+|          a           |          b           |        Objects.equals(a, b)        |
+| :------------------: | :------------------: | :--------------------------------: |
+| not null (not array) | not null (not array) |       `a.equals(b)`의 리턴값       |
+|   not null (array)   |   not null (array)   | `Arrays.deepEquals(a, b)`의 리턴값 |
+|         null         |       not null       |               false                |
+|       not null       |         null         |               false                |
+|         null         |         null         |                true                |
