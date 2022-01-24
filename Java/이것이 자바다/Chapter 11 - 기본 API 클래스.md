@@ -314,3 +314,12 @@ class StudentComparator implements Comparator<Student> {
 |         null         |       not null       |               false                |
 |       not null       |         null         |               false                |
 |         null         |         null         |                true                |
+
+<br>
+<br>
+
+## hash() / hashCode() : 해시코드 생성
+
+- `Objects.hash(Object··· values)`는 매개값으로 주어진 값들을 이용해서 해시 코드를 생성해줌
+- 주어진 매개값들로 배열을 생성하고 `Arrays.hashCode(Object[])`를 호출해서 해시코드를 얻고 이 값을 리턴함
+- `Objects.hashCode(Object o)`와 `o.hashCode()`는 같음
