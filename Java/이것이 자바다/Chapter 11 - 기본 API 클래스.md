@@ -323,3 +323,30 @@ class StudentComparator implements Comparator<Student> {
 - `Objects.hash(Object··· values)`는 매개값으로 주어진 값들을 이용해서 해시 코드를 생성해줌
 - 주어진 매개값들로 배열을 생성하고 `Arrays.hashCode(Object[])`를 호출해서 해시코드를 얻고 이 값을 리턴함
 - `Objects.hashCode(Object o)`와 `o.hashCode()`는 같음
+
+<br>
+<br>
+
+## isNull() / nonNull() / requireNonNull() : null 여부 조사
+
+- `Objects.isNull(Object o)`은 매개값이 null일 경우 true
+- `Objects.nonNull(Object o)`은 매개값이 not null일 경우 true
+- `Objects.requireNonNull()`은 다음 3가지로 오버로딩되어 있음
+
+| 리턴 타입 | 메소드                                               | 설명                                                             |
+| :-------: | :--------------------------------------------------- | :--------------------------------------------------------------- |
+|     T     | requireNonNull(T obj)                                | not null → obj<br>null → NullPointerException                    |
+|     T     | requireNonNull(T obj, String message)                | not null → obj<br>null → NullPointerException(message)           |
+|     T     | requireNonNull(T obj, Supplier\<String> msgSupplier) | not null → obj<br>null → NullPointerException(msgSupplier.get()) |
+
+<br>
+<br>
+
+## toString() : 객체 문자 정보
+
+- `Objects.toString()`은 객체의 문자 정보를 리턴하는데, 다음 2가지로 오버로딩되어 있음
+
+| 리턴 타입 | 메소드                                 | 설명                                          |
+| :-------: | :------------------------------------- | :-------------------------------------------- |
+|  String   | toString(Object o)                     | not null → o.toString()<br>null → "null"      |
+|  String   | toString(Object o, String nullDefault) | not null → o.toString()<br>null → nullDefault |
