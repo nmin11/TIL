@@ -350,3 +350,43 @@ class StudentComparator implements Comparator<Student> {
 | :-------: | :------------------------------------- | :-------------------------------------------- |
 |  String   | toString(Object o)                     | not null → o.toString()<br>null → "null"      |
 |  String   | toString(Object o, String nullDefault) | not null → o.toString()<br>null → nullDefault |
+
+<br>
+<br>
+
+# System 클래스
+
+- Java 프로그램은 운영체제 상에서 바로 실행되는 것이 아니라, JVM 위에서 실행됨
+- 따라서 운영체제의 모든 기능을 Java 코드로 직접 접근하기는 어려움
+- 이런 점을 보완하기 위해 `java.lang.System` 클래스는 운영체제의 일부 기능을 이용할 수 있도록 해줌
+  - 프로그램 종료, 키보드 입력, 모니터 출력, 메모리 정리, 현재 시간 읽기, 시스템 프로퍼티 읽기, 환경 변수 읽기 등
+- System 클래스의 모든 필드와 메소드는 **정적 필드** 와 **정적 메소드** 로 구성되어 있음
+
+<br>
+<br>
+
+## exit() : 프로그램 종료
+
+```java
+System.exit(0);
+```
+
+- 현재 실행하고 있는 프로세스를 강제 종료시키는 역할
+- int 매개값을 지정하도록 되어 있는데, 이 값을 **종료 상태값** 이라고 함
+  - 일반적인 정상 종료의 경우 `0`
+  - 어떤 값을 주더라도 종료가 되는데, 만약 특정 값이 입력되었을 경우에만 종료하고 싶다면 Java의 보안 관리자를 직접 실행해서 종료 상태값을 확인해야 함
+  - 보안 관리자를 활용하고 싶다면 `checkExit()` 메소드를 재정의할 것
+
+<br>
+<br>
+
+## gc() : Garbage Collector 실행
+
+```java
+System.gc();
+```
+
+- JVM은 메모리를 알아서 자동으로 관리해줌
+  - 메모리가 부족할 때와 CPU가 한가할 때 Garbage Collector를 실행시켜서 사용하지 않는 객체를 자동 제거
+- Garbage Collector는 개발자가 직접 코드로 실행할 수 없지만, 가능한 한 빨리 실행해 달라고 요청할 수는 있음
+- Garbage Collector가 너무 자주 작동하면 프로그램 전체의 성능이 떨어지므로, `gc()` 메소드를 쓸 일은 거의 없음
