@@ -390,3 +390,69 @@ System.gc();
   - 메모리가 부족할 때와 CPU가 한가할 때 Garbage Collector를 실행시켜서 사용하지 않는 객체를 자동 제거
 - Garbage Collector는 개발자가 직접 코드로 실행할 수 없지만, 가능한 한 빨리 실행해 달라고 요청할 수는 있음
 - Garbage Collector가 너무 자주 작동하면 프로그램 전체의 성능이 떨어지므로, `gc()` 메소드를 쓸 일은 거의 없음
+
+<br>
+<br>
+
+## currentTimeMillis() / nanoTime() : 현재 시각 읽기
+
+```java
+long time = System.currentTimeMillis();
+long time = System.nanoTime();
+```
+
+- 컴퓨터의 시계로부터 현재 시간을 읽어서 밀리세컨드(1/10³) 단위와 나노세컨드(1/10⁹) 단위의 long 값 리턴
+- 주로 프로그램의 실행 소요 시간 측정에 사용됨
+
+```java
+public class SystemTimeExample {
+  public static void main(String[] args) {
+    long startTime = System.nanoTime();
+
+    int sum = 0;
+    for (int i = 1; i <= 1000000; i++) {
+      sum += i;
+    }
+
+    long finishTime = System.nanoTime();
+
+    System.out.println("1 ~ 1000000 까지의 합 : " + sum);
+    System.out.println("소요 시간 : " + (finishTime - startTime) + " nano second");
+  }
+}
+```
+
+<br>
+<br>
+
+## getProperty() : System Property 읽기
+
+```java
+String value = System.getProperty(String key);
+```
+
+- System Property는 JVM이 시작할 때 자동 설정되는 시스템의 속성값을 뜻함
+- System Property는 key와 value로 구성되어 있음
+- 매개 변수 없이 사용하면 모든 속성들을 불러올 수 있음
+
+|      key       | 설명                             |
+| :------------: | :------------------------------- |
+|  java.version  | Java 버전                        |
+|   java.home    | JRE 파일의 경로                  |
+|    os.name     | OS 이름                          |
+| file.separator | 파일 구분자                      |
+|   user.name    | 사용자 이름                      |
+|   user.home    | 사용자의 홈 디렉토리             |
+|    user.dir    | 사용자가 현재 작업 중인 디렉토리 |
+
+<br>
+<br>
+
+## getenv() : 환경 변수 읽기
+
+```java
+String value = System.getenv(String name);
+```
+
+- 대부분의 운영체제는 실행되는 프로그램들에게 유용한 정보를 제공할 목적으로 **환경 변수(Environment Variable)** 를 제공함
+  - 사용자가 직접 설정할 수도 있음
