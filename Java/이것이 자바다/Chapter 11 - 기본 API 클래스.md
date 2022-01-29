@@ -456,3 +456,262 @@ String value = System.getenv(String name);
 
 - 대부분의 운영체제는 실행되는 프로그램들에게 유용한 정보를 제공할 목적으로 **환경 변수(Environment Variable)** 를 제공함
   - 사용자가 직접 설정할 수도 있음
+
+<br>
+<br>
+
+# Class 클래스
+
+- Java는 클래스와 인터페이스의 메타 데이터를 `java.lang.Class`로 관리함
+  - 메타 데이터란 클래스의 이름, 생성자 정보, 필드 정보, 메소드 정보를 뜻함
+
+<br>
+<br>
+
+## getClass() / forName() : Class 객체 얻기
+
+```java
+Class clazz = obj.getClass();
+```
+
+- 프로그램에서 Class 객체를 얻기 위해서는 Object 클래스의 `getClass()` 메소드를 이용하면 됨
+  - Object 클래스는 모든 클래스의 최상위 클래스이므로 모든 클래스에서 `getClass()`를 호출할 수 있음
+- `getClass()` 메소드는 해당 클래스로 객체를 생성했을 때만 사용 가능
+
+```java
+try {
+  Class clazz = Class.forName(String className);
+} catch (ClassNotFoundException e) {}
+```
+
+- `forName()`을 사용하면 객체를 생성하기 전에 직접 Class 객체를 얻을 수 있음
+- `forName()` 메소드는 패키지가 포함된 클래스 전체 이름을 매개값으로 받아서 Class 객체를 리턴함
+
+<br>
+<br>
+
+## getDeclaredConstructors() / getDeclaredFields() / getDeclaredMethods() : Reflection
+
+```java
+Constructor[] constructors = clazz.getDeclaredConstructors();
+Field[] fields = clazz.getDeclaredFields();
+Method[] methods = clazz.getDeclaredMethods();
+```
+
+- Reflection : Class 객체를 이용해서 클래스의 생성자, 필드, 메소드 정보를 얻어내는 것
+- Constructor, Field, Method 클래스는 모두 `java.lang.reflect` 패키지에 소속되어 있음
+- `getDeclaredFields()`와 `getDeclaredMethods()`는 클래스에 선언된 멤버만 가져오고 상속된 멤버는 가져오지 않음
+  - 만약 상속된 멤버도 얻고 싶다면 `getFields()`나 `getMethods()`를 이용해야 함
+  - 단, `getFields()`와 `getMethods()`는 public 멤버만 가져옴
+
+<br>
+<br>
+
+## newInstance() : 동적 객체 생성
+
+```java
+try {
+  Class clazz = Class.forName("className");
+  Object obj = clazz.newInstance();
+} catch (ClassNotFoundException e) {
+} catch (InstantiationException e) {
+} catch (IllegalAccessException e) {
+}
+```
+
+- Class 객체를 이용하면 new 연산자를 사용하지 않아도 동적으로 객체를 만들 수 있음
+- 이 방법은 코드 작성 시에 클래스 이름을 결정할 수 없고, 런타임 시에 클래스 이름이 결정되는 경우에 매우 유용하게 사용됨
+- `newInstance()` 메소드는 기본 생성자를 호출해서 객체를 생성하기 때문에 반드시 클래스에 기본 생성자가 존재해야 함
+  - 만약 매개 변수가 있는 생성자를 호출하고 싶다면 reflection으로 Constructor 객체를 얻은 이후에 `newInstance()` 메소드를 호출하면 됨
+- `InstantiationException`은 해당 클래스가 추상 클래스이거나 인터페이스일 경우에 발생
+- `IllegalAccessException`은 클래스나 생성자가 접근 제한자로 인해 접근할 수 없는 경우에 발생
+- `newInstance()`의 리턴 타입은 Object이므로 이것을 원래 클래스 타입으로 변환해야만 메소드를 사용할 수 있음 (강제 타입 변환)
+
+<br>
+<br>
+
+# String 클래스
+
+- 어떤 프로그램이건 문자열은 데이터로서 아주 많이 사용됨
+- 그러므로 문자열 생성, 추출, 비교, 찾기, 분리, 변환 등에 대한 메소드를 잘 익혀두어야 함
+
+<br>
+<br>
+
+## String 생성자
+
+- Java의 문자열은 `java.lang.String` 클래스의 인스턴스로 관리됨
+- 소스상에서 문자열 리터럴은 String 객체로 자동 생성되지만, String 클래스의 다양한 생성자를 이용해서 직접 String 객체를 생성할 수도 있음
+- String 클래스에는 Deprecated된 생성자를 제외하면 약 13개의 생성자가 존재함
+
+<br>
+
+### byte[] 배열을 문자열로 변환하기
+
+- 파일의 내용을 읽거나 네트워크를 통해 받은 데이터는 보통 `byte[]` 배열이므로 이를 문자열로 변환하기 위한 생성자들이 존재함
+
+```java
+String str = new String(byte[] bytes);
+```
+
+→ 배열 전체를 String 객체로 생성
+
+```java
+String str = new String(byte[] bytes, String charsetName);
+```
+
+→ 지정한 문자셋으로 디코딩
+
+```java
+String str = new String(byte[] bytes, int offset, int length);
+```
+
+→ 배열의 offset 인덱스 위치부터 length만큼 String 객체로 생성
+
+```java
+String str = new String(byte[] bytes, int offset, int length, String charsetName);
+```
+
+→ 지정한 문자셋으로 디코딩
+
+```java
+public class ByteToStringExample {
+  public static void main(String[] args) {
+    byte[] bytes = { 72, 101, 108, 108, 111, 32, 74, 97, 118, 97 };
+
+    String str1 = new String(bytes);
+    System.out.println(str1);
+
+    String str2 = new String(bytes, 6, 4);
+    System.out.println(str2);
+  }
+}
+
+/*
+Hello Java
+Java
+*/
+```
+
+<br>
+<br>
+
+## String 메소드
+
+| 리턴 타입 | 메소드                                                    | 설명                                              |
+| :-------: | :-------------------------------------------------------- | :------------------------------------------------ |
+|   char    | charAt(int index)                                         | 특정 위치의 문자 리턴                             |
+|  boolean  | equals(Object o)                                          | 두 문자열 비교                                    |
+|  byte[]   | getBytes()                                                | byte[]로 리턴                                     |
+|  byte[]   | getBytes(Charset charset)                                 | 주어진 문자셋으로 인코딩한 byte[]로 리턴          |
+|    int    | indexOf(String str)                                       | 문자열 내에서 주어진 문자열의 위치 리턴           |
+|    int    | length()                                                  | 총 문자의 수 리턴                                 |
+|  String   | replace(CharSequence target,<br>CharSequence replacement) | target 부분을 replacement로 대치한 문자열 리턴    |
+|  String   | substring(int beginIndex)                                 | beginIndex에서 끝까지 잘라낸 문자열 리턴          |
+|  String   | sunstring(int beginIndex,<br>int endIndex)                | beginIndex에서 endIndex 전까지 잘라낸 문자열 리턴 |
+|  String   | toLowerCase()                                             | 알파벳 소문자로 변환한 문자열 리턴                |
+|  String   | toUpperCase()                                             | 알파벳 대문자로 변환한 문자열 리턴                |
+|  String   | trim()                                                    | 앞뒤 공백을 제거한 문자열 리턴                    |
+|  String   | valueOf(int i)<br>valueOf(double d)                       | 기본 타입값을 문자열로 리턴                       |
+
+<br>
+
+### charAt() : 문자 추출
+
+- 매개값으로 주어진 인덱스의 문자를 리턴
+
+<br>
+
+### equals() : 문자열 비교
+
+- 기본 타입 변수의 값을 비교할 때는 `==` 연산자를 사용하지만, 문자열을 비교할 때에는 `eqauls()` 사용이 권장됨
+  - 문자열 리터럴이 같더라도 참조하는 번지가 다를 수 있기 때문
+- 원래 `equals()`는 Object의 번지 비교 메소드이지만, String 클래스가 오버라이딩해서 문자열 리터럴을 비교하도록 변경했음
+
+<br>
+
+### getBytes() : byte 배열로 변환
+
+```java
+byte[] bytes = "문자열".getBytes();
+byte[] bytes = "문자열".getBytes(Charset charset);
+```
+
+- 종종 문자열을 byte 배열로 변환하는 경우가 있음
+  - 네트워크 문자열을 전송하거나, 문자열을 암호화할 때
+- 매개 변수가 없는 `getBytes()`는 시스템의 기본 문자셋으로 인코딩된 byte 배열을 리턴
+- 특정 문자셋으로 인코딩된 byte 배열을 얻으려면 문자셋을 매개 변수로 넣어줘야 함
+
+```java
+try {
+  byte[] bytes = "문자열".getBytes("EUC-KR");
+  byte[] bytes = "문자열".getBytes("UTF-8");
+} catch (UnsupportedEncodingException e) {}
+```
+
+- byte 배열을 다시 문자열로 디코딩할 때에는 어떤 문자셋으로 인코딩된 byte 배열이냐에 따라서 디코딩 방법이 다름
+
+```java
+String str = new String(byte[] bytes, String charsetName);
+```
+
+- 만약 문자셋을 매개 변수로 주지 않을 경우 시스템 기본 문자셋으로 디코딩하게 됨
+
+<br>
+
+### indexOf() : 문자열 찾기
+
+- 매개값으로 주어진 문자열이 시작되는 인덱스 리턴
+- 만약 주어진 문자열이 포함되어 있지 않으면 `-1` 리턴
+
+<br>
+
+### length() : 문자열 길이
+
+- 문자열의 길이(문자의 수) 리턴
+
+<br>
+
+### replace() : 문자열 대치
+
+- 첫 번째 매개값 문자열을 찾아 두 번째 매개값 문자열로 대치한 새로운 문자열을 생성하고 리턴
+
+<br>
+
+### substring() : 문자열 잘라내기
+
+- 주어진 인덱스에서 문자열 추출
+- 매개값이 하나일 경우 해당 인덱스부터 끝까지 추출
+- 매개값이 둘일 경우 두 인덱스 사이의 문자열 추출
+  - beginIndex를 포함하고, endIndex를 포함하지 않는 그 이전까지의 문자열
+
+<br>
+
+### toLowerCase() / toUpperCase() : 알파벳 소·대문자 변경
+
+- `toLowerCase()`는 문자열을 모두 소문자로 바꾼 새로운 문자열 리턴
+- `toUpperCase()`는 문자열을 모두 대문자로 바꾼 새로운 문자열 리턴
+- 주로 영어로 된 두 문자열을 대소문자와 관계없이 비교할 때 이용됨
+  - 두 문자열을 비교하기 전에 두 메소드 중 하나를 둘 다에 적용하여 대소문자를 맞춘 이후에 서로 비교하는 방식
+  - 아니면 굳이 변환할 필요 없이 `equalsIgnoreCase()` 메소드를 사용해서 이 작업을 생략할 수도 있음
+
+<br>
+
+### trim() : 문자열 앞뒤 공백 잘라내기
+
+- 문자열의 앞뒤 공백을 제거한 새로운 문자열을 생성하고 리턴
+
+<br>
+
+### valueOf() : 문자열 변환
+
+```java
+static String valueOf(boolean b)
+static String valueOf(char c)
+static String valueOf(int i)
+static String valueOf(long l)
+static String valueOf(double d)
+static String valueOf(float f)
+```
+
+- 기본 타입의 값을 문자열로 변환
