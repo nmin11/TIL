@@ -715,3 +715,458 @@ static String valueOf(float f)
 ```
 
 - 기본 타입의 값을 문자열로 변환
+
+<br>
+<br>
+
+# StringTokenizer 클래스
+
+- 문자열을 특정 구분자를 기준으로 분리하는 방법
+  - String의 `split()` 메소드 이용하기
+    - 정규표현식으로 구분함
+  - `java.util.StringTokenizer` 클래스 이용하기
+    - 문자로 구분함
+
+<br>
+<br>
+
+## split()
+
+```java
+String[] result = "문자열".split("정규표현식");
+```
+
+- 정규표현식을 구분자로 해서 문자열을 분리한 후 배열에 저장하고 리턴함
+
+```java
+public class StringSplitExample {
+  public static void main(String[] args) {
+    String text = "홍길동&이수홍,박연수,김자바-최명호";
+    String[] names = text.split("&|,|-");
+
+    for (String name : names) {
+      System.out.println(name);
+    }
+  }
+}
+
+/*
+홍길동
+이수홍
+박연수
+김자바
+최명호
+*/
+```
+
+<br>
+<br>
+
+## StringTokenizer 클래스
+
+```java
+StringTokenizer st = new StringTokenizer("문자열", "구분자");
+```
+
+- 구분자가 한 종류일 경우에는 StringTokenizer 클래스를 사용해서 손쉽게 문자열을 분리해낼 수 있음
+- 구분자를 생략할 경우 공백이 기본 구분자가 됨
+
+```java
+String text = "홍길동/이수홍/박연수";
+StringTokenizer st = new StringTokenizer(text, "/");
+```
+
+- 추가적으로 토큰과 관련된 메소드들을 제공해줌
+
+| 리턴 타입 | 메소드          | 설명                          |
+| :-------: | :-------------- | :---------------------------- |
+|    int    | countTokens()   | 꺼내지 않고 남아 있는 토큰 수 |
+|  boolean  | hasMoreTokens() | 남아 있는 토큰이 있는지 여부  |
+|  String   | nextToken()     | 토큰을 하나씩 꺼내옴          |
+
+- `nextToken()` 메소드로 토큰을 하나씩 꺼내오면 StringTokenizer 객체에는 해당 토큰이 없어짐
+  - 더 이상 가져올 토큰이 없다면 `java.util.NoSuchElementException` 발생
+  - 그러므로 토큰을 가져오기 전에 미리 `hasMoreTokens()`를 사용해서 확인해주면 좋음
+
+```java
+public class StringTokenizerExample {
+  public static void main(String[] args) {
+    String text = "홍길동/이수홍/박연수";
+
+    // 전체 토큰 수를 얻어서 for문으로 루핑하는 방법
+    StringTokenizer st = new StringTokenizer(text, "/");
+    int count = st.countTokens();
+    for (int i = 0; i < count; i++) {
+      String token = st.nextToken();
+      System.out.println(token);
+    }
+
+    System.out.println();
+
+    // 남아 있는 토큰을 확인하면서 while문으로 루핑하는 방법
+    st = new StringTokenizer(text, "/");
+    while (st.hasMoreTokens()) {
+      String token = st.nextToken();
+      System.out.println(token);
+    }
+  }
+}
+
+/*
+홍길동
+이수홍
+박연수
+
+홍길동
+이수홍
+박연수
+*/
+```
+
+<br>
+<br>
+
+# StringBuffer, StringBuilder 클래스
+
+- 문자열을 저장하는 String은 내부의 문자열을 수정할 수 없음
+  - 예를 들어 `replace()` 메소드는 내부의 문자를 대치하는 것이 아닌, 대치된 새로운 문자열을 리턴하는 것
+
+```java
+String str = "ABC";
+str += "DEF";
+```
+
+※ 이런 연산을 하게 되면 String 객체는 내부 데이터를 수정할 수 없으므로 새로운 String 객체를 만들어내야 한다.  
+문자열을 결합하는 + 연산을 많이 하면 할수록 그만큼 String 객체의 수가 늘어나기 때문에 프로그램 성능을 느리게 하는 요인이 된다.
+
+→ 그렇기 때문에 문자열을 합칠 때는 `java.lang` 패키지의 **StringBuffer** 또는 **StringBuilder** 클래스를 사용하는 것이 권장됨
+
+- 두 클래스는 내부 buffer(데이터를 임시 저장하는 메모리)에 문자열을 저장해두고, 그 안에서 추가, 수정, 삭제 작업을 할 수 있도록 설계되어 있음
+- String과는 달리 새로운 객체를 만들지 않고도 문자열을 조작할 수 있음
+- 두 클래스의 사용 방법은 동일
+- 두 클래스의 차이점
+  - StringBuffer는 멀티 스레드 환경에서 사용할 수 있도록 동기화가 적용되어 있어 스레드에 안전함
+  - StringBuilder는 단일 스레드 환경에서만 사용하도록 설계되어 있음
+
+※ 아직 스레드를 학습하지 않았기 때문에 **StringBuilder** 클래스를 자세히 살펴볼 것
+
+<br>
+
+## StringBuilder 클래스
+
+- StringBuilder의 생성자들
+  - 기본 생성자는 16개의 문자들을 저장할 수 있는 초기 buffer를 만듦
+  - `StringBuilder(int capacity)` 생성자는 capacity로 주어진 개수만큼 문자들을 저장할 수 있는 초기 buffer를 만듦
+    - StringBuilder는 buffer가 부족할 경우 자동으로 buffer 크기를 늘리기 때문에 사실 초기 buffer의 크기는 그다지 중요하지 않음
+  - `StringBuilder(String str)` 생성자는 str로 주어진 매개값을 buffer의 초기값으로 저장
+
+```java
+StringBuilder sb = new StringBuilder();
+StringBuilder sb = new StringBuilder(16);
+StringBuilder sb = new StringBuilder("Java");
+```
+
+- StringBuilder의 메소드들
+  - `append()`와 `insert()` 메소드는 매개 변수가 다양한 타입으로 오버로딩되어 있기 때문에 대부분의 값을 대입할 수 있음
+
+| 메소드                                  | 설명                                              |
+| :-------------------------------------- | :------------------------------------------------ |
+| append(···)                             | 문자열 끝에 주어진 매개값 추가                    |
+| insert(int offset, ···)                 | 문자열 중간에 주어진 매개값 추가                  |
+| delete(int start, int end)              | 문자열의 일부분 삭제                              |
+| deleteCharAt(int index)                 | 문자열에서 주어진 index의 문자 삭제               |
+| replace(int start, int end, String str) | 문자열의 일부분을 다른 문자열로 대치              |
+| reserve()                               | 문자열의 순서를 뒤바꿈                            |
+| setCharAt(int index, char ch)           | 문자열에서 주어진 index의 문자를 다른 문자로 대치 |
+
+```java
+public class StringBuilderExample {
+  public static void main(String[] args) {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("Java ");
+    sb.append("Program Study");
+    System.out.println(sb.toString());
+
+    sb.insert(4, "2");
+    System.out.println(sb.toString());
+
+    sb.setCharAt(4, '3');
+    System.out.println(sb.toString());
+
+    sb.replace(6, 13, "Book");
+    System.out.println(sb.toString());
+
+    sb.delete(4, 5);
+    System.out.println(sb.toString());
+
+    int length = sb.length();
+    System.out.println("문자수" + length);
+  }
+}
+
+/*
+Java Program Study
+Java2 Program Study
+Java3 Program Study
+Java3 Book Study
+Java Book Study
+*/
+```
+
+<br>
+<br>
+
+# 정규 표현식과 Pattern 클래스
+
+- 문자열이 정해져 있는 형식(정규표현식 : Regular Expression)으로 구성되어 있는지 검증해야 하는 경우가 있음
+  - 예를 들어 이메일, 전화번호 등
+
+<br>
+<br>
+
+## 정규 표현식 작성 방법
+
+- API Document에서 `java.util.regex.Pattern` 클래스의 **Summary of regular-expression constructs** 를 참조하면 되지만 이해하기가 쉽지 않음
+- 간단히 말해서 정규 표현식은 문자 또는 숫자 기호와 반복 기호가 결합된 문자열
+
+|   기호   | 설명                                |
+| :------: | :---------------------------------- |
+|  [abc]   | a, b, c 중 하나의 문자              |
+|  [^abc]  | a, b, c 이외의 하나의 문자          |
+| [a-zA-Z] | a~z, A~Z 중 하나의 문자             |
+|    \d    | 1개의 숫자 [0-9]                    |
+|    \s    | 공백                                |
+|    \w    | 1개의 알파벳 또는 숫자 [a-zA-Z_0-9] |
+|    ?     | 없거나 1개                          |
+|    \*    | 없거나 1개 이상                     |
+|    +     | 1개 이상                            |
+|   {n}    | 정확히 n개                          |
+|   {n,}   | 최소한 n개                          |
+|  {n,m}   | n개에서 m개까지                     |
+|    ()    | Grouping                            |
+
+<br>
+
+### 전화번호 정규 표현식 예시
+
+```java
+(02|010)-\d{3,4}-\d{4}
+```
+
+|   기호    | 설명                  |
+| :-------: | :-------------------- |
+| (02\|010) | 02 또는 010           |
+|     -     | - 포함                |
+|  \d{3,4}  | 3자리 또는 4자리 숫자 |
+
+<br>
+
+### 이메일 정규 표현식 예시
+
+```java
+\w+@\w+\.\w+(\.\w+)?
+```
+
+|   기호   | 설명                               |
+| :------: | :--------------------------------- |
+|   \w+    | 1개 이상의 알파벳 또는 숫자        |
+|    \.    | .                                  |
+| (\.\w+)? | \.\w+이 없거나 한 번 더 올 수 있음 |
+
+<br>
+<br>
+
+## Pattern 클래스
+
+- `java.util.regex.Pattern` 클래스의 정적 메소드 `matches()`를 활용해서 문자열을 정규 표현식으로 검증할 수 있음
+
+```java
+boolean result = Pattern.matches("정규식", "검증할 문자열");
+```
+
+<br>
+<br>
+
+# Arrays 클래스
+
+- Arrays 클래스는 배열 복사, 항목 정렬, 항목 검색과 같은 배열 조작 기능을 가지고 있음
+- Arrays 클래스의 모든 메소드는 static이므로 Arrays 클래스를 통해서 바로 사용 가능함
+
+| 리턴 타입 | 메소드                            | 설명                                                                                     |
+| :-------: | :-------------------------------- | :--------------------------------------------------------------------------------------- |
+|    int    | binarySearch(배열, 찾는값)        | 전체 항목에서 찾는 값이 있는 인덱스 리턴                                                 |
+| 타겟 배열 | copyOf(원본배열, 복사길이)        | 원본 배열에서 복사할 길이만큼 복사한 배열 리턴<br>원본 배열의 길이보다 길 경우 전체 복사 |
+| 타겟 배열 | copyOfRange(원본배열, start, end) | 원본 배열의 시작 인덱스에서 끝 인덱스까지 복사한 배열 리턴                               |
+|  boolean  | deepEquals(배열, 배열)            | 두 배열의 깊은 비교                                                                      |
+|  boolean  | equals(배열, 배열)                | 두 배열의 얕은 비교                                                                      |
+|   void    | fill(배열, 값)                    | 전체 배열 항목에서 동일한 값을 저장                                                      |
+|   void    | fill(배열, start, end, 값)        | 시작 인덱스부터 끝 인덱스까지의 항목에 동일한 값을 저장                                  |
+|   void    | sort(배열)                        | 배열의 전체 항목을 오름차순으로 정렬                                                     |
+|  String   | toString(배열)                    | 배열을 문자열로 변환해서 리턴                                                            |
+
+<br>
+<br>
+
+## 배열 복사
+
+- `copyOf(원본배열, 복사길이)`와 `copyOfRange(원본배열, start, end)` 사용 가능
+- `copyOf(원본배열, 복사길이)`는 원본 배열의 0번 인덱스에서 복사한 길이만큼 복사한 배열을 리턴
+  - 복사할 길이가 원본 배열의 길이보다 크거나 같을 경우, 원본 배열이 그대로 복사됨
+
+```java
+char[] arr1 = {'J', 'A', 'V', 'A'};
+char[] arr2 = Arrays.copyOf(arr1, arr1.length);
+```
+
+- `copyOfRange(원본배열, start, end)`는 원본 배열의 시작 인덱스에서 끝 인덱스 직전까지 복사한 배열을 리턴
+
+```java
+char[] arr1 = {'J', 'A', 'V', 'A'};
+char[] arr2 = Arrays.copyOfRange(arr1, 1, 3);
+```
+
+- 단순히 배열을 복사할 목적이라면 `System.arraycopy()` 메소드를 사용할 수도 있음
+
+```java
+System.arraycopy(Object src, int srcPos, Object dest, int destPos, int length)
+```
+
+<br>
+<br>
+
+## 배열 항목 비교
+
+- `equals()`와 `deepEquals()` 사용 가능
+- `equals()`는 1차 항목의 값만 비교
+- `deepEquals()`는 중첩된 배열의 항목까지 비교
+
+<br>
+<br>
+
+## 배열 항목 정렬
+
+- 기본 타입 또는 String으로 이루어진 배열은 `Arrays.sort()`를 이용해서 자동으로 오름차순 정렬 가능
+- 사용자 정의 클래스 타입일 경우에는 클래스가 **Comparable** 인터페이스를 구현하고 있어야 정렬이 됨
+
+```java
+public class Member implements Comparable<Member> {
+  String name;
+  Member(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public int compareTo(Member o) {
+    return name.compareTo(o.name);
+  }
+}
+```
+
+<br>
+<br>
+
+## 배열 항목 검색
+
+- `Arrays.binarySearch(배열, 찾는값)` 메소드를 활용해서 해당 항목의 인덱스를 찾아낼 수 있음
+
+<br>
+<br>
+
+# Wrapper 클래스
+
+- Java는 Wrapper 객체를 통해 기본 타입의 값을 갖는 객체를 생성할 수 있음
+- Wrapper 객체는 기본 타입의 값을 내부에 두고 포장하는 객체
+- 포장하고 있는 기본 타입 값은 외부에서 변경할 수 없으며, 내부 값을 변경하고 싶다면 새로운 포장 객체를 만들어야 함
+
+| 기본 타입 | 포장 클래스 |
+| :-------: | :---------: |
+|   byte    |    Byte     |
+|   char    |  Character  |
+|   short   |    Short    |
+|    int    |   Integer   |
+|   long    |    Long     |
+|   float   |    Float    |
+|  double   |   Double    |
+|  boolean  |   Boolean   |
+
+<br>
+<br>
+
+## Boxing과 Unboxing
+
+- 기본 타입의 값을 포장 객체로 만드는 과정을 박싱이라 하고, 반대로 포장 객체에서 기본 타입의 값을 얻어내는 과정을 언박싱이라 함
+- 박싱을 하기 위해서는 포장 클래스의 생성자 매개값으로 기본 타입의 값 또는 문자열을 넘겨주면 됨
+
+```java
+Byte obj = new Byte(10);
+Character obj = new Character('가');
+Short obj = new Short(100);
+Integer obj = new Integer(1000);
+Long obj = new Long(10000);
+Float obj = new Float(2.5F);
+Double obj = new Double(3.5);
+Boolean obj = new Boolean(true);
+```
+
+- 생성자 대신 각 포장 클래스가 가지고 있는 정적 메소드 `valueOf()`를 사용할 수도 있음
+
+```java
+Integer obj = Integer.valueOf(1000);
+```
+
+- 언박싱을 하기 위해서는 각 포장 클래스가 가지고 있는 `기본타입명Value()` 메소드를 호출하면 됨
+
+```java
+byte num = obj.byteValue();
+char ch = obj.charValue();
+short num = obj.shortValue();
+int num = obj.intValue();
+long num = obj.longValue();
+float num = obj.floatValue();
+double num = obj.doubleValue();
+boolean bool = obj.booleanValue();
+```
+
+<br>
+<br>
+
+## 자동 박싱과 언박싱
+
+- 자동 박싱은 포장 클래스 타입에 기본값이 대입될 경우에 발생함
+
+```java
+Integer obj = 100;
+```
+
+- 자동 언박싱은 기본 타입에 포장 객체가 대입될 경우에 발생함
+
+```java
+Integer obj = new Integer(100);
+int value = obj;
+```
+
+<br>
+<br>
+
+## 문자열을 기본 타입 값으로 변환
+
+- 대부분의 포장 클래스는 정적 메소드 `parser기본타입()`을 제공함
+
+```java
+byte num = Byte.parseByte("10");
+short num = Short.parseShort("100");
+int num = Integer.parseInt("1000");
+long num = Long.parseLong("10000");
+float num = Float.parseFloat("2.5F");
+double num = Double.parseDouble("3.5");
+boolean bool = Boolean.parseBoolean("true");
+```
+
+<br>
+<br>
+
+## 포장 값 비교
+
+- 포장 객체는 내부의 값을 비교하기 위해 `==` 연산자와 `!=` 연산자를 사용할 수 없음
+- 직접 내부 값을 언박싱해서 비교하거나, `equals()` 메소드로 비교하는 것이 좋음
