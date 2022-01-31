@@ -1170,3 +1170,236 @@ boolean bool = Boolean.parseBoolean("true");
 
 - 포장 객체는 내부의 값을 비교하기 위해 `==` 연산자와 `!=` 연산자를 사용할 수 없음
 - 직접 내부 값을 언박싱해서 비교하거나, `equals()` 메소드로 비교하는 것이 좋음
+
+<br>
+<br>
+
+# Math, Random 클래스
+
+## Math 클래스
+
+- `java.lang.Math` 클래스는 수학 계산에 사용할 수 있는 메소드를 제공함
+- 모두 static 메소드이므로 Math 클래스를 통해 바로 사용 가능
+
+| 메소드                                                  |      설명       |
+| :------------------------------------------------------ | :-------------: |
+| int abs(int a)<br>double abs(double a)                  |     절대값      |
+| double ceil(double a)                                   |     올림값      |
+| double floor(double a)                                  |     내림값      |
+| int max(int a, int b)<br>double max(double a, double b) |     최대값      |
+| int min(int a, int b)<br>double min(double a, double b) |     최소값      |
+| double random()                                         |     랜덤값      |
+| double rint(double a)                                   | 반올림값 (실수) |
+| long round(double a)                                    | 반올림값 (정수) |
+
+- `Math.round(double d)` 메소드는 항상 소수점 첫째 자리에서 반올림한 정수값을 리턴함
+  - 원하는 소수점 자릿수에서 반올림하려면 반올림할 자릿수가 소수점 첫째 자리가 되도록 10ⁿ을 곱한 후, `round()`의 리턴값을 다시 10ⁿ.0으로 나눠줘야 함
+- `Math.random()` 메소드는 0.0과 1.0 사이의 범위에 속하는 하나의 double 값을 리턴함
+  - 예시1 - 주사위 번호 뽑기 : `int num = (int) (Math.random() * 6) + 1`
+  - 예시2 - 로또 번호 뽑기 : `int num = (int) (Math.random() * 45) + 1`
+
+<br>
+<br>
+
+## Random 클래스
+
+- `java.util.Random` 클래스는 난수를 얻어내기 위해 다양한 메소드를 제공함
+- boolean, int, long, float, double 난수를 얻을 수 있음
+- 난수를 만드는 알고리즘에 사용되는 **seed** 를 설정할 수 있음
+
+| 생성자            | 설명                                            |
+| :---------------- | :---------------------------------------------- |
+| Random()          | 호출마다 다른 종자값 자동 설정 (현재 시간 이용) |
+| Random(long seed) | 매개값으로 주어진 종자값 설정                   |
+
+| 메소드                | 설명                                |
+| :-------------------- | :---------------------------------- |
+| boolean nextBoolean() | boolean 타입의 난수 리턴            |
+| double nextDouble()   | double 타입의 난수 리턴 (0.0 ~ 1.0) |
+| int nextInt()         | int 타입의 난수 리턴 (2³¹ ~ 2³¹-1)  |
+| int nextInt(int n)    | int 타입의 난수 리턴 (0 ~ n)        |
+
+```java
+public class RandomExample {
+  public static void main(String[] args) {
+    int[] selectNumber = new int[6];
+    Random random = new Random();
+    System.out.print("선택 번호 : ");
+
+    for (int i = 0; i < 6; i++) {
+      selectNumber[i] = random.nextInt(45) + 1;
+      System.out.print(selectNumber[i] + " ");
+    }
+  }
+}
+```
+
+<br>
+<br>
+
+# Date, Calendar 클래스
+
+## Date 클래스
+
+- 날짜를 표현하는 클래스
+- 객체 간에 날짜 정보를 주고 받을 때 주로 사용됨
+- 여러 개의 생성자가 선언되어 있지만 대부분 Deprecated 되어, 현재는 기본 생성자만 주로 사용함
+  - 기본 생성자는 현재 날짜를 읽어서 Date 객체로 만들어줌
+- Date 객체의 날짜를 문자열로 얻고 싶다면 `toString()` 메소드를 사용하면 됨
+  - 해당 메소드는 영문으로 된 날짜를 리턴하는데, 특정 문자열 포맷으로 얻고 싶다면 `java.text.SimpleDateFormat` 클래스를 이용하면 됨
+
+```java
+public class DateExample {
+  public static void main(String[] args) {
+    Date now = new Date();
+    String str = now.toString();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분 ss초");
+    String form = sdf.format(now);
+  }
+}
+```
+
+<br>
+<br>
+
+## Calendar 클래스
+
+- 달력을 표현하는 클래스
+- abstract 클래스이므로 new 연산자를 사용해서 인스턴스를 생성할 수 없음
+  - 그 이유는 날짜와 시간을 계산하는 방법이 지역과 문화, 나라에 따라 다르기 때문
+  - 그래서 Calendar 클래스에는 날짜와 시간을 계산하는데 꼭 필요한 메소드들만 선언되어 있음
+  - 특별한 역법을 따르는 계산 로직은 하위 클래스에서 구현하도록 되어 있음
+  - 특별한 역법이 아닌 경우라면 Calendar 클래스의 정적 메소드인 `getInstance()` 메소드를 사용해서<br>현재 운영체제에 설정되어 있는 TimeZone을 기준으로 한 Calendar 하위 객체를 얻을 수 있음
+
+```java
+Calendar now = Calendar.getInstance();
+int year = now.get(Calendar.YEAR);
+int month = now.get(Calendar.MONTH) + 1;
+int day = now.get(Calendar.DAY_OF_MONTH);
+int week = now.get(Calendar.DAY_OF_WEEK);
+int amPm = now.get(Calendar.AM_PM);
+int hour = now.get(Calendar.HOUR);
+int minute = now.get(Calendar.MINUTE);
+int second = now.get(Calendar.SECOND);
+```
+
+- 다른 시간대에 해당하는 날짜와 시간을 출력하고자 한다면,<br>Calendar 클래스에 오버로딩된 다른 `getInstance()` 메소드를 사용하면 됨
+
+```java
+TimeZone tz = TimeZone.getTimeZone("America/Los_Angeles");
+Calendar now = Calendar.getInstance(tz);
+```
+
+- `TimeZone.getAvailableIDs()` 메소드를 사용해서 다른 사용 가능한 시간대들을 확인할 수 있음
+
+```java
+public class PrintTimeZoneID {
+  public static void main(String[] args) {
+    String[] availableIDs = TimeZone.getAvailableIDs();
+    for (String id : availableIDs) {
+      System.out.println(id);
+    }
+  }
+}
+```
+
+<br>
+<br>
+
+# Format 클래스
+
+- `java.text.Format`
+- Format 클래스가 필요한 경우에 대한 예시
+  - 정수 세 자리마다 `,`를 넣고 싶을 때
+  - 많은 수의 점수를 소수점 한 자리로 일정하게 맞추어 출력하고자 할 때
+  - 날짜를 원하는 문자열 형태로 출력하고자 할 때
+- sub 클래스들
+  - **DecimalFormat** : 숫자 형식
+  - **SimpleDateFormat** : 날짜 형식
+  - **MessageFormat** : 매개 변수화된 문자열 형식
+
+<br>
+<br>
+
+## DecimalFormat
+
+|  기호  |             의미              |                    패턴 예시 |                     1234567.89 적용 예시 |
+| :----: | :---------------------------: | ---------------------------: | ---------------------------------------: |
+|   0    | 10진수 (빈자리는 0으로 채움)  | 0<br>0.0<br>0000000000.00000 | 1234568<br>1234567.9<br>0001234567.89000 |
+|   #    | 10진수 (빈자리는 채우지 않음) | #<br>#.#<br>##########.##### |       1234568<br>1234567.9<br>1234567.89 |
+|   .    |            소수점             |                          #.0 |                                1234567.9 |
+|   -    |           음수 기호           |                 +#.0<br>-#.0 |                 +1234567.9<br>-1234567.9 |
+|   ,    |           단위 구분           |                      #,###.0 |                              1,234,567.9 |
+|   E    |           지수 문자           |                        0.0E0 |                                    1.2E6 |
+|   ;    |    양수와 음수 패턴 구분자    |              +#,### ; -#,### |                 +1,234,568<br>-1,234,568 |
+|   %    |   100을 곱한 후 % 문자 삽입   |                         #.#% |                               123456789% |
+| \u00A4 |           통화 기호           |                 \u00A4 #,### |                              ₩ 1,234,568 |
+
+```java
+DecimalFormat df = new DecimalFormat("#,###.0");
+String result = df.format(1234567.89)
+```
+
+<br>
+<br>
+
+## SimpleDateFormat
+
+| 패턴 문자 |           의미            |
+| :-------: | :-----------------------: |
+|     y     |            년             |
+|     M     |            월             |
+|     d     |            일             |
+|     D     | 월 구분 없는 일 (1 ~ 365) |
+|     E     |           요일            |
+|     a     |         오전/오후         |
+|     w     |      년의 몇 번째 주      |
+|     W     |      월의 몇 번째 주      |
+|     H     |        시 (0 ~ 23)        |
+|     h     |        시 (1 ~ 12)        |
+|     K     |        시 (0 ~ 11)        |
+|     k     |        시 (1 ~ 24)        |
+|     m     |            분             |
+|     s     |            초             |
+|     S     |  밀리세컨드 (1/1000 초)   |
+
+```java
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일");
+String str = sdf.format(new Date());
+```
+
+<br>
+<br>
+
+## MessageFormat
+
+- 데이터를 파일에 저장하거나, 네트워크로 전송할 때, SQL문을 작성할 때 사용
+- 문자열에 데이터가 들어갈 자리를 표시해 두고, 프로그램이 실행하면서 동적으로 데이터를 삽입해 문자열을 완성시키는 방식
+
+```java
+public class MessageFormatExample {
+  public static void main(String[] args) {
+    String id = "Loko";
+    String name = "남궁민";
+    String tel = "010-1357-2468";
+
+    Strint text = "회원 ID : {0}\n회원 이름 : {1}\n회원 전화 : {2}";
+    String result1 = MessageFormat.format(text, id, name, tel);
+    System.out.println(result1);
+    System.out.println();
+
+    String sql = "insert into member values({0}, {1}, {2})";
+    Object[] arguments = {"'Loko'", "'남궁민'", "'010-1357-2468'"};
+    String result2 = MessageFormat.format(sql, arguments);
+    System.out.println(result2);
+  }
+}
+
+/*
+회원 ID : Loko
+회원 이름 : 남궁민
+회원 전화 : 010-1357-2468
+
+insert into member values('Loko', '남궁민', '010-1357-2468')
+*/
+```
