@@ -14,7 +14,7 @@
   - thread는 사전적 의미로 한 가닥의 실이라는 뜻<br>→ 한 가지 작업을 실행하기 위해 순차적으로 실행할 코드를 실처럼 이어 놓았다고 해서 유래된 이름
 - 멀티 프로세스가 애플리케이션 단위의 멀티 태스킹이라면 멀티 스레드는 애플리케이션 내부에서의 멀티 태스킹
 
-![Multi Process & Multi Thread](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/JVM%20%EC%9E%91%EB%8F%99%20%EA%B3%BC%EC%A0%95.png)
+![Multi Process & Multi Thread](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/multi%20process.png)
 
 - 멀티 프로세스들은 운영체제에서 할당받은 자신의 메모리를 가지고 실행하기 때문에 서로 독립적
   - 따라서 하나의 프로세스에서 오류가 발생해도 다른 프로세스에 영향을 미치지 않음
