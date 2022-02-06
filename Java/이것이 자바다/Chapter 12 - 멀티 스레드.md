@@ -592,3 +592,25 @@ public class InterruptExample {
   - 스레드가 미래에 일시 정지 상태가 되어야 예외가 발생함
   - 따라서 스레드가 일시 정지 상태가 되지 않으면 `interrupt()` 메소드 호출은 아무런 의미가 없음
   - 짧은 시간이나마 일시 정지 상태를 만들기 위해 `Thread.sleep(1)`을 이용하거나,<br>일시 정지를 만들지 않고도 `interrupt`호출 여부를 알 수 있게 해주는 `interrupted()` 혹은 `isInterrupted`를 활용하면 됨
+
+<br>
+<br>
+
+# Daemon 스레드
+
+- 주 스레드의 작업을 돕는 보조적인 역할을 수행하는 스레드
+- 주 스레드가 종료되면 데몬 스레드는 강제 종료됨
+- 이외에는 일반 스레드와 크게 차이가 없음
+- 예시 : 워드프로세서의 자동 저장, 미디어 플레이어의 영상 및 음악 재생, 가비지 컬렉터
+- 생성 방법 : 주 스레드가 데몬이 될 스레드의 `setDaemon(true)` 호출
+
+```java
+public static void main(String[] args) {
+  AutoSaveThread thread = new AutoSaveThread();
+  thread.setDaemon(true);
+  thread.start();
+}
+```
+
+- 주의할 점 : `start()` 호출 이후에 `setDaemon(true)`을 호출하면 `IllegalThreadStateException` 발생
+- 현재 실행 중인 스레드가 데몬 스레드인지 여부는 `isDaemon()`을 호출해서 확인할 수 있음
