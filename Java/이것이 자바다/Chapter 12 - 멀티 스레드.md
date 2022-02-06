@@ -299,3 +299,296 @@ public void method() {
 | 일시 정지 | TIMED_WAITING | 주어진 시간만큼 기다리는 상태                             |
 | 일시 정지 |    BLOCKED    | 사용할 객체의 락이 풀릴 때까지 기다리는 상태              |
 |   종료    |  TERMINATED   | 실행을 마친 상태                                          |
+
+<br>
+<br>
+
+# 스레드 상태 제어
+
+- 스레드 상태 제어 : 실행 중인 스레드의 상태를 변경하는 것
+- 멀티 스레드 프로그램을 만들기 위해서는 정교한 스레드 상태 제어가 필요함
+
+![스레드 상태 제어](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/JVM%20%EC%9E%91%EB%8F%99%20%EA%B3%BC%EC%A0%95.png)
+
+※ 취소선을 가진 메소드는 스레드의 안전성을 해친다고 하여 더 이상 사용하지 않도록 Deprecated 된 메소드들
+
+|                           메소드                            | 설명                                                                                                                                                                                                      |
+| :---------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                         interrupt()                         | 일시 정지 상태의 스레드에 `InterruptedException` 예외를 발생시켜서,<br>catch문에서 실행 대기 상태로 가거나 종료 상태로 갈 수 있도록 함                                                                    |
+|                   notify()<br>notifyAll()                   | 동기화 블록 내에서 `wait()` 메소드에 의해<br>일시 정지 상태에 있는 스레드를 실행 대기 상태로 만듦                                                                                                         |
+|                          resume()                           | `suspend()` 메소드에 의해<br>일시 정지 상태에 있는 스레드를 실행 대기 상태로 만듦                                                                                                                         |
+|     sleep(long millis)<br>sleep(long millis, int nanos)     | 주어진 시간 동안 스레드를 일시 정지 상태로 만듦<br>주어진 시간이 지나면 자동적으로 실행 대기 상태가 됨                                                                                                    |
+| join()<br>join(long millis)<br>join(long millis, int nanos) | 이 메소드를 호출한 스레드는 일시 정지 상태가 됨<br>실행 대기 상태가 되려면 이 메소드를 멤버로 가지는 스레드가 종료되거나,<br>매개값으로 주어진 시간이 지나야 함                                           |
+| wait()<br>wait(long millis)<br>wait(long millis, int nanos) | 동기화 블록 내에서 스레드를 일시 정지 상태로 만듦<br>매개값으로 주어진 시간이 지나면 자동적으로 실행 대기 상태가 됨<br>시간이 주어지지 않으면 `notify()` `notifyAll()`에 의해 실행 대기 상태로 갈 수 있음 |
+|                          suspend()                          | 스레드를 일시 정지 상태로 만듦<br>`resume()` 메소드를 호출하면 다시 실행 대기 상태가 됨                                                                                                                   |
+|                           yield()                           | 실행 중에 우선순위가 동일한 다른 스레드에게 실행을 양보하고 실행 대기 상태가 됨                                                                                                                           |
+|                           stop()                            | 스레드를 즉시 종료시킴                                                                                                                                                                                    |
+
+- Object 클래스의 메소드 : `wait()` `notify()` `notifyAll()`
+  - 나머지는 전부 Thread 클래스의 메소드들
+
+<br>
+<br>
+
+## sleep() : 주어진 시간 동안 일시 정지
+
+```java
+try {
+  Thread.sleep(1000);
+} catch (InterruptedException e) {
+  // interrupt() 메소드 호출 시 실행
+}
+```
+
+- Thread 클래스의 정적 메소드
+- 주어진 시간 동안 일시 정지 상태가 되고, 해당 시간 이후에 실행 대기 상태가 됨
+- 매개값으로 주는 시간을 밀리세컨드(1/1000초) 단위로 주어야 함
+
+<br>
+<br>
+
+## yield() : 다른 스레드에게 실행 양보
+
+- 스레드가 처리하는 작업은 반복적인 실행을 위해 for문이나 while문을 포함하는 경우가 많음
+  - 가끔은 이런 반복문들이 무의미한 반복을 하는 경우가 있음
+- 이런 경우에 해당하는 스레드는 다른 스레드에게 실행을 양보하고 실행 대기 상태로 가는 것이 전체 프로그램 성능에 도움이 됨
+- `yield()` 메소드를 호출한 스레드는 실행 대기 상태로 돌아가고 동일한 우선순위 또는 높은 우선순위를 갖는 다른 스레드에게 실행 기회를 줌
+
+<br>
+<br>
+
+## join() : 다른 스레드의 종료를 기다림
+
+- 스레드는 다른 스레드와 독립적으로 실행하는 것이 기본이지만<br>다른 스레드가 종료될 때까지 기다렸다가 실행해야 하는 경우가 발생할 수도 있음
+
+```java
+public class SumThread extends Thread {
+  private long sum;
+
+  public long getSum() {
+    return sum;
+  }
+
+  public void setSum(long sum) {
+    this.sum = sum;
+  }
+
+  public void run() {
+    for (int i = 1; i <= 100; i++) {
+      sum += i;
+    }
+  }
+}
+```
+
+```java
+public class JoinExample {
+  public static void main(String[] args) {
+    SumThread sumThread = new SumThread();
+    sumThread.start();
+
+    try {
+      sumThread.join();
+    } catch (InterruptedException e) {}
+
+    System.out.println("1 ~ 100 까지의 합 : " + sumThread.getSum());
+  }
+}
+
+/*
+1 ~ 100 까지의 합 : 5050
+*/
+```
+
+<br>
+<br>
+
+## wait() / notify() / notifyAll() : 스레드 간 협업
+
+- 2개의 스레드를 교대로 번갈아가며 실행해야 할 경우가 있음
+- 정확한 교대 작업이 필요할 경우, 자신의 작업이 끝나면 상대방 스레드를 일시 정지 상태에서 풀어주고 자신은 일시 정지 상태로 만드는 과정이 필요함
+- 이 방법의 핵심은 **공유 객체**
+  - 공유 객체는 두 스레드가 작업할 내용을 각각 동기화 메소드로 구분해 놓음
+  - 한 스레드가 작업을 완료하면 `notify()` 메소드를 호출해서 일시 정지 상태에 있는 다른 스레드를 실행 대기 상태로 만들고,<br>자신은 `wait()` 메소드를 호출하여 일시 정지 상태로 만듦
+  - `wait()` 메소드의 매개 변수로 시간을 지정해서 굳이 `notify()` 메소드가 필요하지 않도록 할 수도 있음
+- `notify()`는 `wait()`에 의해 일시 정지된 스레드 중 1개를 실행 대기 상태로 만들고<br>`notifyAll()`은 `wait()`에 의해 일시 정지된 모든 스레드들을 실행 대기 상태로 만듦
+- 주의할 점 : 이 메소드들은 동기화 메소드 또는 동기화 블록에서만 사용 가능
+
+```java
+public class DataBox {
+  private String data;
+
+  public synchronized String getData() {
+    if (this.data == null) {
+      try {
+        wait();
+      } catch (InterruptedException e) {}
+    }
+
+    String returnValue = data;
+    System.out.println("Consumer가 읽은 데이터 : " + returnValue);
+    data = null;
+    notify();
+    return returnValue;
+  }
+
+  public synchronized void setData(String data) {
+    if (this.data != null) {
+      try {
+        wait();
+      } catch (InterruptedException e) {}
+    }
+    this.data = data;
+    System.out.println("Producer가 생성한 데이터 : " + data);
+    notify();
+  }
+}
+```
+
+```java
+public class ProducerThread extends Thread {
+  private DataBox dataBox;
+
+  public ProducerThread(DataBox dataBox) {
+    this.dataBox = dataBox;
+  }
+
+  @Override
+  public void run() {
+    for (int i = 1; i <= 3; i++) {
+      String data = "Data-" + i;
+      dataBox.setData(data);
+    }
+  }
+}
+```
+
+```java
+public class ComsumerThread extends Thread {
+  private DataBox dataBox;
+
+  public ComsumerThread(DataBox dataBox) {
+    this.dataBox = dataBox;
+  }
+
+  @Override
+  public void run() {
+    for (int i = 1; i <= 3; i++) {
+      String data = dataBox.getData();
+    }
+  }
+}
+```
+
+```java
+public class WaitNotifyExample {
+  public static void main(String[] args) {
+    DataBox dataBox = new DataBox();
+
+    ProducerThread producer = new ProducerThread(dataBox);
+    ComsumerThread producer = new ComsumerThread(dataBox);
+
+    producer.start();
+    consumer.start();
+  }
+}
+
+/*
+Produer가 생성한 데이터 : Data-1
+Consumer가 읽은 데이터 : Data-1
+Produer가 생성한 데이터 : Data-2
+Consumer가 읽은 데이터 : Data-2
+Produer가 생성한 데이터 : Data-3
+Consumer가 읽은 데이터 : Data-3
+*/
+```
+
+<br>
+<br>
+
+## stop 플래그 / interrupt() : 스레드의 안전한 종료
+
+- 스레드는 자신의 `run()` 메소드가 모두 실행되면 자동적으로 종료됨
+- 경우에 따라서는 실행 중인 스레드를 즉시 종료할 수도 있음
+  - 예를 들어 사용자가 동영상을 끝까지 보지 않고 중지를 요청했을 때
+- 스레드를 즉시 종료시키기 위해서 `stop()`메소드를 제공하고 있지만, 이 메소드는 Deprecated 되었음
+  - `stop()` 메소드로 스레드를 갑자기 종료하면 스레드가 사용 중이던 자원들이 불안전한 상태로 남겨지기 때문
+- 그러므로 스레드를 안전하게 종료시키기 위한 방법들을 알아두어야 함
+
+<br>
+
+### stop 플래그를 이용하는 방법
+
+- 스레드가 `run()` 메소드를 모두 실행하고 안전하게 종료되도록 유도하는 것이 최선의 방법
+- 그러므로 stop 플래그를 활용하여 `run()` 메소드의 안전한 종료를 유도할 수 있음
+
+```java
+public class PrintThread1 extends Thread {
+  private boolean stop;
+
+  public void setStop(boolean stop) {
+    this.stop = stop;
+  }
+
+  public void run() {
+    while (!stop) {
+      System.out.println("실행 중");
+    }
+    System.out.println("자원 정리");
+    System.out.println("실행 종료");
+  }
+}
+```
+
+```java
+public class StopFlagExample {
+  public static void main(String[] args) {
+    PrintThread1 printThread = new PrintThread1();
+    printThread.start();
+
+    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+
+    printThread.setStop(true);
+  }
+}
+```
+
+<br>
+
+### interrupt() 메소드를 이용하는 방법
+
+- `interrupt()` 메소드는 스레드가 일시 정지 상태에 있을 때 `InterruptedException` 예외를 발생시키는 역할을 함
+- 이를 활용하면 `run()` 메소드를 정상 종료시킬 수 있음
+
+```java
+public class PrintThread2 extends Thread {
+  public void run() {
+    while (true) {
+      System.out.println("실행 중");
+      if (Thread.interrupted()) {
+        break;
+      }
+    }
+    System.out.println("자원 정리");
+    System.out.println("실행 종료");
+  }
+}
+```
+
+```java
+public class InterruptExample {
+  public static void main(String[] args) {
+    Thread thread = new PrintThread2();
+    thread.start();
+
+    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+
+    thread.interrupt();
+  }
+}
+```
+
+- 주의할 점 : 스레드가 실행 대기 또는 실행 상태에 있을 때 `interrupt()` 메소드가 실행되면 즉시 `InterruptException`이 발생하는 것이 아님
+  - 스레드가 미래에 일시 정지 상태가 되어야 예외가 발생함
+  - 따라서 스레드가 일시 정지 상태가 되지 않으면 `interrupt()` 메소드 호출은 아무런 의미가 없음
+  - 짧은 시간이나마 일시 정지 상태를 만들기 위해 `Thread.sleep(1)`을 이용하거나,<br>일시 정지를 만들지 않고도 `interrupt`호출 여부를 알 수 있게 해주는 `interrupted()` 혹은 `isInterrupted`를 활용하면 됨
