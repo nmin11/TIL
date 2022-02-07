@@ -614,3 +614,83 @@ public static void main(String[] args) {
 
 - 주의할 점 : `start()` 호출 이후에 `setDaemon(true)`을 호출하면 `IllegalThreadStateException` 발생
 - 현재 실행 중인 스레드가 데몬 스레드인지 여부는 `isDaemon()`을 호출해서 확인할 수 있음
+
+<br>
+<br>
+
+# 스레드 그룹
+
+- 관련된 스레드를 묶어서 관리할 목적으로 이용됨
+- JVM 실행 시 `system` 스레드 그룹을 만들고, JVM 운영에 필요한 스레드들을 생성해서 `system` 그룹에 포함시킴
+  - 그리고 `system`의 하위 스레드 그룹으로 `main`을 만들고 메인 스레드를 `main` 스레드 그룹에 포함시킴
+- 스레드는 반드시 하나의 스레드 그룹에 포함됨
+  - 명시적으로 그룹에 포함시키지 않으면 기본적으로 자신을 생성한 스레드와 같은 스레드 그룹에 속하게 됨
+  - 우리가 생성하는 작업 스레드는 대부분 `main` 스레드가 생성하므로 기본적으로 main 스레드 그룹에 속하게 됨
+
+<br>
+<br>
+
+## 스레드 그룹 이름 얻기
+
+```java
+ThreadGroup group = Thread.currentThread().getThreadGroup();
+String name = group.getName();
+```
+
+- Thread의 정적 메소드인 `getAllStackTraces()`를 이용하면 프로세스 내에서 실행되는 모든 스레드에 대한 정보를 얻을 수 있음
+
+```java
+Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+```
+
+리턴하는 Map 타입의 객체에서 key는 스레드 객체이고 value는 스레드의 상태 기록들을 갖고 있는 StackTraceElement[] 배열이다.
+
+<br>
+<br>
+
+## 스레드 그룹 생성
+
+```java
+ThreadGroup tg = new ThreadGroup(String name);
+ThreadGroup tg = new ThreadGroup(ThreadGroup parent, String name);
+```
+
+- 스레드 그룹 생성 시 부모 스레드 그룹을 지정하지 않으면 현재 스레드가 속한 그룹의 하위 그룹으로 생성됨
+- 스레드 그룹을 먼저 생성한 후, 이 그룹에 스레드를 포함시키려면 Thread 객체를 생성할 때 생성자 매개값으로 스레드 그룹을 지정하면 됨
+
+```java
+Thread t = new Thread(ThreadGroup group, Runnable target);
+Thread t = new Thread(ThreadGroup group, Runnable target, String name);
+Thread t = new Thread(ThreadGroup group, Runnable target, String name, long stackSize);
+Thread t = new Thread(ThreadGroup group, String name);
+```
+
+- 매개값 중 Runnable 타입은 Runnable 구현 객체를 뜻하고, String 타입은 스레드의 이름이며, long 타입은 JVM이 이 스레드에 할당할 stack 크기
+
+<br>
+<br>
+
+## 스레드 그룹의 일괄 interrupt()
+
+- 스레드 그룹의 `interrupt()` 메소드를 이용하면 그룹 내에 포함된 모든 스레드들을 일괄 interrupt할 수 있음
+- 스레드 그룹의 `interrupt()` 메소드는 소속된 스레드의 `interrupt()` 메소드를 호출할 뿐<br>개별 스레드에서 발생하는 `InterruptedException`에 대한 예외처리를 하지 않음
+  - 따라서 안전한 종료를 위해서는 개별 스레드가 예외 처리를 해야 함
+- 스레드 그룹에는 `suspend()` `resume()` `stop()` 메소드들이 있지만 모두 Deprecated 되었음
+- 스레드 그룹을 통해 사용되는 주요 메소드들
+
+| 메소드 | 설명 |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
+| | |
