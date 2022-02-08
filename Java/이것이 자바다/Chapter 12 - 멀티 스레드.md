@@ -678,19 +678,19 @@ Thread t = new Thread(ThreadGroup group, String name);
 - 스레드 그룹에는 `suspend()` `resume()` `stop()` 메소드들이 있지만 모두 Deprecated 되었음
 - 스레드 그룹을 통해 사용되는 주요 메소드들
 
-| 메소드 | 설명 |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
-| | |
+| 메소드                          | 설명                                                                                          |
+| :------------------------------ | :-------------------------------------------------------------------------------------------- |
+| int activeCount()               | 현재 그룹 및 하위 그룹에서 활동 중인 모든 스레드의 수 리턴                                    |
+| int activeGroupCount()          | 현재 그룹에서 활동 중인 모든 하위 그룹의 수 리턴                                              |
+| void checkAccess()              | 현재 스레드가 스레드 그룹을 변경할 권한이 있는지 체크<br>만약 없다면 `SecurityException` 발생 |
+| void destroy()                  | 현재 그룹 및 하위 그룹 모두 삭제<br>단, 그룹 내 모든 스레드들이 종료 상태일 것                |
+| boolean isDestroyed()           | 현재 그룹이 삭제되었는지 여부 리턴                                                            |
+| int getMaxPriority()            | 현재 그룹에 포함된 스레드가 가질 수 있는 최대 우선순위 리턴                                   |
+| void setMaxPrority(int pri)     | 현재 그룹에 포함된 스레드가 가질 수 있는 최대 우선순위 설정                                   |
+| String getName()                | 현재 그룹의 이름 리턴                                                                         |
+| ThreadGroup getParent()         | 현재 그룹의 부모 그룹 리턴                                                                    |
+| boolean parentOf(ThreadGroup g) | 현재 그룹이 매개값으로 지정한 스레드 그룹의 부모인지 여부 리턴                                |
+| boolean isDaemon()              | 현재 그룹이 데몬 그룹인지 여부 리턴                                                           |
+| void setDaemon(boolean daemon)  | 현재 그룹을 데몬 그룹으로 설정                                                                |
+| void list()                     | 현재 그룹에 포함된 스레드와 하위 그룹에 대한 정보를 출력                                      |
+| void interrupt()                | 현재 그룹에 포함된 모든 스레드들을 interrupt                                                  |
