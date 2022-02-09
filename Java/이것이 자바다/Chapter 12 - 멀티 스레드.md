@@ -665,7 +665,7 @@ Thread t = new Thread(ThreadGroup group, Runnable target, String name, long stac
 Thread t = new Thread(ThreadGroup group, String name);
 ```
 
-- 매개값 중 Runnable 타입은 Runnable 구현 객체를 뜻하고, String 타입은 스레드의 이름이며, long 타입은 JVM이 이 스레드에 할당할 stack 크기
+- 매개값 중 Runnable 타입은 Runnable 구현 객체를 뜻하고, String 타입은 스레드의 이름이며,<br>long 타입은 JVM이 이 스레드에 할당할 stack 크기
 
 <br>
 <br>
@@ -694,3 +694,18 @@ Thread t = new Thread(ThreadGroup group, String name);
 | void setDaemon(boolean daemon)  | 현재 그룹을 데몬 그룹으로 설정                                                                |
 | void list()                     | 현재 그룹에 포함된 스레드와 하위 그룹에 대한 정보를 출력                                      |
 | void interrupt()                | 현재 그룹에 포함된 모든 스레드들을 interrupt                                                  |
+
+<br>
+<br>
+
+# 스레드풀
+
+![스레드풀](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/Thread%20Pool.png)
+
+- 병렬 작업 처리가 많아지면 스레드 개수가 증가되고 그에 따른 스레드 생성과 스케줄링으로 인해<br>메모리 사용량이 늘어나서 애플리케이션 성능이 저하됨
+- 갑작스런 병렬 작업의 폭증으로 인한 스레드 폭증을 막기 위해 **ThreadPool** 을 이용해야 함
+- 스레드풀은 작업 처리에 사용되는 스레드를 제한된 개수만큼 정해 놓고<br>작업 큐에 들어오는 작업들을 하나씩 스레드가 맡아 처리하게 함
+  - 작업 처리가 끝난 스레드는 다시 작업 큐에서 새로운 작업을 가져와서 처리함
+  - 그렇기 때문에 작업 처리 요청이 폭증되어도 스레드의 전체 개수가 늘어나지 않게 됨
+- Java는 스레드풀을 생성하고 사용할 수 있도록 `java.util.concurrent` 패키지에서<br>ExecutorService 인터페이스와 Executors 클래스를 제공함
+  - Executors의 다양한 정적 메소드를 통해 ExecutorService 구현 객체를 만들 수 있으며, 이것이 바로 스레드풀
