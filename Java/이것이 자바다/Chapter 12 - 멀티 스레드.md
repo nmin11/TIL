@@ -709,3 +709,43 @@ Thread t = new Thread(ThreadGroup group, String name);
   - 그렇기 때문에 작업 처리 요청이 폭증되어도 스레드의 전체 개수가 늘어나지 않게 됨
 - Java는 스레드풀을 생성하고 사용할 수 있도록 `java.util.concurrent` 패키지에서<br>ExecutorService 인터페이스와 Executors 클래스를 제공함
   - Executors의 다양한 정적 메소드를 통해 ExecutorService 구현 객체를 만들 수 있으며, 이것이 바로 스레드풀
+
+<br>
+<br>
+
+## 스레드풀 생성 및 종료
+
+### 스레드풀 생성
+
+- ExecutorService 구현 객체는 Executors 클래스의 2가지 메소드 중 하나를 이용해서 간편하게 생성 가능
+
+| 메소드                           | 초기 스레드 수 | 코어 스레드 수 |  최대 스레드 수   |
+| :------------------------------- | :------------: | :------------: | :---------------: |
+| newCachedThreadPool()            |       0        |       0        | Integer.MAX_VALUE |
+| newFixedThreadPool(int nThreads) |       0        |    nThreads    |     nThreads      |
+
+- 코어 스레드 수는 사용되지 않는 스레드를 스레드풀에서 제거할 때 최소한 유지해야 할 스레드 수를 뜻함
+- `newCachedThreadPool()`로 생성된 스레드풀은 스레드 개수보다 작업 개수가 많으면 새 스레드를 생성시켜 작업을 처리함
+  - 이론적으로 int 최대값만큼 스레드가 추가되지만, 이는 운영체제의 성능과 상황에 따라 달라짐
+  - 1개 이상의 스레드가 추가되었을 경우 60초 동안 추가된 스레드가<br>아무 작업도 하지 않으면 해당 스레드를 종료하고 풀에서 제거함
+- `newFixedThreadPool(int nThreads)`로 생성된 스레드풀 또한 스레드 개수보다 작업 개수가 많으면<br>새 스레드를 생성시키고 작업을 처리함
+  - 스레드가 작업을 처리하지 않고 놀고 있더라도 스레드 개수가 줄지 않음
+- CPU 코어의 수만큼 최대 스레드를 사용하는 스레드풀을 생성할 수도 있음
+
+```java
+ExecutorService es = Exectors.newFixedThreadPool(
+  Runtime.getRuntime().availableProcessors()
+);
+```
+
+- 두 메소드를 사용하지 않고 직접 ThreadPoolExecutor 객체를 생성할 수도 있음
+
+```java
+ExecutorService threadPool = new ThreadPoolExecutor(
+  3,                                // 코어 스레드 개수
+  100,                              // 최대 스레드 개수
+  120L,                             // 놀고 있는 시간
+  TimeUnit.SECONDS,                 // 놀고 있는 시간 단위
+  new SynchronousQueue<Runnable>()  // 작업 큐
+);
+```
