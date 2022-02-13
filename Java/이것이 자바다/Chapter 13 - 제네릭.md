@@ -150,3 +150,50 @@ Product<TV, String> product = new Product<TV, String>();
 // Java 7 이상 버전
 Product<TV, String> product = new Product<>();
 ```
+
+<br>
+<br>
+
+# 제네릭 메소드 : \<T, R> R method(T t)
+
+- 제네릭 메소드 : 매개 타입과 리턴 타입으로 타입 파라미터를 갖는 메소드
+- 선언 방법 : 리턴 타입 앞에 `<>` 기호를 추가하고 타입 파라미터를 기술하고,<br>리턴 타입과 매개 타입으로 타입 파라미터를 사용하면 됨
+
+```java
+public <T> Box<T> boxing(T t) { ··· }
+```
+
+- 호출 방법
+  - 코드에서 타입 파라미터의 구체적인 타입을 명시적으로 지정하기
+  - 컴파일러가 매개값의 타입을 보고 구체적인 타입을 추정하도록 하기
+
+```java
+Box<Integer> box = <Integer>boxing(100);
+Box<Integer> box = boxing(100);
+```
+
+<br>
+
+※ 제네릭 메소드 예시
+
+```java
+public class Util {
+    public static <T> Box<T> boxing(T t) {
+        Box<T> box = new Box<T>();
+        box.set(t);
+        return box;
+    }
+}
+```
+
+```java
+public class BoxingMethodExample {
+    public static void main(String[] args) {
+        Box<Integer> box1 = Util.<Integer>boxing(100);
+        int intValue = box1.get();
+
+        Box<Integer> box2 = Util.boxing("로코");
+        String strValue = box2.get();
+    }
+}
+```
