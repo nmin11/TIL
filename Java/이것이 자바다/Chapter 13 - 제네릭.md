@@ -197,3 +197,25 @@ public class BoxingMethodExample {
     }
 }
 ```
+
+<br>
+<br>
+
+# 제한된 타입 파라미터 : \<T extends 최상위타입>
+
+- 타입 파라미터에 지정되는 구체적인 타입을 제한할 필요가 종종 있음
+  - 예를 들어 숫자를 연산하는 제네릭 메소드는 매개값으로 Number 타입 또는 하위 클래스 타입의 인스턴스만 가져야 함
+- 선언 방법 : 타입 파라미터 뒤에 `extends` 키워드를 붙여서 상위 타입 명시
+  - 상위 타입은 클래스 뿐만 아니라 인터페이스도 가능
+  - 인터페이스라고 해서 `implements`를 사용하지 않음
+- 타입 파라미터에 지정되는 구체적인 타입은 상위 타입이거나 하위 또는 구현 클래스
+- 메소드 `{}` 안에서 타입 파라미터 변수로 사용 가능한 것은 상위 타입의 멤버로 제한됨
+  - 하위 타입에만 있는 필드와 메소드는 사용 불가
+
+```java
+public <T extends Number> int compare(T t1, T t2) {
+    double v1 = t1.doubleValue();
+    double v2 = t2.doubleValue();
+    return Double.compare(v1, v2);
+}
+```
