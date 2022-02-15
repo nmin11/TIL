@@ -219,3 +219,112 @@ public <T extends Number> int compare(T t1, T t2) {
     return Double.compare(v1, v2);
 }
 ```
+
+<br>
+<br>
+
+# 와일드카드 타입 : \<?>, \<? extends ···>, \<? super ···>
+
+- 코드에서 `?`를 일반적으로 **wildcard** 라고 부름
+- 제네릭 타입으로 사용 가능한 와일드카드의 3가지 형태
+  - `제네릭타입<?>` : Unbounded Wildcards (제한 없음)<br>구체적인 타입으로 모든 클래스나 인터페이스 타입이 올 수 있음
+  - `제네릭타입<? extends 상위타입>` : Upper Bounded Wildcards (상위 클래스 제한)<br>구체적인 타입으로 상위 타입이나 하위 타입만 올 수 있음
+  - `제네릭타입<? super 하위타입>` : Lower Bounded Wildcards (하위 클래스 제한)<br>구체적인 타입으로 하위 타입이나 상위 타입이 올 수 있음
+
+```java
+public class Course<T> {
+    private String name;
+    private T[] students;
+
+    public Course(String name, int capacity) {
+        this.name = name;
+        students = (T[]) (new Object[capacity]);
+    }
+
+    public String getName() { return name; }
+    public T[] getStudents() { return students; }
+    public void add(T t) {
+        for (int i = 0; i < students.length; i++) {
+            students[i] = t;
+            break;
+        }
+    }
+}
+```
+
+※ 수강생이 될 수 있는 타입은 다음 4가지 클래스라고 가정
+
+![수강생이 될 수 있는 타입](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/JVM%20%EC%9E%91%EB%8F%99%20%EA%B3%BC%EC%A0%95.png)
+
+```java
+import java.util.Arrays;
+
+public class WildcardExample {
+    // 모두 과정
+    public static void registerCourse(Course<?> course) {
+        System.out.println(course.getName() + " : " + Arrays.toString(course.getStudents()));
+    }
+
+    // 학생 과정
+    public static void registerCourseStudent(Course<? extends Student> course) {
+        System.out.println(course.getName() + " : " + Arrays.toString(course.getStudents()));
+    }
+
+    // 직장인 및 일반인 과정
+    public static void registerCourseWorker(Course<? super Worker> course) {
+        System.out.println(course.getName() + " : " + Arrays.toString(course.getStudents()));
+    }
+
+    public static void main(String[] args) {
+        Course<Person> person = new Course<Person>("일반인 과정", 5);
+        person.add(new Person("일반인"));
+        person.add(new Worker("직장인"));
+        person.add(new Student("학생"));
+        person.add(new HighStudent("고등학생"));
+
+        Course<Worker> worker = new Course<Worker>("직장인 과정", 5);
+        worker.add(new Worker("직장인"));
+
+        Course<Student> student = new Course<Student>("학생 과정", 5);
+        student.add(new Student("학생"));
+        student.add(new HighStudent("고등학생"));
+
+        Course<HighStudent> highStudent = new Course<HighStudent>("고등학생 과정", 5);
+        highStudent.add(new HighStudent("고등학생"));
+
+        // 모두 등록 가능
+        registerCourse(person);
+        registerCourse(worker);
+        registerCourse(student);
+        registerCourse(highStudent);
+        System.out.println();
+
+        // 학생 등록 가능
+        // registerCourseStudent(person);
+        // registerCourseStudent(worker);
+        registerCourseStudent(student);
+        registerCourseStudent(highStudent);
+        System.out.println();
+
+        // 직장인 및 일반인 등록 가능
+        registerCourseWorker(person);
+        registerCourseWorker(worker);
+        // registerCourseWorker(student);
+        // registerCourseWorker(highStudent);
+        System.out.println();
+    }
+}
+
+/*
+일반인 과정 : [일반인, 직장인, 학생, 고등학생, null]
+직장인 과정 : [직장인, null, null, null, null]
+학생 과정 : [학생, 고등학생, null, null, null]
+고등학생 과정 : [고등학생, null, null, null, null]
+
+학생 과정 : [학생, 고등학생, null, null, null]
+고등학생 과정 : [고등학생, null, null, null, null]
+
+일반인 과정 : [일반인, 직장인, 학생, 고등학생, null]
+직장인 과정 : [직장인, null, null, null, null]
+*/
+```
