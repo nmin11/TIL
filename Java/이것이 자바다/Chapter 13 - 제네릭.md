@@ -328,3 +328,45 @@ public class WildcardExample {
 직장인 과정 : [직장인, null, null, null, null]
 */
 ```
+
+<br>
+<br>
+
+# 제네릭 타입의 상속과 구현
+
+- 제네릭 타입도 다른 타입과 마찬가지로 부모 클래스가 될 수 있음
+  - 자식 제네릭 타입은 추가적으로 타입 파라미터를 가질 수 있음
+
+```java
+public class ChildProduct<T, M, C> extends Product<T, M> { ··· }
+```
+
+- 제네릭 인터페이스를 구현한 클래스도 제네릭 타입이 됨
+  - 구현 클래스도 제네릭 타입이어야 함
+
+```java
+public interface Storage<T> {
+    public void add(T item, int index);
+    public T get(int index);
+}
+```
+
+```java
+public class StorageImpl<T> implements Storage<T> {
+    private T[] array;
+
+    public StorageImpl(int capacity) {
+        this.array = (T[]) (new Object[capacity]);
+    }
+
+    @Override
+    public void add(T item, int index) {
+        array[index] = item;
+    }
+
+    @Override
+    public T get(int index) {
+        return array[index];
+    }
+}
+```
