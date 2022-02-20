@@ -168,3 +168,73 @@ int result = fun.method(2, 5);
 ## 로컬 변수 사용
 
 - 메소드의 매개 변수 또는 로컬 변수를 사용하려면 `final` 특성을 가져야 함
+
+<br>
+<br>
+
+# 표준 API의 함수적 인터페이스
+
+- Java에서 제공되는 표준 API에서 1개의 추상 메소드를 가지는 인터페이스들은<br>모두 람다식을 이용해서 익명 구현 객체로 표현 가능
+
+※ Runnable은 `run()` 메소드만 존재하기 때문에 람다식으로 정의 가능
+
+```java
+Thread thread = new Thread(() -> {
+  for (int i = 0; i < 10; i++) {
+    System.out.println(i);
+  }
+});
+```
+
+- Java 8 부터 빈번하게 사용되는 함수적 인터페이스는 `java.util.function` 표준 API 패키지로 제공함
+- 이 함수적 인터페이스들의 목적은<br>메소드 또는 생성자의 매개 타입으로 사용되어 람다식을 대입할 수 있도록 하기 위함
+- `java.util.function`의 함수적 인터페이스는 크게<br>**Consumer**, **Supplier**, **Function**, **Operator**, **Predicate** 로 구분됨
+
+<br>
+<br>
+
+## Consumer 함수적 인터페이스
+
+- 특징 : 리턴값이 없는 `accept()` 메소드를 가짐
+  - `accept()`는 단지 매개값을 소비하는 역할만 수행
+
+|     인터페이스명      | 추상 메소드                    | 설명                           |
+| :-------------------: | :----------------------------- | :----------------------------- |
+|     Consumner\<T>     | void accept(T t)               | 객체 T를 받아 소비             |
+|   BiConsumer\<T, U>   | void accept(T t, U u)          | 객체 T와 U를 받아 소비         |
+|    DoubleConsumer     | void accept(double value)      | double 값을 받아 소비          |
+|      IntConsumer      | void accept(int value)         | int 값을 받아 소비             |
+|     LongConsumer      | void accept(long value)        | long 값을 받아 소비            |
+| ObjDoubleConsumer\<T> | void accept(T t, double value) | 객체 T와 double 값을 받아 소비 |
+|  ObjIntConsumer\<T>   | void accept(T t, int value)    | 객체 T와 int 값을 받아 소비    |
+|  ObjLongConsumer\<T>  | void accept(T t, long value)   | 객체 T와 long 값을 받아 소비   |
+
+```java
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.ObjIntConsumer;
+
+public class ConsumerExample {
+  public static void main(String[] args) {
+    Consumer<String> consumer = t -> System.out.println(t + "8");
+    consumer.accept("Java");
+
+    BiConsumer<String, String> bigConsumer = (t, u) -> System.out.println(t + u);
+    bigConsumer.accept("Java", "8");
+
+    DoubleConsumer doubleConsumer = d -> System.out.println("Java" + d);
+    doubleConsumer.accept(8.0);
+
+    ObjIntConsumer<String> objIntConsumer = (t, i) -> System.out.println(t + i);
+    consumer.accept("Java", 8);
+  }
+}
+
+/*
+Java8
+Java8
+Java8.0
+Java8
+*/
+```
