@@ -238,3 +238,33 @@ Java8.0
 Java8
 */
 ```
+
+<br>
+<br>
+
+## Supplier 함수적 인터페이스
+
+- 특징 : 매개 변수가 없고 리턴값이 있는 `get()` 메소드를 가지고 있음
+
+|  인터페이스명   | 추상 메소드            | 설명            |
+| :-------------: | :--------------------- | :-------------- |
+|  Supplier\<T>   | T get()                | T 객체 리턴     |
+| BooleanSupplier | boolean getAsBoolean() | boolean 값 리턴 |
+| DoubleSupplier  | double getAsDouble()   | double 값 리턴  |
+|   IntSupplier   | int getAsInt()         | int 값 리턴     |
+|  LongSupplier   | long getAsLong()       | long 값 리턴    |
+
+```java
+import java.util.function.IntSupplier;
+
+public class SupplierExample {
+  public static void main(String[] args) {
+    IntSupplier is = () -> {
+      int num = (int) (Math.random() * 6) + 1;
+      return num;
+    };
+
+    int num = is.getAsInt();
+  }
+}
+```
