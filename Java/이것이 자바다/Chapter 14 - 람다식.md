@@ -268,3 +268,28 @@ public class SupplierExample {
   }
 }
 ```
+
+<br>
+<br>
+
+## Function 함수적 인터페이스
+
+- 특징 : 매개값과 리턴값이 있는 `apply()` 메소드를 가지고 있음
+  - `apply()`는 매개값을 리턴값으로 매핑하는 역할을 수행
+
+|       인터페이스명        | 추상 메소드                      | 설명                      |
+| :-----------------------: | :------------------------------- | :------------------------ |
+|      Function\<T, R>      | R apply(T t)                     | 객체 T를 객체 R로 매핑    |
+|   BiFunction\<T, U, R>    | R apply(T t, U u)                | 객체 T, U를 객체 R로 매핑 |
+|    DoubleFunction\<R>     | R apply(double value)            | double을 객체 R로 매핑    |
+|      IntFunction\<R>      | R apply(int value)               | int를 객체 R로 매핑       |
+|    IntToDoubleFunction    | double applyAsDouble(int value)  | int를 double로 매핑       |
+|     IntToLongFunction     | long applyAsLong(int value)      | int를 long으로 매핑       |
+|   LongToDoubleFunction    | double applyAsDouble(long value) | long을 double로 매핑      |
+|     LongToIntFunction     | int applyAsInt(long value)       | long을 int로 매핑         |
+| ToDoubleBiFunction\<T, U> | double applyAsDouble(T t, U u)   | 객체 T, U를 double로 매핑 |
+|   ToDoubleFunction\<T>    | double applyAsDouble(T t)        | 객체 T를 double로 매핑    |
+|  ToIntBiFunction\<T, U>   | int applyAsInt(T t, U u)         | 객체 T, U를 int로 매핑    |
+|     ToIntFunction\<T>     | int applyAsInt(T t)              | 객체 T를 int로 매핑       |
+|  ToLongBiFunction\<T, U>  | long applyAsLong(T t, U u)       | 객체 T, U를 long으로 매핑 |
+|    ToLongFunction\<T>     | long applyAsLong(T t)            | 객체 T를 long으로 매핑    |
