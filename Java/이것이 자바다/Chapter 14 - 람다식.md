@@ -293,3 +293,75 @@ public class SupplierExample {
 |     ToIntFunction\<T>     | int applyAsInt(T t)              | 객체 T를 int로 매핑       |
 |  ToLongBiFunction\<T, U>  | long applyAsLong(T t, U u)       | 객체 T, U를 long으로 매핑 |
 |    ToLongFunction\<T>     | long applyAsLong(T t)            | 객체 T를 long으로 매핑    |
+
+```java
+public class Student {
+  private String name;
+  private int englishScore;
+  private int mathScore;
+
+  public Student(String name, int englishScore, int mathScore) {
+    this.name = name;
+    this.englishScore = englishScore;
+    this.mathScore = mathScore;
+  }
+
+  public String getName() { return name; }
+  public int getEnglishScore() { return englishScore; }
+  public int getMathScore() { return mathScore; }
+}
+```
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
+
+public class FunctionExample1 {
+  private static List<Student> list = Arrays.asList(
+    new Student("남궁민", 90, 96);
+    new Student("로코", 95, 93);
+  );
+
+  public static void printString(Function<Student, String> function) {
+    for (Student student : list) {
+      System.out.print(function.apply(student) + " ");
+    }
+    System.out.println();
+  }
+
+  public static void printInt(ToIntFunction<Student> function) {
+    for (Student student : list) {
+      System.out.print(function.applyAsInt(student) + " ");
+    }
+    System.out.println();
+  }
+
+  public static double avg(ToIntFunction<Student> function) {
+    int sum = 0;
+    for (Student student : list) {
+      sum += function.applyAsInt(student);
+    }
+    double avg = (double) sum / list.size();
+    return avg;
+  }
+
+  public static void main(String[] args) {
+    System.out.println("[학생 이름]");
+    printString(t -> t.getName());
+
+    System.out.println("[영어 점수]");
+    printInt(t -> t.getEnglishScore());
+
+    System.out.println("[수학 점수]");
+    printInt(t -> t.getMathScore());
+
+    double englishAvg = avg(s -> s.getEnglishScore());
+    System.out.println("영어 평균 점수 : " + englishAvg);
+
+    double mathAvg = avg(s -> s.getMathScore());
+    System.out.println("수학 평균 점수 : " + mathAvg);
+  }
+}
+```
