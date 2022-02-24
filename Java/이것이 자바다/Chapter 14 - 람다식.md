@@ -365,3 +365,56 @@ public class FunctionExample1 {
   }
 }
 ```
+
+<br>
+<br>
+
+## Operator 함수적 인터페이스
+
+- 특징 : Function과 동일하게 매개 변수와 리턴값이 있는 `apply()` 메소드를 가지고 있음
+  - Operator의 `apply()`는 매개값을 이용해서 연산을 수행한 후 동일한 타입으로 리턴값을 제공하는 역할 수행
+
+|     인터페이스명     | 추상 메소드                          | 설명                     |
+| :------------------: | :----------------------------------- | :----------------------- |
+|  BinaryOperator\<T>  | T apply(T, T)                        | T와 T를 연산한 후 T 리턴 |
+|  UnaryOperator\<T>   | T apply(T)                           | T를 연산한 후 T 리턴     |
+| DoubleBinaryOperator | double applyAsDouble(double, double) | 2개의 double 연산        |
+| DoubleUnaryOperator  | double applyAsDouble(double)         | 1개의 double 연산        |
+|  IntBinaryOperator   | int applyAsInt(int, int)             | 2개의 int 연산           |
+|   IntUnaryOperator   | int applyAsInt(int)                  | 1개의 int 연산           |
+|  LongBinaryOperator  | long applyAsLong(long, long)         | 2개의 long 연산          |
+|  LongUnaryOperator   | long applyAsLong(long)               | 1개의 long 연산          |
+
+```java
+import java.util.function.IntBinaryOperator;
+
+public class OperatorExample {
+  private static int[] scores = { 92, 95, 87 };
+
+  public static int maxOrMin(IntBinaryOperator operator) {
+    int result = scores[0];
+    for (int score : scores) {
+      result = operator.applyAsInt(result, score);
+    }
+    return result;
+  }
+
+  public static void main(String[] args) {
+    int max = maxOrMin(
+      (a, b) -> {
+        if (a >= b) return a;
+        else return b;
+      }
+    );
+    System.out.println("최대값 : " + max);
+
+    int min = maxOrMin(
+      (a, b) -> {
+        if (a <= b) return a;
+        else return b;
+      }
+    );
+    System.out.println("최소값 : " + min);
+  }
+}
+```
