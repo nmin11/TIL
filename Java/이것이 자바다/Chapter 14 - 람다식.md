@@ -374,16 +374,16 @@ public class FunctionExample1 {
 - 특징 : Function과 동일하게 매개 변수와 리턴값이 있는 `apply()` 메소드를 가지고 있음
   - Operator의 `apply()`는 매개값을 이용해서 연산을 수행한 후 동일한 타입으로 리턴값을 제공하는 역할 수행
 
-|     인터페이스명     | 추상 메소드                          | 설명                     |
-| :------------------: | :----------------------------------- | :----------------------- |
-|  BinaryOperator\<T>  | T apply(T, T)                        | T와 T를 연산한 후 T 리턴 |
-|  UnaryOperator\<T>   | T apply(T)                           | T를 연산한 후 T 리턴     |
-| DoubleBinaryOperator | double applyAsDouble(double, double) | 2개의 double 연산        |
-| DoubleUnaryOperator  | double applyAsDouble(double)         | 1개의 double 연산        |
-|  IntBinaryOperator   | int applyAsInt(int, int)             | 2개의 int 연산           |
-|   IntUnaryOperator   | int applyAsInt(int)                  | 1개의 int 연산           |
-|  LongBinaryOperator  | long applyAsLong(long, long)         | 2개의 long 연산          |
-|  LongUnaryOperator   | long applyAsLong(long)               | 1개의 long 연산          |
+|     인터페이스명     | 추상 메소드                                    | 설명                     |
+| :------------------: | :--------------------------------------------- | :----------------------- |
+|  BinaryOperator\<T>  | T apply(T t1, T t2)                            | T와 T를 연산한 후 T 리턴 |
+|  UnaryOperator\<T>   | T apply(T t)                                   | T를 연산한 후 T 리턴     |
+| DoubleBinaryOperator | double applyAsDouble(double val1, double val2) | 2개의 double 연산        |
+| DoubleUnaryOperator  | double applyAsDouble(double val)               | 1개의 double 연산        |
+|  IntBinaryOperator   | int applyAsInt(int val1, int val2)             | 2개의 int 연산           |
+|   IntUnaryOperator   | int applyAsInt(int val)                        | 1개의 int 연산           |
+|  LongBinaryOperator  | long applyAsLong(long val1, long val2)         | 2개의 long 연산          |
+|  LongUnaryOperator   | long applyAsLong(long val)                     | 1개의 long 연산          |
 
 ```java
 import java.util.function.IntBinaryOperator;
@@ -415,6 +415,73 @@ public class OperatorExample {
       }
     );
     System.out.println("최소값 : " + min);
+  }
+}
+```
+
+<br>
+<br>
+
+## Predicate 함수적 인터페이스
+
+- 특징 : 매개 변수와 boolean 리턴값이 있는 `test()` 메소드를 가지고 있음
+  - 매개값을 조사하는 메소드 역할 수행
+
+|    인터페이스명    | 추상 메소드              | 설명                   |
+| :----------------: | :----------------------- | :--------------------- |
+|   Predicate\<T>    | boolean test(T t)        | 객체 T를 조사          |
+| BiPredicate\<T, U> | boolean test(T t, U u)   | 객체 T와 U를 비교 조사 |
+|  DoublePredicate   | boolean test(double val) | double 값을 조사       |
+|    IntPredicate    | boolean test(int val)    | int 값을 조사          |
+|   LongPredicate    | boolean test(long val)   | long 값을 조사         |
+
+```java
+public class Student {
+  private String name;
+  private String sex;
+  private int score;
+
+  public Student(String name, String sex, int score) {
+    this.name = name;
+    this.sex = sex;
+    this.score = score;
+  }
+
+  public String getSex() { return sex; }
+  public int getScore() { return score; }
+}
+```
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class PredicateExample {
+  private static List<Student> list = Arrays.asList(
+    new Student("남궁민", "남자", 90);
+    new Student("로코", "여자", 90);
+    new Student("존잘남", "남자", 95);
+    new Student("셰르디", "여자", 92);
+  );
+
+  public static double avg(Predicate<Student> predicate) {
+    int count = 0, sum = 0;
+    for (Student student : list) {
+      if (predicate.test(student)) {
+        count++;
+        sum += student.getScore();
+      }
+    }
+    return (double) sum / count;
+  }
+
+  public static void main(String[] args) {
+    double maleAvg = avg(t -> t.getSex().equals("남자"));
+    System.out.println("남자 평균 점수 : " + maleAvg);
+
+    double femaleAvg = avg(t -> t.getSex().equals("여자"));
+    System.out.println("여자 평균 점수 : " + femaleAvg);
   }
 }
 ```
