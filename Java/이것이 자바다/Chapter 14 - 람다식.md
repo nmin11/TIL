@@ -602,3 +602,43 @@ public class FunctionAndThenComposeExample {
 거주 도시 : 서울
 */
 ```
+
+<br>
+<br>
+
+## and(), or(), negate() 디폴트 메소드와 isEqual() 정적 메소드
+
+- Predicate 종류의 함수적 인터페이스는 위의 메소드들을 가지고 있음
+- 이 디폴트 메소드들은 각각 `&&` `||` `!` 와 대응됨
+
+```java
+import java.util.function.IntPredicate;
+
+public class PredicateAndOrNegateExample {
+  public static void main(String[] args) {
+    IntPredicate predicateA = a -> a % 2 == 0;
+    IntPredicate predicateB = a -> a % 3 == 0;
+
+    IntPredicate predicateAB;
+    boolean result;
+
+    predicateAB = predicateA.and(predicateB);
+    result = predicateAB.test(9);
+    System.out.println("9는 2와 3의 배수인가? " + result);
+
+    predicateAB = predicateA.or(predicateB);
+    result = predicateAB.test(9);
+    System.out.println("9는 2 또는 3의 배수인가? " + result);
+
+    predicateAB = predicateA.negate();
+    result = predicateAB.test(9);
+    System.out.println("9는 홀수인가? " + result);
+  }
+}
+
+/*
+9는 2와 3의 배수인가? false
+9는 2 또는 3의 배수인가? true
+9는 홀수인가? true
+*/
+```
