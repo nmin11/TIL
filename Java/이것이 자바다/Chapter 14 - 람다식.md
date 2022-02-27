@@ -485,3 +485,120 @@ public class PredicateExample {
   }
 }
 ```
+
+<br>
+<br>
+
+## andThen()과 compose() 디폴트 메소드
+
+- 디폴트 및 정적 메소드는 추상 메소드가 아니기 때문에 함수적 인터페이스에 선언되어도<br>여전히 함수적 인터페이스의 성질을 잃지 않음
+- `java.util.function` 패키지의 함수적 인터페이스는 하나 이상의 디폴트 및 정적 메소드를 가지고 있음
+- Consumer, Function, Operator 종류의 함수적 인터페이스는 `andThen()`과 `compose()` 디폴트 메소드를 가지고 있음
+
+```java
+인터페이스AB = 인터페이스A.andThen(인터페이스B);
+최종결과 = 인터페이스AB.method();
+
+인터페이스AB = 인터페이스A.compose(인터페이스B);
+최종결과 = 인터페이스AB.method();
+```
+
+- `andThen()` : 인터페이스A부터 처리 → 결과를 인터페이스B의 매개값으로 제공 → 인터페이스B는 연산 후 최종 결과 리턴
+- `compose()` : 인터페이스B부터 처리 → 결과를 인터페이스A의 매개값으로 제공 → 인터페이스A는 연산 후 최종 결과 리턴
+
+※ `andThen()` / `compose()` 디폴트 메소드를 제공하는 함수적 인터페이스들
+
+**Consumer**
+
+| 함수적 인터페이스 | andThen() | compose() |
+| :---------------: | :-------: | :-------: |
+|   Consumer\<T>    |     O     |     X     |
+| BiConsumer\<T, U> |     O     |     X     |
+|  DoubleConsumer   |     O     |     X     |
+|    IntConsumer    |     O     |     X     |
+|   LongConsumer    |     O     |     X     |
+
+**Function**
+
+|  함수적 인터페이스   | andThen() | compose() |
+| :------------------: | :-------: | :-------: |
+|   Function\<T, R>    |     O     |     O     |
+| BiFunction\<T, U, R> |     O     |     X     |
+
+**Operator**
+
+|  함수적 인터페이스  | andThen() | compose() |
+| :-----------------: | :-------: | :-------: |
+| BinaryOperator\<T>  |     O     |     X     |
+| DoubleUnaryOperator |     O     |     O     |
+|  IntUnaryOperator   |     O     |     O     |
+|  LongUnaryOperator  |     O     |     O     |
+
+<br>
+
+### Consumer의 순차적 연결
+
+- Consumer 종류의 함수적 인터페이스는 처리 결과를 리턴하지 않기 때문에<br>`andThen()` 메소드는 호출 순서만 정함
+
+```java
+import java.util.function.Consumer;
+
+public class ConsumerAndThenExample {
+  public static void main(String[] args) {
+    Consumer<Member> consumerA = (m) -> {
+      System.out.println("consumerA : " + m.getName());
+    };
+
+    Consumer<Member> consumerB = (m) -> {
+      System.out.println("consumerB : " + m.getId());
+    };
+
+    Consumer<Member> consumerAB = consumerA.andThen(consumerB);
+    consumerAB.accept(new Member("남궁민", "loko", null));
+  }
+}
+
+/*
+consumerA : 남궁민
+consumerB : loko
+*/
+```
+
+<br>
+
+### Function의 순차적 연결
+
+- Function과 Operator 종류의 함수적 인터페이스는 먼저 실행한 결과를 매개값으로 넘겨주고<br>최종 처리 결과를 리턴함
+
+```java
+import java.util.function.Function;
+
+public class FunctionAndThenComposeExample {
+  public static void main(String[] args) {
+    Function<Member, Address> functionA;
+    Function<Address, String> functionB;
+    Function<Member, String> functionAB;
+    String city;
+
+    functionA = (m) -> m.getAddress();
+    functionB = (a) -> a.getCity();
+
+    functionAB = functionA.andThen(functionB);
+    city = functionAB.apply(
+      new Member("남궁민", "loko", new Address("한국", "서울"))
+    );
+    System.out.println("거주 도시 : " + city);
+
+    functionAB = functionB.compose(functionA);
+    city = functionAB.apply(
+      new Member("남궁민", "loko", new Address("한국", "서울"))
+    );
+    System.out.println("거주 도시 : " + city);
+  }
+}
+
+/*
+거주 도시 : 서울
+거주 도시 : 서울
+*/
+```
