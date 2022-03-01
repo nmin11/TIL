@@ -642,3 +642,10 @@ public class PredicateAndOrNegateExample {
 9는 홀수인가? true
 */
 ```
+
+- `isEqual()` 메소드는 `test()` 매개값인 **sourceObject** 와 `isEqual()` 매개값인 **targetObject** 를<br>`java.util.Objects` 의 `equals()` 매개값으로 제공하고<br>`Objects.equals(sourceObject, targetObject)`의 리턴값을 얻어 새로운 **Predicate\<T>** 생성
+
+```java
+Predicate<Object> predicate = Predicate.isEqual(targetObject);
+boolean result = predicate.test(sourceObject);
+```
