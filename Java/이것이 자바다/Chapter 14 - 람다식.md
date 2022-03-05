@@ -649,3 +649,185 @@ public class PredicateAndOrNegateExample {
 Predicate<Object> predicate = Predicate.isEqual(targetObject);
 boolean result = predicate.test(sourceObject);
 ```
+
+<br>
+<br>
+
+## minBy(), maxBy() 정적 메소드
+
+- **BinaryOperator\<T>** 함수적 인터페이스는 `minBy()`와 `maxBy()` 정적 메소드를 제공함
+- 두 메소드는 매개값으로 제공되는 **Comparator** 를 이용해서 최대 T와 최소 T를 얻는 BinaryOperator\<T>를 리턴함
+
+```java
+BinaryOperator<T> minBy(Comparator<? super T> comparator)
+BinaryOperator<T> maxBy(Comparator<? super T> comparator)
+```
+
+```java
+import java.util.function.BinaryOperator;
+
+public class OperatorMinByMaxByExample {
+  public static void main(String[] args) {
+    BinaryOperator<Fruit> binaryOperator;
+    Fruit fruit;
+
+    binaryOperator = BinaryOperator.minBy((f1, f2) -> Integer.compare(f1.price, f2.price));
+    fruit = binaryOperator.apply(new Fruit("딸기", 6000), new Fruit("수박", 10000));
+    System.out.println(fruit.name);
+
+    binaryOperator = BinaryOperator.maxBy((f1, f2) -> Integer.compare(f1.price, f2.price));
+    fruit = binaryOperator.apply(new Fruit("딸기", 6000), new Fruit("수박", 10000));
+    System.out.println(fruit.name);
+  }
+}
+
+/*
+딸기
+수박
+*/
+```
+
+<br>
+<br>
+
+# Method Reference
+
+- 목적 : 메소드를 참조해서 매개 변수의 정보 및 리턴 타입을 알아내어, 불필요한 매개 변수를 제거하는 것
+- 람다식은 종종 기존 메소드를 단순히 호출만 하는 경우가 많기 때문에,<br>이런 경우 메소드 참조를 사용하면 깔끔하게 처리 가능함
+
+※ 기존의 람다식
+
+```java
+(left, right) -> Math.max(left, right);
+```
+
+※ 메소드 참조
+
+```java
+Math :: max;
+```
+
+※ 메소드 참조 또한 인터페이스의 익명 구현 객체로 생성되므로<br>타겟 타입인 인터페이스의 추상 메소드가 어떤 매개 변수 및 리턴 타입을 가지느냐에 따라 달라짐
+
+```java
+IntBinaryOperator operator = Math :: max;
+```
+
+<br>
+<br>
+
+## 정적 메소드와 인스턴스 메소드 참조
+
+- 정적 메소드 참조 : `클래스 :: 메소드`
+- 인스턴스 메소드 참조 : `참조변수 :: 메소드` (먼저 객체를 생성하여 참조 변수에 할당해야 함)
+
+```java
+public class Calculator {
+  public static int staticMethod(int x, int y) { return x + y; }
+  public int instanceMethod(int x, int y) { return x + y; }
+}
+```
+
+```java
+import java.util.function.IntBinaryOperator;
+
+public class MethodReferencesExample {
+  public static void main(String[] args) {
+    IntBinaryOperator operator;
+
+    operator = (x, y) -> Calculator.staticMethod(x, y);
+    System.out.println("결과 1 : " + operator.applyAsInt(1, 2));
+
+    operator = Calculator :: staticMethod;
+    System.out.println("결과 2 : " + operator.applyAsInt(3, 4));
+
+    Calculator obj = new Calculator();
+    operator = (x, y) -> obj.instanceMethod(x, y);
+    System.out.println("결과 3 : " + operator.applyAsInt(5, 6));
+
+    operator = obj :: instanceMethod;
+    System.out.println("결과 4 : " + operator.applyAsInt(7, 8));
+  }
+}
+
+/*
+결과 1 : 3
+결과 2 : 7
+결과 3 : 11
+결과 4 : 15
+*/
+```
+
+<br>
+<br>
+
+## 매개 변수의 메소드 참조
+
+- 람다식에서 매개 변수를 매개값으로 사용하는 경우 : `(a, b) -> { a.instanceMethod(b); }`
+- 위 경우에 대한 메소드 참조 방식 : `클래스 :: instanceMethod`
+
+```java
+import java.util.fnuction.ToIntBiFunction;
+
+public class ArgumentMethodReferencesExample {
+  public static void main(String[] args) {
+    ToIntBiFunction<String, String> function;
+
+    function = (a, b) -> a.compareToIgnoreCase(b);
+    print(function.applyAsInt("Java8", "JAVA8"));
+
+    function = String :: compareToIgnoreCase;
+    print(function.applyAsInt("Java8", "JAVA8"));
+  }
+
+  public static void print(int order) {
+    if (order < 0) { System.out.println("사전순으로 먼저 옵니다."); }
+    else if (order == 0) { System.out.println("동일한 문자열입니다."); }
+    else { System.out.println("사전순으로 나중에 옵니다."); }
+  }
+}
+```
+
+<br>
+<br>
+
+## 생성자 참조
+
+- 생성자를 참조한다는 것은 객체 생성을 의미함
+- 단순히 객체를 생성하고 리턴하도록 구성된 람다식은 생성자 참조로 대치 가능
+- 객체 생성 후 리턴만 하는 람다식 : `(a, b) -> { return new 클래스(a, b); }`
+- 위 경우에 대한 생성자 참조 : `클래스 :: new`
+  - 생성자가 여러 개 오버로딩되어 있을 경우, 컴파일러는 함수적 인터페이스의 추상 메소드의 것과 동일한 생성자를 찾아 실행함
+
+```java
+public class Member {
+  private String name;
+  private String id;
+
+  public Member() {}
+  public Member(String id) {
+    this.id = id;
+  }
+  public Member(String name, String id) {
+    this.name = name;
+    this.id = id;
+  }
+
+  public String getId() { return id; }
+}
+```
+
+```java
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+public class ConstructorReferencesExample {
+  public static void main(String[] args) {
+    Function<String, Member> function1 = Member :: new;
+    Member member1 = function1.apply("angel");
+
+    BiFunction<String, String, Member> function2 = Member :: new;
+    Member member2 = function2.apply("loko", "angel");
+  }
+}
+```
