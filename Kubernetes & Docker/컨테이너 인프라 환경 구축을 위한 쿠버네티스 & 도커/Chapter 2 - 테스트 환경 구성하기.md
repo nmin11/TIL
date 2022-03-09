@@ -78,3 +78,28 @@ end
   - 베이그런트에서 ssh 서비스의 기본 포트 번호인 22번을 `id: ssh` 설정을 해주지 않으면<br>2222 포트와 60010 포트의 내용을 게스트의 22번으로 포워딩됨<br>→ 기능적으로 큰 문제를 일으키지 않지만 명시적으로 지정해주는 것이 좋음
 - line 15 : 호스트(PC)와 게스트(가상 머신) 사이에 디렉토리 동기화가 이뤄지지 않도록 설정
 - line 16~17 : config와 cfg에 대한 설정 작업이 종료됐음을 명시
+
+<br>
+<br>
+
+## 가상 머신에 추가 패키지 설정하기
+
+※ 추가되는 코드
+
+```ruby
+cfg.vm.provision "shell", path: "install_pkg.sh" # add provisioning script
+```
+
+- `vm.provision "shell"` 구문으로 path에 있는 install_pkg.sh를 게스트(CentOS) 내부에서 호출하여 실행되도록 함
+
+※ install_pkg.sh 코드
+
+```sh
+# !/usr/bin/env bash
+# install packages
+yum install epel-release -y
+yum install vim-enhanced -y
+```
+
+- EPEL(Extra Packages for Enterprise Linux) 저장소와 코드 하이라이트를 위한 Vim 추가 기능 설치
+- provision 구문 실행 명령어 : `vagrant provision`
