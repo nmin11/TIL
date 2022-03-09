@@ -103,3 +103,75 @@ yum install vim-enhanced -y
 
 - EPEL(Extra Packages for Enterprise Linux) 저장소와 코드 하이라이트를 위한 Vim 추가 기능 설치
 - provision 구문 실행 명령어 : `vagrant provision`
+
+<br>
+<br>
+
+## 가상 머신 추가로 구성하기
+
+- 단순히 운영 체제 1개를 구성하려고 베이그런트를 사용하지는 않음
+
+※ Vagrantfile 파일 변경
+
+```ruby
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
+  config.vm.define "m-k8s" do |cfg|
+    cfg.vm.box = "sysnet4admin/CentOS-k8s"
+    cfg.vm.provider "virtualbox" do |vb|
+      vb.name = "m-k8s(github_SysNet4Admin)"
+      vb.cpus = 2
+      vb.memory = 2048
+      vb.customize ["modifyvm", :id, "--groups", "/k8s-SM(github_SysNet4Admin)"]
+    end
+    cfg.vm.host_name = "m-k8s"
+    cfg.vm.network "private_network", ip: "192.168.1.10"
+    cfg.vm.network "forwarded_port", guest: 22, host: 60010, auto_correct: true, id: "ssh"
+    cfg.vm.synced_folder "../data", "/vagrant", disabled: true
+    cfg.vm.provision "shell", path: "install_pkg.sh" # add provisioning script
+    cfg.vm.provision "file", source: "ping_2_nds.sh", destination: "ping_2_nds.sh"
+    cfg.vm.provision "shell", path: "config.sh"
+  end
+
+  # Added Nodes
+
+  (1..3).each do |i|
+    config.vm.define "w#{i}-k8s" do |cfg|
+      cfg.vm.box = "sysnet4admin/CentOS-k8s"
+      cfg.vm.provider "virtualbox" do |vb|
+        vb.name = "w#{i}-k8s(github_SysNet4Admin)"
+        vb.cpus = 1
+        vb.memory = 1024
+        vb.customize ["modifyvm", :id, "--groups", "/k8s-SM(github_SysNet4Admin)"]
+      end
+      cfg.vm.host_name = "w#{i}-k8s"
+      cfg.vm.network "private_network", ip: "192.168.1.10#{i}"
+      cfg.vm.network "forwarded_port", guest: 22, host: "6010#{i}", auto_correct: true, id: "ssh"
+      cfg.vm.synced_folder "../data", "/vagrant", disabled: true
+      cfg.vm.provision "shell", path: "install_pkg.sh"
+    end
+  end
+end
+```
+
+- line 17 : 파일을 게스트 운영 체제에 전달하기 위해 "shell"이 아닌 "file" 구문 사용<br>이렇게 하면 호스트에 있는 파일을 게스트의 홈 디렉토리로 전달
+- line 18 : `config.sh`를 게스트에서 실행
+- line 23~36 : 추가한 3대의 CentOS에 대한 구성
+
+※ ping_2_nds.sh
+
+```sh
+# ping 3 times per nodes
+ping 192.168.1.101 -c 3
+ping 192.168.1.102 -c 3
+ping 192.168.1.103 -c 3
+```
+
+※ config.sh
+
+```sh
+# !/usr/bin/env bash
+# modify permission
+chmod 744 ./ping_2_nds.sh
+```
