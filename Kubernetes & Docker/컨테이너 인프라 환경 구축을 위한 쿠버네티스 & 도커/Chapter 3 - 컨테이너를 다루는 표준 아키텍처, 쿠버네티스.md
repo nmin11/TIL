@@ -54,3 +54,155 @@
 
 - kubernetes에서 끝의 k와 s만 두고, 나머지 8자는 축약한 것
 - 참고로 쿠버네티스는 그리스어로 도선사나 조타수를 의미함
+
+<br>
+<br>
+
+## 쿠버네티스 구성 방법
+
+### 1. 퍼블릭 클라우드 업체에서 제공하는 관리형 쿠버네티스 사용
+
+- EKS(Amazon Elastic Kubernetes Service), AKS(Azure Kubernetes Services), GKE(Google Kubernetes Engine) 등을 사용
+- 구성이 이미 다 갖춰져 있고 마스터 노드를 클라우드 업체에서 관리하기 때문에 학습용으로 부적합
+
+<br>
+
+### 2. 설치형 쿠버네티스 사용
+
+- 수세의 Rancher, 레드햇의 OpenShift 사용
+- 유료라 쉽게 접근하기 어려움
+
+<br>
+
+### 3. 구성형 쿠버네티스 사용
+
+- 사용하는 시스템에 쿠버네티스 클러스터를 자동으로 구성해주선 솔루션을 사용하는 방법
+- kubeadm, kops, KRIB, kubespray 등이 있으며, kubeadm이 가장 널리 알려져 있음
+  - kubeadm은 사용자가 변경하기도 수월하고, 온프레미스와 클라우드를 모두 지원하며, 배우기도 쉬움
+
+<br>
+<br>
+
+## 쿠버네티스 구성하기
+
+※ Vagrantfile
+
+```ruby
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  N = 3 # max number of worker nodes
+  Ver = '1.18.4' # Kubernetes Version to install
+
+  #=============#
+  # Master Node #
+  #=============#
+
+    config.vm.define "m-k8s" do |cfg|
+      cfg.vm.box = "sysnet4admin/CentOS-k8s"
+      cfg.vm.provider "virtualbox" do |vb|
+        vb.name = "m-k8s(github_SysNet4Admin)"
+        vb.cpus = 2
+        vb.memory = 3072
+        vb.customize ["modifyvm", :id, "--groups", "/k8s-SgMST-1.13.1(github_SysNet4Admin)"]
+      end
+      cfg.vm.host_name = "m-k8s"
+      cfg.vm.network "private_network", ip: "192.168.1.10"
+      cfg.vm.network "forwarded_port", guest: 22, host: 60010, auto_correct: true, id: "ssh"
+      cfg.vm.synced_folder "../data", "/vagrant", disabled: true
+      cfg.vm.provision "shell", path: "config.sh", args: N
+      cfg.vm.provision "shell", path: "install_pkg.sh", args: [ Ver, "Main" ]
+      cfg.vm.provision "shell", path: "master_node.sh"
+    end
+
+  #==============#
+  # Worker Nodes #
+  #==============#
+
+  (1..N).each do |i|
+    config.vm.define "w#{i}-k8s" do |cfg|
+      cfg.vm.box = "sysnet4admin/CentOS-k8s"
+      cfg.vm.provider "virtualbox" do |vb|
+        vb.name = "w#{i}-k8s(github_SysNet4Admin)"
+        vb.cpus = 1
+        vb.memory = 2560
+        vb.customize ["modifyvm", :id, "--groups", "/k8s-SgMST-1.13.1(github_SysNet4Admin)"]
+      end
+      cfg.vm.host_name = "w#{i}-k8s"
+      cfg.vm.network "private_network", ip: "192.168.1.10#{i}"
+      cfg.vm.network "forwarded_port", guest: 22, host: "6010#{i}", auto_correct: true, id: "ssh"
+      cfg.vm.synced_folder "../data", "/vagrant", disabled: true
+      cfg.vm.provision "shell", path: "config.sh", args: N
+      cfg.vm.provision "shell", path: "install_pkg.sh", args: Ver
+      cfg.vm.provision "shell", path: "work_nodes.sh"
+    end
+  end
+
+end
+```
+
+- line 5 : 쿠버네티스에서 작업을 수행할 워커 노드의 수를 변수로 받음
+- line 6 : 쿠버네티스 버전을 사용자가 선택할 수 있도록 변수로 저장
+- line 25 : `args: [ Ver, "Main" ]` 코드를 통해 쿠버네티스 버전 정보와 Main이라는 문자를 install_pkg.sh에 전달
+- line 26 / line 48 : 쿠버네티스 마스터 노드를 위한 master_node.sh와 워커 노드를 위한 work_nodes.sh 코드 추가
+
+※ config.sh
+
+- kubeadm으로 쿠버네티스를 설치하기 위한 사전 조건 설정 스크립트
+
+```ruby
+#!/usr/bin/env bash
+
+# vim configuration
+echo 'alias vi=vim' >> /etc/profile
+
+# swapoff -a to disable swapping
+swapoff -a
+# sed to comment the swap partition in /etc/fstab
+sed -i.bak -r 's/(.+ swap .+)/#\1/' /etc/fstab
+
+# kubernetes repo
+gg_pkg="packages.cloud.google.com/yum/doc" # Due to shorten addr for key
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://${gg_pkg}/yum-key.gpg https://${gg_pkg}/rpm-package-key.gpg
+EOF
+
+# Set SELinux in permissive mode (effectively disabling it)
+setenforce 0
+sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+# RHEL/CentOS 7 have reported traffic issues being routed incorrectly due to iptables bypassed
+cat <<EOF >  /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+modprobe br_netfilter
+
+# local small dns & vagrant cannot parse and delivery shell code.
+echo "192.168.1.10 m-k8s" >> /etc/hosts
+for (( i=1; i<=$1; i++  )); do echo "192.168.1.10$i w$i-k8s" >> /etc/hosts; done
+
+# config DNS
+cat <<EOF > /etc/resolv.conf
+nameserver 1.1.1.1 #cloudflare DNS
+nameserver 8.8.8.8 #Google DNS
+EOF
+```
+
+- line 4 : vi를 호출하면 vim을 호출하도록 프로파일 입력
+- line 7 : 쿠버네티스의 설치 요구 조건을 맞추기 위해 스왑되지 않도록 설정
+- line 9 : 시스템이 다시 시작되더라도 스왑이 되지 않도록 설정
+- line 13~21 : 쿠버네티스를 내려받을 리포지토리 설정
+- line 24~25 : selinux가 제한적으로 사용되지 않도록 permissive 모드로 변경
+- line 28~31 : 브리지 네트워크를 통과하는 IPv4와 IPv6의 패킷을 iptables가 관리하게 설정<br>pod의 통신을 iptables로 제어<br>필요에 따라 IPVS(IP Virtual Server) 같은 방식으로도 구성 가능
+- line 32 : br_netfilter 커널 모듈을 사용해 브리지로 네트워크 구성<br>IP Masquerade를 사용해 내부 네트워크와 외부 네트워크 분리
+  - IP Masquerade는 커널에서 제공하는 NAT(Network Address Translation) 기능
+- line 35~36 : 쿠버네티스 안에서 노드 간 통신을 이름으로 할 수 있도록 각 노드의 호스트 이름과 IP를 /etc/hosts에 설정<br>이때 워커 노드는 Vagrantfile에서 넘겨받은 N 변수로 전달된 노드 수에 맞게 동적으로 생성
+- line 39~42 : 외부와 통신할 수 있게 DNS 서버 지정
