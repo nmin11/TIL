@@ -206,3 +206,89 @@ EOF
   - IP Masquerade는 커널에서 제공하는 NAT(Network Address Translation) 기능
 - line 35~36 : 쿠버네티스 안에서 노드 간 통신을 이름으로 할 수 있도록 각 노드의 호스트 이름과 IP를 /etc/hosts에 설정<br>이때 워커 노드는 Vagrantfile에서 넘겨받은 N 변수로 전달된 노드 수에 맞게 동적으로 생성
 - line 39~42 : 외부와 통신할 수 있게 DNS 서버 지정
+
+※ install_pkg.sh
+
+- 클러스터를 구성하기 위해서 가상 머신에 설치돼야 하는 의존성 패키지를 명시
+- 실습에 필요한 소스 코드를 m-k8s 가상 머신 내부에 내려받도록 설정
+
+```ruby
+#!/usr/bin/env bash
+
+# install packages
+yum install epel-release -y
+yum install vim-enhanced -y
+yum install git -y
+
+# install docker
+yum install docker -y && systemctl enable --now docker
+
+# install kubernetes cluster
+yum install kubectl-$1 kubelet-$1 kubeadm-$1 -y
+systemctl enable --now kubelet
+
+# git clone _Book_k8sInfra.git
+if [ $2 = 'Main' ]; then
+  git clone https://github.com/sysnet4admin/_Book_k8sInfra.git
+  mv /home/vagrant/_Book_k8sInfra $HOME
+  find $HOME/_Book_k8sInfra/ -regex ".*\.\(sh\)" -exec chmod 700 {} \;
+fi
+```
+
+- line 6 : git 설치
+- line 9 : 쿠버네티스를 관리하는 컨테이너를 설치하기 위해 도커 설치 및 구동
+- line 12~13 : 쿠버네티스를 구성하기 위해 첫 번째 변수(1.18.4)의 버전으로 kubectl, kubelet, kubeadm 설치 및 kubelet 시작
+- line 16~20 : 전체 실행 코드를 마스터 노드에만 내려받도록 Vagrantfile에서 두 번째 변수(Main)를 넘겨 받고<br>git에서 코드를 내려받아 실습 진행 루트 홈디렉토리(/root)로 옮김<br>.sh를 바로 찾아서 실행할 수 있도록 `chmod 700` 설정
+
+※ master_node.sh
+
+- m-k8s를 쿠버네티스 마스터 노드로 구성하는 스크립트
+- 여기서 쿠버네티스 클러스터를 구성할 때 꼭 선택해야 하는 CNI(Container Network Interface)도 함께 구성함
+
+```ruby
+#!/usr/bin/env bash
+
+# init kubernetes
+kubeadm init --token 123456.1234567890123456 --token-ttl 0 \
+--pod-network-cidr=172.16.0.0/16 --apiserver-advertise-address=192.168.1.10
+
+# config for master node only
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+# config for kubernetes's network
+kubectl apply -f \
+https://raw.githubusercontent.com/sysnet4admin/IaC/master/manifests/172.16_net_calico.yaml
+```
+
+- line 4~5 : kubeadm을 통해 쿠버네티스의 워커 노드를 받아들일 준비
+  - 토큰 값 지정
+  - ttl(time to live)을 0으로 설정해서 기본값인 24시간 후에 토큰이 계속 유지되도록 함
+  - 워커 노드가 정해진 토큰으로 들어오게 함
+  - 쿠버네티스가 컨테이너에 자동으로 부여하는 네트워크를 172.16.0.0/16(172.16.0.1~172.16.255.254)으로 제공
+  - 워커 노드가 접속하는 API 서버의 IP를 192.168.1.10으로 지정해 워커 노드들이 자동으로 API 서버에 연결되도록 함
+- line 8~10 : 마스터 노드에 현재 사용자가 쿠버네티스를 정상적으로 구동할 수 있게 설정 파일을 홈디렉토리(/root)에 복사하고<br>쿠버네티스를 이용할 사용자에게 권한 부여
+- line 13~14 : CNI인 Calico의 설정을 적용해 쿠버네티스의 네트워크 구성
+
+※ work_nodes.sh
+
+- 3대의 가상 머신(w1-k8s, w2-k8s, w3-k8s)에 쿠버네티스 워커 노드를 구성하는 스크립트
+- 마스터 노드에 구성된 클러스터에 조인이 필요한 정보가 모두 코드화되어 있어서<br>스크립트를 실행하기만 하면 편하게 워커 노드로서 쿠버네티스 클러스터에 조인
+
+```ruby
+#!/usr/bin/env bash
+
+# config for work_nodes only
+kubeadm join --token 123456.1234567890123456 \
+             --discovery-token-unsafe-skip-ca-verification 192.168.1.10:6443
+```
+
+- line 4~5 : kubeadm을 이용해 쿠버네티스 마스터 노드에 접속
+  - 연결에 필요한 토큰은 기존에 마스터 노드에서 생성한 것 사용
+  - 간단하게 구성하기 위해 `--discovery-token-unsafe-skip-ca-verification`으로 인증 무시
+  - API 서버 주소인 192.168.1.10으로 기본 포트 번호인 6443포트에 접속하도록 설정
+
+※ vagrant up 이후 마스터 노드와 워커 노드 확인하는 명령어
+
+- 마스터 노드 콘솔에서 `kubectl get nodes` 입력
