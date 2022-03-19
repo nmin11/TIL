@@ -493,3 +493,95 @@ kubeadm join --token 123456.1234567890123456 \
 - 그래서 쿠버네티스에서는 다수의 파드를 만드는 레플리카셋 오브젝트를 제공함
 - 예를 들어 파드를 3개 만들겠다고 레플리카셋에 선언하면 컨트롤러 매니저와 스케줄러가 워커 노드에 파드 3개를 만들도록 선언함
 - 그러나 레플리카셋은 파드 수를 보장하는 기능만 제공하기 때문에 디플로이먼트를 사용하기를 권장함
+
+<br>
+<br>
+
+## 스펙을 지정해 오브젝트 생성하기
+
+- `kubectl create deployment` 명령어는 디플로이먼트를 생성하면서 1개의 파드만 만들 뿐
+- `create`에서는 `replicas` 옵션을 사용할 수 없으며, `scale`은 이미 만들어진 디플로이먼트에서만 사용 가능
+- 디플로이먼트를 생성하면서 한꺼번에 여러 개의 파드를 만들 순 없을까?
+- 이 의문점을 해결하려면 **오브젝트 스펙** 파일을 작성하면 됨
+- 오브젝트 스펙은 일반적으로 YAML 문법으로 작성함
+  - YAML(Yet Another Markup Language, 또 다른 마크업 언어)
+  - 그러나 공식 사이트에서 YAML Ain't Markup Language라고 재정의했음
+
+※ echo-hname.yaml
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-hname
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: echo-hname
+          image: sysnet4admin/echo-hname
+```
+
+- apiVersion : 오브젝트를 포함하는 API의 버전
+  - 일반적으로 알파와 베타 버전은 안정적이지 않지만 그만큼 풍부한 기능을 가지고 있음
+- kind : `apps/v1`은 여러 종류의 `kind`를 가지고 있는데, Deployment를 선택해서 레플리카셋 생성
+- metadata : 디플로이먼트의 이름과 레이블 지정
+- replicas : 레플리카셋이 몇 개의 파드를 생성할지 결정
+
+※ `kubectl api-versions` : 쿠버네티스에서 사용 가능한 API 버전 확인 명령어
+
+※ nginx-pod.yaml
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+    - name: container-name
+      image: nginx
+```
+
+- 파드의 스펙이며, `echo-hname.yaml`의 `template` 부분과 동일함
+- metadata : 파드의 이름 지정
+- spec : 파드에서 호출할 컨테이너 이미지 지정
+
+<br>
+<br>
+
+## apply로 오브젝트 생성하고 관리하기
+
+- 변경 사항을 다시 적용하고 싶은 경우를 위해서 쿠버네티스는 `apply`라는 명령어를 제공함
+- 애초에 변경 사항이 발생할 가능성이 있는 오브젝트는 처음부터 `create` 대신 `apply`로 생성하는 것이 좋음
+
+|    구분     |    Run    |  Create   |      Apply      |
+| :---------: | :-------: | :-------: | :-------------: |
+|  명령 실행  |  제한적   |   가능    |     불가능      |
+|  파일 실행  |  불가능   |   가능    |      가능       |
+|    변경     |  불가능   |  불가능   |      가능       |
+| 실행 편의성 | 매우 좋음 | 매우 좋음 |      좋음       |
+|  기능 유지  |  제한적   |  지원됨   | 다양하게 지원됨 |
+
+<br>
+<br>
+
+## 파드의 컨테이너 자동 복구 방법
+
+- 쿠버네티스는 거의 모든 부분이 자동 복구되도록 설계되었음
+- 특히 파드의 자동 복구 기술을 **Self-Healing**이라 하며,<br>제대로 작동하지 않는 컨테이너를 다시 시작하거나 교체해 파드가 정상 작동하게 함
+
+※ `kubectl exec -it nginx-pod -- /bin/bash`
+
+- `exec` : execute(실행)를 뜻함
+- `-it` : stdin(standard input)의 i와 tty(teletypewriter)의 t를 합쳐서 it가 되었으며, 표준 명령을 인터페이스로 작성한다는 의미
+- `--` : exec에서 인자값을 나누고 싶을 때 사용
