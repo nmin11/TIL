@@ -653,3 +653,72 @@ spec:
 ### 특정 시점으로 파드 복구하기
 
 - `kubectl undo <Object> --to-revision=<원하는 버전>`
+
+<br>
+<br>
+
+# 쿠버네티스 연결을 담당하는 서비스
+
+- 쿠버네티스 클러스터 내부에서만 파드를 이용하려고 쿠버네티스를 배우는 건 당연히 아님
+- 외부 사용자가 파드를 이용하는 방법을 알아야 함
+- 쿠버네티스에서는 외부에서 쿠버네티스 클러스터에 접속하는 방법을 **서비스**라고 함
+
+<br>
+<br>
+
+## 가장 간단하게 연결하는 노드포트
+
+- 노드포트 서비스를 설정하면 모든 워커 노드의 특정 포트(노드 포트)를 열고 여기로 오는 모든 요청을 노드포트 서비스로 전달함
+- 그리고 노드포트 서비스는 해당 업무를 처리할 수 있는 파드로 요청을 전달함
+
+<br>
+
+### 노드포드 서비스로 외부에서 접속하기
+
+※ nodeport.yaml
+
+```yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: np-svc
+spec:
+  selector:
+    app: np-pods
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30000
+  type: NodePort
+```
+
+- 기존 파드 구조에서 `kind`가 `Service`로 바뀌었고, `spec`에 컨테이너에 대한 정보가 없음
+- 그리고 접속에 필요한 네트워크 관련 정보를 설정하고, 서비스의 `type`을 `NodePort`로 지정함
+- 생성 후 `kubectl get services`로 확인해보면 위 명세대로 만들어진 서비스 외에도 `CLUSTER-IP`가 있는데,<br>이는 쿠버네티스 클러스터 내부에서 사용하는 IP이며 자동으로 지정됨
+
+<br>
+
+### 부하 분산 테스트하기
+
+※ 테스트 방법
+
+```sh
+$i=0; while($true)
+{
+  % { $i++; write-host -NoNewline "$i $_" }
+  (Invoke-RestMethod "http://192.168.1.101:30000")-replace '\n', " "
+}
+```
+
+- 레플리카셋을 늘려주는 만큼 존재하는 파드에 자동으로 분산되어 명령이 실행되는 것을 확인할 수 있음
+- 이는 노드포트의 오브젝트 스펙에 적힌 `np-pods`와 디플로이먼트의 이름을 확인해서 동일하면 같은 파드라고 간주하기 때문
+
+<br>
+
+### expose로 노드포트 서비스 실행하기
+
+- 노드포트 서비스는 오브젝트 스펙 파일 말고도 `expose` 명령어를 써서 생성할 수 있음
+- 예시 : `kubectl expose deployment np-pods --type=NodePort --name=np-svc-v2 --port=80`
+- 이 경우 오브젝트 스펙과는 달리 포트 번호가 30000 ~ 32767 에서 임의로 지정됨
