@@ -722,3 +722,109 @@ $i=0; while($true)
 - 노드포트 서비스는 오브젝트 스펙 파일 말고도 `expose` 명령어를 써서 생성할 수 있음
 - 예시 : `kubectl expose deployment np-pods --type=NodePort --name=np-svc-v2 --port=80`
 - 이 경우 오브젝트 스펙과는 달리 포트 번호가 30000 ~ 32767 에서 임의로 지정됨
+
+<br>
+<br>
+
+## 사용 목적별로 연결하는 인그레스
+
+- 노드포트 서비스는 포트를 중복 사용할 수 없어서 1개의 노드포트에 1개의 디플로이먼트만 적용됨
+- 쿠버네티스에서 여러 개의 디플로이먼트가 있을 때는 **Ingress**를 사용함
+- 인그레스는 고유한 주소를 제공해 사용 목적에 따라 다른 응답을 제공할 수 있고,<br>트래픽에 대한 L4/L7 로드밸런서와 보안 인증서를 처리하는 기능을 제공함
+- 인그레스를 사용하려면 인그레스 컨트롤러가 필요
+  - 다양한 인그레스 컨트롤러가 있는데 여기서는 쿠버네티스에서 프로젝트로 지원하는 NGINX 인그레스 컨트롤러로 구성해볼 것
+- 인그레스 컨트롤러는 파드와 직접 통신 불가
+  - 노드포트 또는 로드밸런서 서비스와 연동되어야 함
+  - 여기서는 노드포트로 이를 연동했음
+- NGINX 인그레스 컨트롤러 작동 단계
+  1. 사용자는 노드마다 설정된 노드포트를 통해 노드포트 서비스로 접속<br>이때 노드포트 서비스를 NGINX 인그레스 컨트롤러로 구성
+  2. NGINX 인그레스 컨트롤러는 사용자의 접속 경로에 따라 적합한 클러스터 IP 서비스로 경로 제공
+  3. 클러스터 IP 서비스는 사용자를 해당 파드로 연결해줌
+- 인그레스 컨트롤러의 궁극적인 목적 : 사용자가 접속하려는 경로에 따라 다른 결과값을 제공하는 것
+- NGINX 인그레스 컨트롤러는 default 네임스페이스가 아닌 ingress-nginx 네임스페이스에 속하므로<br>조회 시 `-n ingress-nginx` 옵션을 추가해야 함
+  - `-n`은 namespace의 약어로, default 외의 네임스페이스를 확인할 때 사용하는 옵션
+
+※ ingress-config.yaml
+
+```yml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  # Ingress의 이름이며, 이를 통해 통신할 ingress 컨트롤러 확인
+  name: ingress-nginx
+  # 메타데이터의 기록 및 변경으로, 여기선 rewrite-target을 기본 주소로 지정함
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  # 규칙 지정
+  rules:
+    - http:
+        paths:
+          # 기본 경로 규칙
+          - path:
+            backend:
+              serviceName: hname-svc-default
+              servicePort: 80
+          # /ip 경로 추가
+          - path: /ip
+            backend:
+              serviceName: ip-svc
+              servicePort: 80
+          # /your-directory 경로 추가
+          - path: /your-directory
+            backend:
+              serviceName: your-svc
+              servicePort: 80
+```
+
+- 설정 파일 등록 후 `kubectl get ingress`로 확인 가능
+  - `kubectl get ingress -o yaml`로 요청한 내용이 확실하게 적용되었는지 확인 가능
+
+※ ingress.yaml
+
+```yml
+apiVersion: v1
+kind: Service
+metadata:
+  # 서비스 이름
+  name: nginx-ingress-controller
+  # 네임스페이스 이름
+  namespace: ingress-nginx
+spec:
+  # 사용할 프로토콜과 포트들을 지정
+  ports:
+    # http에 대한 프로토콜 및 포트 지정
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30100
+    # https에 대한 프로토콜 및 포트 지정
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443
+      nodePort: 30101
+  # 셀렉터의 레이블 지정
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+  # 서비스 타입을 설정
+  type: NodePort
+```
+
+- http를 처리하기 위해 30100번 포트로 들어온 요청을 80번 포트로 넘기고,<br>https를 처리하기 위해 30101번 포트로 들어온 요청을 443번 포트로 넘김
+- NGINX 인그레스 컨트롤러가 위치하는 네임스페이스를 ingress-nginx로 지정
+- NGINX 인그레스 컨트롤러의 요구 사항에 따라 셀렉터를 ingress-nginx로 지정
+- 이렇게 생성된 NGINX 인그레스 컨트롤러를 확인할 때 : `kubectl get services -n ingress-nginx`
+
+<br>
+<br>
+
+## 클라우드에서 쉽게 구성 가능한 로드밸런서
+
+- 앞의 연결 방식은 들어오는 요청을 모두 워커 노드의 노드포트를 통해 노드포트 서비스로 이동하고<br>이를 다시 쿠버네티스의 파드로 보내는 구조
+- 앞의 방식들은 너무 비효율적이기 때문에 쿠버네티스에서는 **LoadBalancer**라는 서비스 타입을 제공해서<br>간단한 구조로 파드를 외부에 노출하고 부하를 분산할 수 있도록 해줌
+- 로드밸런서를 사용하려면 로드밸런서를 이미 구현해 둔 서비스업체의 도움을 받아 쿠버네티스 클러스터 외부에 구현해야 함
+- 사용 예시 : `kubectl expose deployment ex-lb --type=LoadBalancer --name=ex-svc`
+  - 이 실습은 클라우드 사(EKS, GKE, AKS)에서만 가능
+- 이 다음부터 우리가 만든 테스트 가상 환경(온프레미스)에서 로드밸런서를 사용하기 위한 대안을 찾아볼 것
