@@ -828,3 +828,106 @@ spec:
 - 사용 예시 : `kubectl expose deployment ex-lb --type=LoadBalancer --name=ex-svc`
   - 이 실습은 클라우드 사(EKS, GKE, AKS)에서만 가능
 - 이 다음부터 우리가 만든 테스트 가상 환경(온프레미스)에서 로드밸런서를 사용하기 위한 대안을 찾아볼 것
+
+<br>
+<br>
+
+## 온프레미스에서 로드밸런서를 제공하는 MetalLB
+
+- 온프레미스에서 로드밸런서를 사용하려면 내부에 로드밸런서 서비스를 받아주는 구성이 필요함
+- **MetalLB**는 bare metal(운영 체제가 설치되지 않은 하드웨어)로 구성된 쿠버네티스에서도<br>로드밸런서를 사용할 수 있게 고안된 프로젝트
+- 특별한 네트워크 설정이나 구성이 있는 것이 아니라 기존의 L2 네트워크(ARP/NDP)와 L3 네트워크(BGP)로 로드밸런서를 구현함
+- MetalLB 컨트롤러는 작동 방식(protocol)을 정의하고 EXTERNAL-IP를 부여해 관리함
+- MetalLB Speaker는 정해진 작동 방식(L2/L3)에 따라 경로를 만들 수 있도록<br>네트워크 정보를 광고하고 수집해 각 파드의 경로를 제공함
+
+※ metallb-l2config.yaml
+
+```yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  # ConfigMap 이름
+  name: config
+data:
+  # 설정 내용
+  config: |
+    address-pools:
+    - name: nginx-ip-range
+      protocol: layer2
+      addresses:
+      - 192.168.1.11-192.168.1.13
+```
+
+- ConfigMap이라는 설정이 정의된 포맷을 사용
+- protocol : metallb에서 제공하는 로드밸런서의 동작 방식
+- addresses : metallb에서 제공하는 로드밸런서의 Ext 주소
+- 생성된 ConfigMap은 `kubectl get configmap` 명령어로 확인 가능
+
+<br>
+<br>
+
+## 부하에 따라 자동으로 파드 수를 조절하는 HPA
+
+- 쿠버네티스는 갑자기 사용자가 늘어나서 파드가 감당할 수 없게 될 경우에 대비해서<br>부하량에 따라 디플로이먼트의 파드 수를 유동적으로 관리하는 HPA(Horizontal Pod Autoscaler) 제공
+- 파드의 자원 사용 정도를 파악하는 명령어 : `kubectl top pods`
+  - 리눅스의 top(table of processes)과 비슷함
+- HPA는 자원을 요청할 때 Metrics-Server를 통해 계측값을 전달받음
+  - 따라서 파드의 자원이 어느 정도 사용되는지 파악하기 위해서는 메트릭 서버를 설정해야 함
+  - 메트릭 서버는 git clone 할 수 있는 원본 소스가 있음 (https://github.com/kubernetes-sigs/metrics-server)
+  - 이 책에서는 소스 파일을 sysnet4admin 계정으로 가져와서 실습에 필요한 추가 설정을 추가했음
+
+※ metrics-server.yaml 변경된 부분
+
+```yml
+containers:
+  - name: metrics-server
+    image: k8s.gcr.io/metrics-server-amd64:v0.3.6
+    args:
+      # Manually Add for lab env(Sysnet4admin/k8s)
+      # skip tls internal usage purpose
+      - --kubelet-insecure-tls
+      # kubelet could use internalIP communication
+      - --kubelet-preferred-address-types=InternalIP
+      - --cert-dir=/tmp
+      - --secure-port=4443
+```
+
+- `- --kubelet-insecure-tls` : TLS(Transport Layer Security) 인증을 무시하도록 함
+- 마지막 3줄 : kubelet이 내부 주소를 우선 사용하게 함
+
+<br>
+
+- 실습에서 scale 기준 값이 설정되어 있지 않아서 파드 증설 시점을 알 수 없기에,<br>파드에 부하가 걸리기 전에 scale이 실행되도록 디플로이먼트를 새로 생성하기 보다는 edit 명령어로 수정
+  - 수정 명령어 : `KUBE_EDITOR="vim" kubectl edit deployment hpa-hname-pods`
+
+※ 수정 내용
+
+```yml
+spec:
+  containers:
+    - image: sysnet4admin/echo-hname
+      imagePullPolicy: Always
+      name: echo-hname
+      resources:
+        requests:
+          cpu: "10m"
+        limits:
+          cpu: "50m"
+```
+
+- resources 부분에서 requests와 limits 추가
+  - 이 값은 파드마다 주어진 부하량을 결정하는 기준이 됨
+  - 단위 m은 milliunits의 약어로 1000m은 1개의 CPU가 됨
+
+<br>
+
+- 실습에서 사용한 autoscale 명령어 : `kubectl autoscale deployment hpa-hname-pods --min=1 --max=30 --cpu-percent=50`
+  - min은 최소 파드 수, max는 최대 파드 수, cpu-percent는 CPU 사용량이 50%가 넘으면 autoscale한다는 의미
+- HPA 현재 상태를 요약해서 보여주는 명령어 : `kubectl get hpa`
+- 부하량 테스트 시 사용하는 명령어 : `watch kubectl top pods` `watch kubectl get pods`
+  - watch는 2초에 한번씩 자동으로 상태를 확인할 수 있도록 해줌
+
+<br>
+
+=> 지금까지 쿠버네티스에서 파드 생성 후<br>실제 쿠버네티스 외부의 사용자들이 쿠버네티스 내부의 파드에 접속할 수 있도록 경로를 만들어주는 여러 서비스들을 살펴봤음<br>다음 절부터 디플로이먼트 외 다른 오브젝트를 사용해보게 될 것
