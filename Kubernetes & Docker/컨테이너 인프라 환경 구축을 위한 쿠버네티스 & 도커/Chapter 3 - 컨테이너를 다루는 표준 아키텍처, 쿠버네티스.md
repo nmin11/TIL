@@ -958,3 +958,23 @@ spec:
 
 - 이름 그대로 설정을 목적으로 사용하는 오브젝트
 - 이전에 인그레스 설정을 위해서 오브젝트를 인그레스로 선언했고 MetalLB에서는 컨피그맵을 사용했는데,<br>이는 인그레스는 오브젝트가 인그레스로 지정되어 있지만 MetalLB는 프로젝트 타입으로 정해진 오브젝트가 없기 때문
+
+<br>
+<br>
+
+## PV와 PVC
+
+- 파드는 언제라도 생성되고 지워지는 것
+- 그런데 때때로 파드에서 생성한 내용을 기록하고 보관하거나 모든 파드가 동일한 설정 값을 유지하고 관리하기 위해<br>공유된 볼륨으로부터 공통된 설정을 갖도록 설계해야 할 때도 있음
+- 쿠버네티스는 이런 경우를 위해 다양한 형태의 볼륨을 제공함
+  - 임시 : emptyDir
+  - 로컬 : host Path, local
+  - 원격 : persistentVolumeClaim, cephfs, cinder, csi, fc, flexVolume, flocker, glusterfs, iscsi, nfs,<br>portworxVolume, quobyte, rbd, scaleIO, storageos, vsphereVolume
+  - 특수 목적 : downwardAPI, configMap, secret, azureFile, projected
+  - 클라우드 : awsElasticBlockStore, azureDisk, gcePersistentDisk
+- 다양한 볼륨 스토리지 중에 PV와 PVC를 이해하면 다른 볼륨 스토리지도 쉽게 이해할 수 있음
+- PVC(PersistentVolumeClaim) : 지속적으로 사용 가능한 볼륨 요청
+- PV(PersistentVolume) : 지속적으로 사용 가능한 볼륨
+- PVC를 사용하려면 PV로 볼륨을 선언해야 함
+- 간단하게 PV는 볼륨을 사용할 수 있게 준비하는 단계이고, PVC는 준비된 볼륨에서 일정 공간을 할당받는 것
+- 가장 구현하기 쉬운 NFS 볼륨 타입으로 PV와 PVC를 생성하고 파드에 마운해보게 될 것
