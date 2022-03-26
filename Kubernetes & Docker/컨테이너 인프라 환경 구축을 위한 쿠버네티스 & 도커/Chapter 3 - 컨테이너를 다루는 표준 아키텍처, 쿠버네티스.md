@@ -978,3 +978,153 @@ spec:
 - PVC를 사용하려면 PV로 볼륨을 선언해야 함
 - 간단하게 PV는 볼륨을 사용할 수 있게 준비하는 단계이고, PVC는 준비된 볼륨에서 일정 공간을 할당받는 것
 - 가장 구현하기 쉬운 NFS 볼륨 타입으로 PV와 PVC를 생성하고 파드에 마운해보게 될 것
+
+<br>
+
+### NFS 볼륨에 PV/PVC를 만들고 파드에 연결하기
+
+- PV로 선언할 볼륨을 만들기 위해 NFS 서버를 마스터 노드에 구성
+
+```sh
+[root@m-k8s] mkdir /nfs_shared
+[root@m-k8s] echo '/nfs_shared 192.168.1.0/24(rw,sync,no_root,squash)' >> /etc/exports
+```
+
+- /nfs_shared를 NFS로 받아들일 IP 영역을 192.168.1.0/24로 설정
+- 옵션을 적용해서 /etc/exports에 기록
+
+```sh
+[root@m-k8s] systemctl enable --now nfs
+```
+
+- NFS 서버를 활성화하고 다음 시작 시에도 자동 적용되도록 설정
+- 그 이후 PV를 생성하는 yaml 파일 실행
+
+※ nfs-pv.yaml
+
+```yml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 192.168.1.10
+    path: /nfs_shared
+```
+
+- capacity : storage는 실제로 사용하는 용량을 제한하는 것이 아닌 쓸 수 있는 양을 레이블로 붙이는 것과 같음<br>이는 현재 스토리지가 단순히 NFS로 설정되어서 그런 것
+- accessModes : PV를 어떤 방식으로 사용할지 정의한 부분
+  - ReadWriteMany : 여러 개의 노드가 읽고 쓸 수 있도록 마운트하는 옵션
+  - 옵션에는 ReadWriteOnce, ReadOnlyMany 가 있음
+- persistentVolumeReclaimPolicy : PV가 제거됐을 때 작동 방법을 정의
+  - 옵션에는 Retain(유지), Delete(삭제), Recycle(재활용, Deprecated) 이 있음
+- nfs : NFS 서버의 연결 위치에 대한 설정
+- yaml 파일 실행해서 생성한 이후에는 `kubectl get pv` 명령어를 통해 Available 상태를 확인할 수 있음
+- 그 이후 PVC를 생성하는 yaml 파일도 실행
+
+※ nfs-pvc.yaml
+
+```yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Mi
+```
+
+- PV와 구성이 거의 동일함
+  - PV는 사용자가 요청할 볼륨 공간을 관리자가 만듦
+  - PVC는 사용자 간 볼륨을 요청하는 데에 사용됨
+- 마찬가지로 실행 이후에 `kubectl get pvc`로 상태 확인 가능
+  - STATUS가 Bound이면 PV와 PVC가 연결됐음을 뜻함
+- 이후 PVC를 볼륨으로 사용하는 디플로이먼트 오브젝트 스펙을 배포
+
+※ nfs-pvc-deploy.yaml
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-pvc-deploy
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nfs-pvc-deploy
+  template:
+    metadata:
+      labels:
+        app: nfs-pvc-deploy
+    spec:
+      containers:
+        - name: audit-trail
+          image: sysnet4admin/audit-trail
+          volumeMounts:
+            - name: nfs-vol
+              mountPath: /audit
+      volumes:
+        - name: nfs-vol
+          persistentVolumeClaim:
+            claimName: nfs-pvc
+```
+
+- audit-trail 이미지 : 요청을 처리할 때마다 접속 정보를 로그로 기록해주는 역할 수행
+- volumeMounts : 볼륨이 마운트될 위치 지정
+- volumes : PVC로 생성된 볼륨을 마운트하기 위해서 nfs-pvc라는 이름 사용
+
+<br>
+
+**audit 로그 테스트**
+
+1. 배포 이후 `kubectl exec -it <pod name> -- /bin/bash` 명령어로 생성된 파드 중 하나로 접속
+2. 로드밸런서 실행 : `kubectl expose deployment nfs-pvc-deploy --type=LoadBalancer --name=nfs-pvc-deploy-svc --port=80`
+3. 실행된 서비스의 IP로 접속 (192.168.1.21)
+4. exec로 접속한 파드에서 `ls /audit` 명령어로 생성된 로그 파일을 확인하고 `cat` 명령어로 해당 파일 열람
+
+<br>
+
+### NFS 볼륨을 파드에 직접 마운트하기
+
+- 사용자가 관리자와 동일한 단일 시스템이라면 PV와 PVC를 사용할 필요가 없음
+- 여기서는 단순히 볼륨을 마운트하는지 확인하고 넘어갈 것
+
+※ nfs-ip.yaml
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-ip
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nfs-ip
+  template:
+    metadata:
+      labels:
+        app: nfs-ip
+    spec:
+      containers:
+        - name: audit-trail
+          image: sysnet4admin/audit-trail
+          volumeMounts:
+            - name: nfs-vol
+              mountPath: /audit
+      volumes:
+        - name: nfs-vol
+          nfs:
+            server: 192.168.1.10
+            path: /nfs_shared
+```
