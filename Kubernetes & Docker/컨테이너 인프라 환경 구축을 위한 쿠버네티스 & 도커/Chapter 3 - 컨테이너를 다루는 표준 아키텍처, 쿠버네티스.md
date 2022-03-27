@@ -438,7 +438,7 @@ kubeadm join --token 123456.1234567890123456 \
   - nginx는 파드의 이름, --image=nginx는 생성할 이미지의 이름
 - `kubectl create` 명령어는 deployment를 추가해서 실행해야 함
   - `kubectl create deployment dpy-nginx --image=nginx`
-- `run`으로 파드를 생성하면 단일 파드 1개만 생성되어 관리되고, `create deployment`로 생성하면 Deployment라는 관리 그룹 내에 파드가 생성됨
+- `run`으로 파드를 생성하면 단일 파드 1개만 생성되어 관리되고,<br>`create deployment`로 생성하면 Deployment라는 관리 그룹 내에 파드가 생성됨
   - 비유를 들자면, 초코파이 1개를 그냥 생성한 것과 초코파이 1개를 초코파이 상자에 생성한 것
 - 최근에는 대부분 `create`로 파드를 생성하지만 단순 테스트 목적이라면 `run`을 사용해볼 수 있을 것
 
