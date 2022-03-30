@@ -166,7 +166,7 @@
 - status : 컨테이너 작동 상태
 - ancestor : 컨테이너가 사용하는 이미지
 
-=> 이외에도 도커 공식 문서(https://docs.docker.com/engine/reference/commandline/ps/#filtering)에서 더 많은 키 확인 가능
+=> 이외에도 도커 공식 문서(https://docs.docker.com/engine/reference/commandline/ps/#filtering) 에서 더 많은 키 확인 가능
 
 <br>
 
