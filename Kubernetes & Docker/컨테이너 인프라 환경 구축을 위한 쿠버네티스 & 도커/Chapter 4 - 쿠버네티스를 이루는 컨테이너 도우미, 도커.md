@@ -197,3 +197,46 @@
 |  주 활용 용도  |   임시 파일   | 컨테이너 생성 시 필요한 파일 |  보존이 필요한 파일   |   보존이 필요한 파일   |
 |  관리 편의성   |   좋지 못함   |             좋음             |         좋음          |       매우 좋음        |
 |  파일 보존성   |   좋지 못함   |             좋음             |       매우 좋음       |       매우 좋음        |
+
+- 바인드 마운트 실행 코드 예시 :<br>`docker run -d -p 8081:80 \-v /root/html:/usr/share/nginx --restart always --name nginx-bind-mounts nginx`
+  - nginx-bind-mounts라는 이름의 컨테이너 구동
+  - 컨테이너의 /usr/share/nginx/html/ 디렉토리와 호스트의 /root/html 디렉토리 연결
+  - -v(--volume) \<호스트 디렉토리 경로>:[컨테이너 디렉토리 경로]<br>호스트 디렉토리와 컨테이너 디렉토리 연결
+  - 유의점 : 바인드 마운트는 호스트 디렉토리의 내용을 그대로 컨테이너 디렉토리에 덮어쓰므로<br>컨테이너 디렉토리에 어떠한 내용이 있더라고 해당 내용은 삭제됨
+- docker 컨테이너 조회 명령어 예시 : `docker ps -f name=nginx-bind-mounts`
+- docker의 많은 기능과 명령이 kubectl과 동일하거나 비슷함
+
+<br>
+
+- volume : 도커가 직접 관리하며 컨테이너에 제공하는 호스트의 공간
+- 생성 명령어 예시 : `docker volume create nginx-volume`
+- 조회 명령어 예시 : `docker volume inspect nginx-volume`
+  - 볼륨에 적용된 드라이버 종류와 실제 호스트에 연결된 디렉토리, 볼륨 이름 등을 조회할 수 있음
+- 볼륨 실행 예시 :<br>`docker run -d -v nginx-volume:/usr/share/nginx/html \-p 8082:80 --restart always --name nginx-volume nginx`
+- 볼륨은 바인드 마운트와 다르게 덮어쓰지 않고 서로 동기화하기 때문에 컨테이너 디렉토리의 파일이 보존됨<br>하지만 볼륨 컨테이너 디렉토리와 동일한 파일이 존재한 상태로 연결하면 덮어쓰게 됨
+- 볼륨을 사용하면 `docker volume ls`로 조회하거나 `docker volume rm`으로 삭제할 수 있어서 바인드 마운트보다 간편함
+- 실습에서 볼륨 경로는 /var/lib/docker/volumes/ 디렉토리 안에 생성되었는데,<br>var 디렉토리는 로그, 캐시, 상태 정보 등을 저장함<br>이 기본 디렉토리를 그대로 사용하면 다른 기능이 사용하는 용량까지 차지하는 문제가 발생할 수 있음<br>따라서 충분한 용량이 확보된 디렉토리로 설정할 필요가 있으며,<br>이 때 --data-root 옵션이나 --mount 옵션을 활용할 수 있음
+
+<br>
+<br>
+
+## 사용하지 않는 컨테이너 정리하기
+
+- 컨테이너나 이미지를 삭제하기 전에 먼저 컨테이너를 정지해야 함
+- 컨테이너 정지 명령어 : `docker stop <컨테이너 이름 | ID>`
+  - 이름으로 정지할 수도 있고, ID 중 앞 글자 일부를 적어서 정지할 수도 있음
+- 조회 명령어에 옵션을 넣어서 조회된 컨테이너들을 정지할 수도 있음
+  - 조회 명령어 예시 : `docker ps -q -f ancestor=nginx`
+    - -q(--quite) 옵션은 ID만 출력하는 옵션
+  - 조회된 것들을 정지하는 명령어 예시 : `docker stop $(docker ps -q -f ancestor=nginx)`
+
+⭐ 정지된 컨테이너는 삭제된 것이 아님
+
+- `docker ps -a` 옵션을 통해 정지된 컨테이너까지 모두 조회 가능
+- 정지된 컨테이너 시작 명령어 : `docker start <컨테이너 이름 | ID>`
+- 컨테이너 삭제 명령어 : `docker rm <컨테이너 이름 | ID>`
+  - 실습에서 사용한 일괄 삭제 예시 : `docker rm $(docker ps -aq -f ancestor=nginx)`
+- 컨테이너를 삭제해도 내려받은 이미지는 아직도 남아 있음
+  - 실습에서 사용한 이미지 일괄 삭제 예시 : `docker rmi $(docker images -q nginx)`
+  - rmi : remove image
+  - 이미지는 컨테이너가 정지 상태가 아닌 삭제 상태일 때 삭제 가능
