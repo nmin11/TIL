@@ -240,3 +240,50 @@
   - 실습에서 사용한 이미지 일괄 삭제 예시 : `docker rmi $(docker images -q nginx)`
   - rmi : remove image
   - 이미지는 컨테이너가 정지 상태가 아닌 삭제 상태일 때 삭제 가능
+
+<br>
+<br>
+
+# 4가지 방법으로 컨테이너 이미지 만들기
+
+- 컨테이너 인프라 환경을 구성할 때 이미 제공된 이미지를 사용하는 경우도 있지만<br>직접 만든 애플리케이션으로 컨테이너를 만들 수도 있음
+- 여기서는 저자가 제공하는 소스 코드로 Java 실행 파일을 빌드하고 이를 다시 도커 빌드를 사용해 컨테이너 이미지로 만들 것임
+
+<br>
+<br>
+
+## 기본 방법으로 빌드하기
+
+- Java 소스 빌드 → Dockerfile 작성 → Dockerfile 빌드 → 빌드 완료
+- OpenJDK 1.8 설치 및 `mvnw clean package` 명령을 통한 JAR 생성
+- `docker build -t basic-img .` 명령어로 컨테이너 이미지 빌드
+  - `-t(tag)`는 만들어질 이미지, `.`은 작업 공간을 현재 디렉토리로 지정
+- 위 빌드 과정을 이해하기 위해 Dockerfile을 살펴봐야 함
+
+```bash
+FROM openjdk:8
+LABEL description="Echo IP Java Application"
+EXPOSE 60431
+COPY ./target/app-in-host.jar /opt/app-in-image.jar
+WORKDIR /opt
+ENTRYPOINT [ "java", "-jar", "app-in-image.jar" ]
+```
+
+- Dockerfile은 빌드용 DSL(Domain-Specific Languages)로 작성된 파일
+- 좀 더 이해하기 쉽도록 bash 명령어로 유사 해석하면 다음과 같음
+
+| Dockerfile                                          | bash 유사 명령어                                                 |
+| :-------------------------------------------------- | :--------------------------------------------------------------- |
+| FROM openjdk:8                                      | import openjdk:8 image                                           |
+| LABEL description="Echo IP Java Application"        | Label_desc="Echo IP Java Application"                            |
+| EXPOSE 60431                                        | EXPOSE=60431                                                     |
+| COPY ./target/app-in-host.jar /opt/app-in-image.jar | scp \<HOST>/target/app-in-host.jar \<IMAGE>/opt/app-in-image.jar |
+| WORKDIR /opt                                        | cd /opt                                                          |
+| ENTRYPOINT [ "java", "-jar", "app-in-image.jar" ]   | ./java -jar app-in-image.jar                                     |
+
+- line 1 : 이미지를 가져오고, 가져온 이미지 내부에서 컨테이너 이미지를 빌드<br>누군가 만들어 놓은 이미지에 필요한 부분을 추가한다고 보면 됨<br>기초 이미지를 어떤 것을 선택하냐에 따라 다양한 환경의 컨테이너 빌드 가능
+- line 2 : 이미지에 부가적인 설명을 위한 레이블을 추가할 때 사용
+- line 3 : 생성된 이미지로 컨테이너를 구동할 때 어떤 포트를 사용할지 알려줌<br>외부와 연결하려면 지정한 포트를 호스트 포트로 연결해야 한다고 알려줄 뿐 자동 연결은 아님<br>외부에서 접속하려면 `docker run`에 `-p` 옵션을 넣어야 함
+- line 4 : 호스트에서 새로 생성한 컨테이너 이미지로 필요한 파일 복사
+- line 5 : 이미지의 현재 작업 위치를 변경
+- line 6 : \["명령어", "옵션" ... "옵션"]의 형식<br>컨테이너 구동 시 안의 명령어에 옵션들을 붙여서 실행
