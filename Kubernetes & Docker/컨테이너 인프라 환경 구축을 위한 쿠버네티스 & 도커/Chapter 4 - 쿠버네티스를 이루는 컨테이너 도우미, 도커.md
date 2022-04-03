@@ -287,3 +287,59 @@ ENTRYPOINT [ "java", "-jar", "app-in-image.jar" ]
 - line 4 : 호스트에서 새로 생성한 컨테이너 이미지로 필요한 파일 복사
 - line 5 : 이미지의 현재 작업 위치를 변경
 - line 6 : \["명령어", "옵션" ... "옵션"]의 형식<br>컨테이너 구동 시 안의 명령어에 옵션들을 붙여서 실행
+
+<br>
+<br>
+
+## 컨테이너 용량 줄이기
+
+- 불필요한 공간을 점유하면 비용 낭비가 되고 성능 저하가 될 수 있음
+- 기초 이미지를 openjdk에서 GCR(Google Container Registry)에서 제공하는 distroless로 변경
+  - distroless는 Java 실행을 위해 경량화된 이미지
+- 왜 openjdk를 호스트에 설치해서 빌드하고 COPY로 넘기는 번거로운 작업을 해야 할까?
+
+<br>
+<br>
+
+## 컨테이너 내부에서 컨테이너 빌드하기
+
+- openjdk 이미지를 기초 이미지로 컨테이너 내부에서 Java 소스를 빌드하면 가장 큰 컨테이너를 얻게 됨
+- 컨테이너 이미지는 커지면 커질수록 비효율적
+- 하지만 Dockerfile 하나만 빌드하면 컨테이너가 바로 생성되는 편리함을 포기할 순 없으니 이를 위한 마지막 방법이 따로 있음
+
+<br>
+<br>
+
+## 최적화해 컨테이너 빌드하기
+
+**Multi-Stage Build**
+
+- 최종 이미지의 용량을 줄일 수 있고 호스트에 어떠한 빌드 도구도 설치할 필요가 없음
+- 멀티 스테이지는 docker-ce 17.06 버전부터 지원됨
+  - 도커 버전 확인 방법 : `kubectl get nodes -o wide` 명령어 입력 후 CONTAINER_RUNTIME 확인
+- 핵심은 빌드하는 위치와 최종 이미지를 '분리'하는 것
+  - 그래서 최종 이미지는 빌드된 JAR를 가지고 있지만 용량을 줄일 수 있음
+
+※ Dockerfile
+
+```bash
+# 1단계 : Java 소스를 빌드해서 JAR로 만듦
+FROM openjdk:8 AS int-build # 기초 이미지에 int-build라는 별칭을 붙임
+LABEL description="Java Application builder"
+RUN git clone https://github.com/iac-source/inbuilder.git
+WORKDIR inbuilder
+RUN chmod 700 mvnw
+RUN ./mvnw clean package
+
+# 2단계 : 빌드된 JAR를 경량화 이미지에 복사
+FROM gcr.io/distroless/java:8
+LABEL description="Echo IP Java Application"
+EXPOSE 60434
+# int-build에서 빌드가 완성된 JAR 파일을 distroless에 지정된 디렉토리로 복사
+COPY --from=int-build inbuilder/target/app-in-host.jar /opt/app-in-image.jar
+WORKDIR /opt
+ENTRYPOINT [ "java", "-jar", "app-in-image.jar" ]
+```
+
+- `docker images | head -n 3` 명령어로 확인해보면 이름이 없는 `<none>` 이미지가 있는데,<br>이는 dangling 이미지이며, 멀테 스테이지 과정에서 Java 소스를 빌드하는 과정에서 생성된 이미지
+  - 공간을 적게 사용하기 위해선 `docker rmi $(docker images -f dangling=true -q)` 같은 명령어로 삭제해야 함
