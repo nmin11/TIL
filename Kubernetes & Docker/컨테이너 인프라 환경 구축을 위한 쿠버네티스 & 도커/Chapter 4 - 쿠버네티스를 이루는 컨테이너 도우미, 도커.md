@@ -365,3 +365,156 @@ ENTRYPOINT [ "java", "-jar", "app-in-image.jar" ]
   - 기본적으로 사용하는 도커 허브에 올려 놓고 다시 받기
   - 쿠버네티스 클러스터가 접근할 수 있는 곳에 이미지 레지스트리를 만들고 그곳에서 받아오기
 - 이 책에서는 도커 허브의 방법은 너무 쉬우니 어려운 길을 갈 것
+
+<br>
+<br>
+
+## 레지스트리 구성하기
+
+- 호스트에서 생성한 이미지를 쿠버네티스에서 사용하려면 모든 노드에서 공통으로 접근하는 레지스트리가 필요함
+- 도커나 쿠버네티스는 도커 허브라는 레지스트리에서 이미지를 내려받을 수 있음
+- 때로는 직접 만든 이미지를 private하게 할 필요가 있음
+  - 도커 허브에서도 private repository를 제공하지만 무료 사용자에게는 1개 밖에 허용되지 않음
+  - 도커 허브 무료 사용자는 이미지를 내려받는 횟수에도 제약이 있음
+- 제약 없이 사용하기 위해 레지스트리를 직접 구축하는 방법이 있음
+  - 인터넷 연결이 필요 없으므로 내부 전산망에서도 구현 가능
+- 책에서는 Docker Registry 이미지를 사용해서 사설 도커 레지스트리를 만듦
+  - 사설 도커 레지스트리는 기능은 부족하지만 컨테이너를 하나만 구동하면 되기에 설치가 간편하고<br>내부에서 테스트 목적으로 사용하기에 적합
+
+<br>
+
+※ 레지스트리 종류
+
+- Quay
+  - 레드햇에서 제공하는 이미지 레지스트리
+  - 오픈 소스 무료 버전과 서버에 직접 설치하는 유료 버전, 클라우드 비용을 지불하는 서비스형 상품이 있음
+  - 유료로 사용하면 신뢰성 보증과 기술 지원 서비스를 받을 수 있으므로 안정적으로 사용하고 싶은 분들에게 추천
+- Harbor
+  - 클라우드 네이티브 컴퓨팅 재단의 지원을 받는 Project Harbor에서 오픈 소스로 제공하는 레지스트리
+  - 도커 이미지 외에 헬름 차트도 저장 가능
+  - 이미지와 헬름 차트를 모두 사용하는 유저에게 적합
+- Nexus Repository
+  - Sonatype에서 만든 레지스트리
+  - 오픈 소스 무료 버전과 유료 버전이 있음
+  - 도커 이미지 외에도 리눅스 설치 패키지, 자바 라이브러리, 파이썬 라이브러리 등 다양한 형식의 파일 저장 가능
+  - 여러 형식의 패키지를 하나의 저장소에 관리하려는 유저에게 적합
+  - 다양한 형식 지원 덕분에 레지스트리 중 가장 많은 사용자를 보유하고 있음
+- Docker Registry
+  - 도커 허브에서 제공하는 레지스트리 전용 컨테이너 이미지
+  - 무료로 사용할 수 있고 도커 이미지만 저장 가능
+  - 기능이 매우 간단해서 개인용이나 테스트용으로 적합
+
+|   구분    |        Quay         |      Harbor       | Nexus Repository | Docker Registry |
+| :-------: | :-----------------: | :---------------: | :--------------: | :-------------: |
+|   가격    |       유/무료       |       무료        |     유/무료      |      무료       |
+| 저장 형식 |  도커 이미지, 헬름  | 도커 이미지, 헬름 |      다양함      |   도커 이미지   |
+| 설치 방법 | 직접 설치, 클라우드 |     직접 설치     |    직접 설치     |    직접 설치    |
+|   기능    |   부가 기능 있음    |  부가 기능 있음   |    매우 많음     |      최소       |
+| 관련 자료 |        적음         |       보통        |       많음       |      많음       |
+
+<br>
+
+**실습 - 사설 도커 레지스트리 만들기**
+
+※ tls.csr
+
+- 인증서 생성을 위한 서명 요청서
+- CSR : Certificate Signing Request
+- 인증서를 생성하는 개인이나 기관의 정보와 인증서를 생성하는 데 필요한 추가 정보들 기록
+- 이 파일을 기반으로 인증서와 개인키를 생성함
+- 도커는 이미지를 올리거나 내려받으려고 레지스트리에 접속하는 과정에서 SAN을 검증함
+  - SAN : Subject Alternative Name
+
+```
+[req]
+distinguished_name = private_registry_cert_req
+x509_extensions = v3_req
+prompt = no
+
+[private_registry_cert_req]
+C = KR
+ST = SEOUL
+L = SEOUL
+O = gilbut
+OU = Book_k8sInfra
+CN = 192.168.1.10
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.0 = m-k8s
+IP.0 = 192.168.1.10
+```
+
+- \[private_registry_cert_req]<br>인증서 요청자의 국가, 도시, 소속, 이름, 인증서를 설치하는 서버의 주소 등의 정보
+- \[v3_req] : 키의 사용 목적 기입, alt_names의 정보를 주체 대체 이름(SAN)으로 이용
+- \[alt_names] : 도메인 이름과 사이트가 일치하는지 확인할 때 사용하는 추가적인 정보
+
+<br>
+
+※ create-registry.sh
+
+- 실제로 레지스트리를 생성하고 구동하는 과정이 담긴 스크립트
+- 인증서 생성과 배포, 레지스트리 생성과 구동의 순서로 이루어져 있음
+
+```sh
+#!/usr/bin/env bash
+certs=/etc/docker/certs.d/192.168.1.10:8443
+mkdir /registry-image
+mkdir /etc/docker/certs
+mkdir -p $certs
+openssl req -x509 -config $(dirname "$0")/tls.csr -nodes -newkey rsa:4096 \
+-keyout tls.key -out tls.crt -days 365 -extensions v3_req
+
+yum install sshpass -y
+for i in {1..3}
+  do
+    sshpass -p vagrant ssh -o StrictHostKeyChecking=no root@192.168.1.10$i mkdir -p $certs
+    sshpass -p vagrant scp tls.crt 192.168.1.10$i:$certs
+  done
+
+cp tls.crt $certs
+mv tls.* /etc/docker/certs
+
+docker run -d \
+  --restart=always \
+  --name registry \
+  -v /etc/docker/certs:/docker-in-certs:ro \
+  -v /registry-image:/var/lib/registry \
+  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/docker-in-certs/tls.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/docker-in-certs/tls.key \
+  -p 8443:443 \
+  registry:2
+```
+
+- certs 변수 : 도커가 지정된 변수 경로에서 레지스트리 주소와 일치하는 디렉토리에<br>위치한 인증서를 찾아 레지스트리에 HTTPS로 접속함<br>마스터 노드와 워커 노드에 인증서 디렉토리를 생성할 때 변수 certs를 찾게 됨
+- openssl 부분 : HTTPS 접속을 하려면 서버의 정보가 담긴 인증서와 주고 받는 데이터 암호화 및 복호화에 사용할 키가 필요함<br>요청서가 담긴 tls.csr 파일로 HTTPS 인증서인 tls.crt와 키에 사용할 tls.key 파일 생성<br>`$(dirname "$0")`은 현재 shell 파일이 실행되는 경로로 치환해줌
+- sshpass : SSH 접속을 위한 비밀번호를 자동으로 입력해주는 도구<br>이게 없으면 직접 입력해야 하는데, 그럴 경우 자동화 과정이 힘듦
+- for문 부분 : 각 워커 노드에 대한 인증서 디렉토리 생성 및 복사를 위한 반복 작업
+- cp 부분 : tls.crt를 certs 변수로 지정한 디렉토리로 복사
+- mv 부분 : tls.crt와 tls.key를 /etc/docker/certs/ 디렉토리로 이동
+  - 레지스트리 컨테이너에 들어오는 요청을 인증하고, 인증서가 설치된 호스트에서만 레지스트리에 접근할 수 있게 함
+- docker run
+  - -d : 컨테이너 백그라운에서 데몬으로 실행
+  - --restart=always : 정지되면 자동으로 재실행
+  - --name registry : 이름은 registry
+  - -v : 인증서 디렉토리를 컨테이너 내부의 docker-in-certs 디렉토리와 연결 및 ro(readonly) 설정<br>호스트 저장 공간 registry-image 디렉토리를 컨테이너 내부의 /var/lib/registry 디렉토리와 연결
+  - -e : 레지스트리가 요청을 받아들이는 포트로 443번 포트를 설정<br>레지스트리가 사용할 HTTPS 인증서의 경로 설정<br>HTTPS로 데이터를 주고받을 때 데이터 암호화 및 복호화를 위한 키로 사용할 파일의 경로를 설정
+  - -p : 호스트 컴퓨터의 8443번 포트와 컨테이너 내부의 443번 포트를 연결
+  - 마지막 줄 : 도커 허브에 있는 registry 이미지로 2.\*의 최신 버전을 사용함
+
+<br>
+
+- 배포 시 `docker tag` 사용
+  - 레지스트리가 서비스되는 주소와 제공되는 이미지 이름을 레지스트리에 등록될 이름으로 지정해야 하기 때문
+  - docker tag : 이미지의 레이어를 공유하는 사본을 만듦, 윈도우의 바로가기와 유사
+- 배포 확인 방법 : `curl <레지스트리 주소>/v2/_catalog`
+  - 예시 : `curl https://192.168.1.10:8443/v2/_catalog -k`
+  - 레지스트리에 등록된 이미지의 목록을 보여줌
+  - 자체 서명 인증서를 쓰는 사이트이기 때문에 -k(--insecure) 옵션으로 보안 검증 생략
+- 이미지를 삭제하려면 ID를 `docker images | grep <이름>` 명령어로 알아내서 삭제
+  - 삭제 예시 : `docker rmi -f aa23`
