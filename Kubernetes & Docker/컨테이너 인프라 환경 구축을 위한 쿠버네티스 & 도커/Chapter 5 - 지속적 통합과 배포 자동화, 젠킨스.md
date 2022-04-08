@@ -241,3 +241,131 @@
 <br>
 
 => 여기까지 젠킨스 설치를 위한 도구들을 살펴봤고, 다음에는 본격적으로 젠킨스를 설치하고 살펴볼 것
+
+<br>
+<br>
+
+# 젠킨스 설치 및 설정하기
+
+## 헬름으로 젠킨스 설치하기
+
+- 헬름으로 설치되는 젠킨스는 파드에서 동작하는 애플리케이션이기 때문에<br>PV를 마운트하지 않으면 파드 재실행 시 내부 볼륨의 모든 데이터가 삭제됨
+  - PV가 NFS를 통해 프로비저닝될 수 있게 해야 함
+- 젠킨스를 헬름 차트로 설치해 애플리케이션을 사용하게 되면<br>젠킨스의 여러 설정 파일과 구성 파일들이 PVC를 통해 PV에 파일로 저장됨
+  - 이 때 PV에 적절한 접근 ID를 부여하지 않으면 PVC를 사용해 파일을 읽고 쓰는 기능에 문제가 발생할 수 있음
+  - `chown 1000:1000 /nfs_shared/jenkins` 명령어를 통해<br>젠킨스 PV가 사용할 NFS 디렉토리에 대한 접근 ID를 1000번으로 설정
+    - 젠킨스 컨트롤러 이미지에서 기본적으로 사용하는 유저 ID와 그룹 ID가 1000번이기 때문
+- 젠킨스는 사용자가 배포를 위해 생성한 내용과 사용자의 계정 정보,<br>사용하는 플러그인 같은 데이터를 저장하기 위해 PV와 PVC의 구성을 필요로 함
+
+※ 젠킨스 릴리스 정보
+
+- NAME : 젠킨스의 릴리스 이름, 이후 헬름 명령어로 젠킨스 조회, 삭제, 변경을 위해 사용하게 되는 이름
+- NAMESPACE : 젠킨스가 배포된 네임스페이스
+- REVISION : 배포된 릴리스가 몇 번째로 배포된 것인지 알려줌<br>`helm upgrade` 명령어로 젠킨스 버전 업그레이드 때마다 1씩 증가<br>이전 버전으로 돌아가기 위해 `helm rollback` 명령어를 사용할 수 있음<br>롤백할 경우, REVISION의 번호를 직접 지정해서 특정 리비전으로 돌아가도록 하는 것도 가능
+- NOTES : 설치와 관련된 안내 사항 몇 가지 표시
+  1. 젠킨스의 관리자 비밀번호를 얻어오기 위한 명령어
+  2. 젠킨스가 구동되는 파드에 접속할 수 있도록 외부의 트래픽을 쿠버네티스의 파드로 전달하게 만드는 설정
+  3. 젠킨스 접속 시 사용할 유저 이름 표시
+
+<br>
+
+- 젠킨스 배포 시 젠킨스가 마스터 노드에 있음을 확인할 수 있음
+- node와 deployment의 yaml 파일을 확인해보면 taints와 tolerations가 이런 결과를 만들고 있음
+- 일반적으로 taints와 tolerations는 혼합해서 사용
+- 비유적으로 taints는 다루기 꺼려지는 것, tolerations는 꺼려지는 것을 참아내는 인내를 뜻함
+- 그런데 쿠버네티스의 taints와 tolerations는 사전적 의미와 반대
+  - 매우 특별하게 취급돼야 하는 곳에 taints 설정하고 쉽게 접근 못하는 소중한 것으로 설정
+  - tolerations는 특별한 키를 가져야만 출입 가능
+- 즉, 마스터 노드에 taints가 설정되어 있어서, 특별한 목적으로 사용되는 노드라는 것을 명시해둔 것
+- 일반적으로 taints는 마스터 노드 이외에도 GPU 노드, DB 전용 노드 등 특별한 목적의 노드들에 주로 사용됨
+- 이 책에서는 편의를 위해 젠킨스 컨트롤러가 여러 곳에 스케줄되지 않고 마스터 노드에만 스케줄됨
+
+※ taints와 tolerations
+
+- 관계를 어떻게 정의하냐에 따라 배포를 상당히 유연하게 만들 수 있음
+- taints : key와 value, 그리고 이 둘에 따른 effect의 조합을 통해<br>taints를 통해 설정된 노드에 파드 배치 기준을 설정
+  - key와 value의 조합은 taints를 설정한 노드가 어떤 노드인지를 구분하기 위해 사용함
+  - key는 필수로 설정해야 하고, value는 생략할 수 있음
+  - effect는 taints와 tolerations의 key 또는 value가 일치하지 않는 파드가<br>노드에 스케줄되려 하는 경우 어떤 동작을 할 것인지 나타냄
+    - effect에는 NoSchedule, PreferNoSchedule, NoExecute 값을 줄 수 있음
+
+|       효과       | taints가 설정된 노드에 파드 신규 배치                   | 파드가 배치된 노드에 taints 설정 |
+| :--------------: | :------------------------------------------------------ | :------------------------------- |
+|    NoSchedule    | 노드에 파드 배치 거부                                   | 노드에 존재하는 파드 유지        |
+| PreferNoSchedule | 다른 노드에 파드 배치가 불가능할 때<br>노드에 파드 배치 | 노드에 존재하는 파드 유지        |
+|    NoExecute     | 노드에 파드 배치 거부                                   | 파드를 노드에서 제거             |
+
+- tolerations : 똑같이 key, value, effect를 가지고 있고, 추가적으로 operator가 있음
+  - taints가 설정된 노드로 들어가기 위한 특별한 열쇠의 역할<br>key와 effect가 반드시 일치해야 함
+  - 연산자는 기본적으로 Equal로 동작해서 taints와 tolerations를 비교하는 역할을 수행
+  - 연산자 Exists의 경우 비교할 key와 value가 존재한다는 가정으로 taints에 접근할 만능키로 바꿔주는 역할 수행
+  - key, value, effect를 연산자를 통해 비교한 후 조건에 맞는 taints를 식별하는 방식
+  - key와 effect 중 생략된 요소가 있다면 해당 요소는 와일드카드로서의 의미
+  - tolerations의 key, value, effect는 taints의 key, value, effect와<br>조건에 맞는지를 Equal 혹은 Exists 연산자를 통해서 판단
+  - 연산자를 생략할 경우 묵시적으로 Equal을 의미함
+  - 조건 판단 결과 taints와 tolerations의 조건이 맞으면<br>taints가 설정된 노드에 tolerations를 가진 파드 배치 가능
+    - 조건이 맞다고 생각하는 기준은 Equal 연산자를 사용했을 때<br>taints와 tolerations의 key, value, effect까지 일치하는 경우
+  - Exists 연산자 사용 시 value는 반드시 생략해야 하고 이 상태에서 key와 effect의 일치 여부 판단
+    - key와 effect를 모두 생략한 상태로 Exists 연산자만 사용하면<br>taints의 key와 effect는 모든 key와 모든 effect를 의미하므로<br>Exitsts 연산자 하나만으로도 taints가 설정된 모든 노드에 대해서 해당 tolerations를 설정한 파드 배포 가능
+
+※ jenkins-install.sh
+
+```sh
+#!/usr/bin/env bash
+jkopt1="--sessionTimeout=1440"
+jkopt2="--sessionEviction=86400"
+jvopt1="-Duser.timezone=Asia/Seoul"
+jvopt2="-Dcasc.jenkins.config=https://raw.githubusercontent.com/sysnet4admin/_Book_k8sInfra/main/ch5/5.3.1/jenkins-config.yaml"
+
+helm install jenkins edu/jenkins \
+--set persistence.existingClaim=jenkins \
+--set master.adminPassword=admin \
+--set master.nodeSelector."kubernetes\.io/hostname"=m-k8s \
+--set master.tolerations[0].key=node-role.kubernetes.io/master \
+--set master.tolerations[0].effect=NoSchedule \
+--set master.tolerations[0].operator=Exists \
+--set master.runAsUser=1000 \
+--set master.runAsGroup=1000 \
+--set master.tag=2.249.3-lts-centos7 \
+--set master.serviceType=LoadBalancer \
+--set master.servicePort=80 \
+--set master.jenkinsOpts="$jkopt1 $jkopt2" \
+--set master.javaOpts="$jvopt1 $jvopt2"
+```
+
+- jkopt 부분 : 기본 설정이 30분 넘게 사용하지 않으면 세션이 종료되므로<br>세션 유효 시간 및 세션 정리 시간을 하루로 설정
+- -Duser.timezone : 기본 설정으로는 시간대가 정확히 맞지 않으므로<br>젠킨스를 통한 CI/CD 시에 명확히 작업을 구분하기 힘듦
+- -Dcasc.jenkins.config : 쿠버네티스를 위한 젠킨스 에이전트 노드 설정은<br>Pod Template이라는 곳을 통해서 설정값 입력<br>그런데 마스터 노드가 재실행되면 설정이 초기화됨<br>따라서 설정값을 미리 입력해 둔 yaml 파일을 Github 저장소에서 받아오도록 설정
+- helm install : edu 차트 저장소의 jenkins 차트를 사용해 jenkins 릴리스 설치
+- --set persistence.existingClaim : PVC 동적 프로비저닝 사용을 위해 jenkins라는 이름의 PVC 사용하도록 설정
+- --set master.adminPassword : 젠킨스 접속 시 사용할 관리자 비밀번호를 admin으로 설정<br>이 값이 없으면 jenkins가 설치 과정에서 임의로 생성한 비밀번호 사용
+- --set master.nodeSelector : 젠킨스의 컨트롤러 파드를 쿠버네티스 마스터 노드에 배치하도록 선택<br>`nodeSelector`는 뒤에 따라오는 문자열과 일치하는 레이블을 가진 노드에 파드를 스케줄링하겠다는 설정<br>`.` 앞의 `\`는 점을 하위 속성으로 분리하게 되기 때문에 이를 방지하기 위한 escape
+- --set master.tolerations[0] : 이 옵션들이 없으면 마스터 노드에 파드를 배치할 수 없음<br>현재 마스터 노드에 NoSchedule taints가 설정되어 있기 때문<br>taints가 설정된 노드에 파드를 배치하려면 tolerations 옵션 필요<br>그래서 taints와 tolerations 관련 설정들을 해주는 부분
+- --set master.runAsUser / runAsGroup : 젠킨스를 구동하는 파드가 실행될 때의 유저 ID와 그룹 ID 설정
+- --set master.tag : 이후 젠킨스 버전에 따른 UI 변경을 막기 위해서 젠킨스 버전 고정
+- --set master.serviceType : 차트로 생성되는 서비스의 타입을 로드밸런서로 설정해 외부 IP를 받아옴
+- --set master.servicePort : 젠킨스가 http 상에서 구동되도록 80포트 지정
+- --set master.jenkinsOpts : 앞서 선언한 변수들을 호출해서 젠킨스에 적용
+- --set master.javaOpts : 앞서 선언한 변수들을 호출해서 젠킨스 실행 환경(JVM)에 적용
+
+<br>
+<br>
+
+## 젠킨스 살펴보기
+
+- 젠킨스 컨트롤러는 마스터에 설치했지만 젠킨스 에이전트는 필요 시에 생성되고 제거되는 임시적 구조를 가짐
+  - 따라서 젠킨스 에이전트 작업 내용들은 삭제 전에 젠킨스 컨트롤러에 저장되어야 함
+  - 이를 위해 젠킨스 에이전트 서비스가 항상 동작하고 있음
+- 젠킨스 컨트롤러 단독 설치 시 설치된 서버에서 젠킨스 자체 시스템 관리, CI/CD 설정, 빌드 등의 작업을<br>모두 젠킨스 컨트롤러 단일 노드에서 수행
+- 컨트롤러-에이전트 구조로 설치 시 컨트롤러는 젠킨스 자체의 관리 및 CI/CD와 관련된 설정만 담당<br>실제 빌드 작업은 에이전트로 설정된 노드에서 이루어짐
+- 따라서 컨트롤러 단독 설치는 일반적으로 간단한 테스트에서만 사용되고<br>주로 컨트롤러-에이전트 구조로 사용함
+
+※ 젠킨스 메뉴에 대해
+
+- Item : 젠킨스를 통해서 빌드할 작업을 뜻함
+- 사람 : 사용자를 관리하는 메뉴<br>젠킨스 구동 서버에서 직접 사용자를 관리하는 방법과 별도의 DB를 가지고 관리하는 방법이 있음
+- 빌드 기록 : 젠킨스 작업에 대한 성공, 실패, 진행 내역을 볼 수 있음
+- Jenkins 관리 : 젠킨스의 시스템, 보안, 도구, 플러그인 등 각종 설정을 수행하는 곳
+- My Views : 젠킨스에서 각종 작업을 분류해 모아서 볼 수 있는 대시보드
+- Lockable Resources : 젠킨스에서는 한 번에 여러 작업이 일어날 수 있으므로 동시성 문제가 발생할 수 있음<br>그러므로 작업이 끝날 때까지 같은 작업을 하지 못하도록 하는 잠금 장치
+- New View : 대시보드인 View를 생성하는 작업
