@@ -433,3 +433,114 @@ helm install jenkins edu/jenkins \
   - 외부와 연결되는 프록시 서버 설정 가능
   - 프록시 서버를 통해서 내부망에서도 젠킨스를 설치하고 업데이트할 수 있음
   - 별도의 플러그인 파일을 업로드해서 플러그인을 설치할 수 있음
+
+<br>
+<br>
+
+## 젠킨스 에이전트 설정하기
+
+**젠킨스 관리 > 노드 관리**
+
+- 신규 노드
+  - 에이전트 노드 추가
+  - 고정된 여러 대의 서버에서 에이전트 노드를 추가해야 할 때 필요
+- Configure Clouds
+  - 클라우드 환경 기반의 에이전트 설정 시 필요
+  - 쿠버네티스 위에 설치된 젠킨스의 에이전트에 관한 설정도 여기서 설정 가능
+- Node Monitoring
+  - 에이전트 노드의 안정성을 위한 각종 모니터링 관련 사항 설정 가능
+- 노드 목록
+  - 현재 구성된 노드 목록을 보여줌
+  - 쿠버네티스상의 젠킨스는 작업 진행 시에만 파드 형태의 에이전트가 생성되었다가 사라지므로<br>작업 중이 아니라면 젠킨스 컨트롤러 노드만 표시됨
+
+<br>
+
+### 쿠버네티스에서 젠킨스 에이전트 구성
+
+**젠킨스 관리 > 노드 관리 > Configure Clouds**
+
+- (실습 기준) 헬름을 통해 젠킨스 설치 시 JCasC 기능을 사용했기에<br>쿠버네티스 환경에 맞게 자동화된 설정이 있음
+  - JCasC : Jenkins Configuration as a Code
+  - 이것 때문에 kubernetes 플러그인의 도움을 받기 위해 업데이트를 진행했던 것
+- Kubernetes
+  - 쿠버네티스 설정 관련 영역
+  - Name에 이름 지정 가능
+- Kubernetes Cloud details
+  - 쿠버네티스 클러스터에 접속하기 위한 정보 설정
+  - 헬름을 통해서 쿠버네티스 위에 설치한 젠킨스는<br>쿠버네티스 클러스터 내부에서 동작하기 때문에 기본값으로 둬도 무방
+  - 쿠버네티스 클러스터 외부에 젠킨스를 설치한 경우에는 여기에서 쿠버네티스에 대한 정보를 수정해야 함
+- Pod Templates
+  - 쿠버네티스상의 젠킨스는 작업 시 에이전트를 파드 형태로 생성
+  - 여기에서는 에이전트로 사용될 파드 관련 설정을 진행
+  - 젠킨스 컨트롤러를 재시작하면 모든 설정이 초기화됨
+  - 현재 세팅으로 마스터 노드를 재시작하면 모든 설정 초기화
+  - 이를 해결하기 위해 헬름 설치 시 미리 jenkins-config.yaml을 읽어 들이도록 구성했음
+
+<br>
+
+### 젠킨스 에이전트의 상세 내용
+
+- 젠킨스의 CI/CD 작업은 실제로 에이전트에서 동작
+- 쿠버네티스에서는 에이전트가 파드로 운영되나 파드에는 `docker` 명령이나 `kubectl` 명령이 존재하지 않음
+- 가장 쉬운 해결 방법은 호스트 시스템의 docker와 kubectl을 그대로 이용하는 것
+- 쿠버네티스 파드에서 워커 노드에 있는 특정 경로를 마운트해서 사용할 수 있도록 해주는<br>**hostpath** 를 사용할 것
+- Pod Template : 파드의 구성 요소를 그대로 메뉴상에 넣어 둔 것
+  - 여기서 생성한 파드를 kubectl get pod \<이름> -o yaml로 조회해보면 이해하기 쉬울 것
+
+<br>
+
+### Pod Template의 Add Volume 옵션들
+
+- Config Map Volume
+  - 쿠버네티스의 ConfigMap 오브젝트를 파드 내부에 연결해서 사용하도록 설정
+- Empty Dir Volume
+  - 파일 및 내용이 없는 디렉토리를 파드 내부에 생성
+  - 젠킨스로 빌드 시 컨테이너가 다수 생성될 수 있는데,<br>이 때 컨테이너 간의 공유 목적으로 빈 디렉토리를 주로 사용함
+- Host Path Volume
+  - 호스트인 쿠버네티스 워커 노드의 파일 및 디렉토리를 파드에서 사용할 수 있도록 연결
+  - 호스트에 위치한 명령이나 데이터를 사용할 수 있음
+  - 필요한 경우 파일을 저장해 파드가 사라진 경우에도 데이터 보존 가능
+- NFS Volume
+  - NFS 서버에 위치한 원격 디렉토리를 파드가 사용할 수 있도록 설정
+- Persistent Volume Claim
+  - 쿠버네티스 클러스터에서 PVC로 설정한 볼륨을 파드에서 사용할 수 있도록 설정
+- Secret Volume
+  - 쿠버네티스의 Secret 오브젝트를 파드 내부에 연결해서 사용하도록 설정
+
+<br>
+
+### jenkins 서비스 어카운트를 위한 권한 설정하기
+
+- 서비스 어카운트 조회 : `kubectl get serviceaccounts`
+- 권한부여 예시 : `kubectl create clusterrolebinding jenkins-cluster-admin \`<br>`--clusterrole=cluster-admin --serviceaccount=default:jenkins`
+- jenkins 서비스 어카운트를 통해 젠킨스 에이전트 파드를 생성하거나<br>파드 내부에 제약 없이 접근하려면 **cluster-admin 역할 (Role)** 을 부여해야 함
+- 필요한 영역에 따라 권한을 여러 개 부여해야 하지만 실습에서는 1개 권한만 부여
+- Role을 부여하고 이 권한이 필요한 서비스 어카운트인 jenkins에 Binding해주는 방식
+- 이런 방식을 RBAC(Role-Based Access Control)라고 함
+- 쿠버네티스의 역할 부여 구조는 **할 수 있는 일**과 **할 수 있는 주체**의 결합으로 이루어짐
+- Rules
+  - '할 수 있는 일'과 관련된 Role, ClusterRole이 가지는 자세한 행동 규칙
+  - apiGroups, resources, verbs의 속성을 가짐
+  - 접근 가능한 API의 집합을 apiGroups로 표현
+  - apiGroups에서 분류된 자원 중 접근 가능한 자원을 선별하기 위해 resources를 사용
+  - resources에 대해서 할 수 있는 행동을 규정하기 위해 verbs 사용
+    - verb 종류 : get, list, create, update, patch, watch, delete
+- Role, ClusterRole
+  - '할 수 있는 일'을 대표하는 오브젝트
+  - Rules에 적용된 규칙에 따른 동작을 할 수 있음
+  - 적용 범위에 따라 Role과 ClusterRole로 나뉨
+  - Role : 해당 Role을 가진 주체가 특정 namespace에 대해서 접근 가능
+  - ClusterRole : 해당 ClusterRole을 가진 주체가 쿠버네티스 클러스터 전체에 대해서 접근 가능
+- RoleBinding, ClusterRoleBinding
+  - Role과 ClusterRole의 '할 수 있는 일' 속성을 '할 수 있는 주체'를 대표하는 속성인 Subjects와 연결
+  - Role과 ClusterRole은 roleRef(할 수 있는 역할의 참조)와 subject(수행 주체) 속성을 가짐
+  - RoleBinding : Role과 결합하여 namespace 범위의 접근 제어 수행
+  - ClusterRoleBinding : ClusterRole과 결합하여 클러스터 전체 범위의 접근 제어 수행
+- Subjects
+  - 행위를 수행하는 주체
+  - 특정 사용자 혹은 그룹, 서비스 어카운트를 속성으로 가질 수 있음
+  - 사용자는 쿠버네티스에 접근을 수행하는 실제 이용자
+  - 쿠버네티스 클러스터의 사용자 목록은 kubeconfig의 users 섹션에 기록되어 있음
+  - 서비스 어카운트는 파드 내부의 프로세스에 적용되는 개념
+  - 파드는 namespace에 존재하는 default 서비스 어카운트 또는 다른 특정 서비스 어카운트 사용
+  - 파드 내부의 프로세스는 설정된 서비스 어카운트로서<br>쿠버네티스상에 존재하는 자원에 접근 시도 가능
