@@ -735,3 +735,207 @@ pipeline {
 - 하지만 배포를 위한 디플로이먼트를 만들기 위해 기존에 비해 최소 2배 이상의 리소스가 필요
 - 그래도 무중단 배포와 장애 복구의 이점 때문에 리소스 사용은 크게 부각되는 단점이 아님
 - 쿠버네티스에는 블루그린 배포가 기본 기능이 아니지만 젠킨스를 이용하면 구현 가능
+
+<br>
+
+**Jenkinsfile**
+
+```sh
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        labels:
+          app: blue-green-deploy
+        name: blue-green-deploy
+      spec:
+        containers:
+        - name: kustomize
+          image: sysnet4admin/kustomize:3.6.1
+          tty: true
+          volumeMounts:
+          - mountPath: /bin/kubectl
+            name: kubectl
+          command:
+          - cat
+        serviceAccount: jenkins
+        volumes:
+        - name: kubectl
+          hostPath:
+            path: /bin/kubectl
+      '''
+    }
+  }
+  stages {
+    stage('git scm update'){
+      steps {
+        git url: 'https://github.com/IaC-Source/blue-green.git', branch: 'main'
+      }
+    }
+    stage('define tag'){
+      steps {
+        script {
+          if(env.BUILD_NUMBER.toInteger() % 2 == 1){
+            env.tag = "blue"
+          } else {
+            env.tag = "green"
+          }
+        }
+      }
+    }
+    stage('deploy configmap and deployment'){
+      steps {
+        container('kustomize'){
+          dir('deployment'){
+            sh '''
+            kubectl apply -f configmap.yaml
+            kustomize create --resources ./deployment.yaml
+            echo "deploy new deployment"
+            kustomize edit add label deploy:$tag -f
+            kustomize edit set namesuffix -- -$tag
+            kustomize edit set image sysnet4admin/dashboard:$tag
+            kustomize build . | kubectl apply -f -
+            echo "retrieve new deployment"
+            kubectl get deployments -o wide
+            '''
+          }
+        }
+      }
+    }
+    stage('switching LB'){
+      steps {
+        container('kustomize'){
+          dir('service'){
+            sh '''
+            kustomize create --resources ./lb.yaml
+            while true;
+            do
+              export replicas=$(kubectl get deployments \
+              --selector=app=dashboard,deploy=$tag \
+              -o jsonpath --template="{.items[0].status.replicas}")
+              export ready=$(kubectl get deployments \
+              --selector=app=dashboard,deploy=$tag \
+              -o jsonpath --template="{.items[0].status.readyReplicas}")
+              echo "total replicas: $replicas, ready replicas: $ready"
+              if [ "$ready" -eq "$replicas" ]; then
+                echo "tag change and build deployment file by kustomize"
+                kustomize edit add label deploy:$tag -f
+                kustomize build . | kubectl apply -f -
+                echo "delete $tag deployment"
+                kubectl delete deployment --selector=app=dashboard,deploy!=$tag
+                kubectl get deployments -o wide
+                break
+              else
+                sleep 1
+              fi
+            done
+            '''
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+- kubernetes
+  - 쿠버네티스의 파드를 젠킨스 작업이 수행되는 에이전트로 사용
+  - `kubernetes { }` 내부에서는 에이전트로 사용할 파드에 대한 명세를 YAML 형태로 정의 가능
+- yaml
+  - 젠킨스의 에이전트로 만들어지는 파드의 명세
+  - `kubectl` 명령어로 파드를 생성할 때 쓰는 매니페스트와 동일한 형식의 YAML 사용 가능
+  - kustomize를 바로 사용할 수 있도록 이미 설치되어 있는 컨테이너를 에이전트 파드에 포함
+  - kubectl을 사용할 수 있도록 호스트와 연결된 볼륨이 설정되어 있음
+  - 쿠버네티스 클러스터에 오브젝트를 배포할 수 있도록 서비스 어카운트 jenkins가 설정되어 있음
+- 'git scm update' stage
+  - Github로부터 소스 코드 내려받기 단계
+  - 지정된 url의 main 브랜치로부터 코드를 내려받음
+- 'define tag' stage
+  - 실습에서는 젠킨스의 빌드 횟수마다 부여되는 번호에 따라<br>블루/그린이 전환되도록 젠킨스 스크립트 사용
+  - 젠킨스 빌드 번호가 홀수일 때 tag 환경변수값을 blue로, 짝수일 때 green으로 설정
+- 'deploy configmap and deployment' stage
+  - 대시보드를 배포하기 위해 필요한 ConfigMap 배포 후 디플로이먼트를 배포하는 단계
+  - `dir(deployment)`를 통해 하위 디렉토리로 이동 후 작업 진행
+  - 디플로이먼트의 이미지, 이름, 레이블에 설정한 tag 환경 변수를<br>일일이 수정하지 않도록 kustomize 명령 사용
+- 'switching LB' stage
+  - 디플로이먼트 배포 이후 외부의 요청을 로드밸런서에 보내줄 대상을 다시 설정하는 단계
+  - `dir(service)`를 통해 하위 디렉토리로 이동 후 작업 진행
+  - kustomize를 통해 tag 환경변수 덧붙이는 작업
+  - replicas 값과 readyReplicas 값을 비교해 값이 같은 경우 배포가 완료되었다고 판단
+
+<br>
+<br>
+
+# 젠킨스 플러그인을 통해 구현되는 GitOps
+
+**젠킨스가 제공하는 플러그인 종류**
+
+- Platforms : 웹 애플리케이션 이외의 플랫폼에서 작동하는 애플리케이션 빌드를 위한 것들
+- User Interface : 젠킨스 확장 UI를 적용하기 위한 것들
+- Administration : 젠킨스 자체 관리에 필요한 것들
+- Source code management : 소스 코드 저장소 연결이나 관리를 위한 것들
+- Build management : CI/CD 단계에서 추가적으로 사용할 수 있는 것들
+
+<br>
+
+- 이번 장 목표 : 아래 3개의 플러그인을 조합해 젠킨스에서 GitOps 구현하기
+  - Kubernetes Continuous Deploy : 쿠버네티스용 지속적 배포
+  - Slack Notification : 슬랙 알림
+  - Last Changes : 변경 내용 비교
+
+<br>
+
+※ GitOps란?
+
+- Git과 Ops(Operations, 운영)의 합성어
+- git을 통해 모든 것을 선언적으로 SCM에 업데이트하면 오퍼레이터가 변경 감지 및 배포
+- 현재 쿠버네티스 환경에 맞춰 설명하자면···
+  - 배포되어야 할 매니페스트 파일을 Github 저장소에 저장
+  - 매니페스트 업데이트 시 젠킨스가 이를 파악해서 쿠버네티스 클러스터에 배포
+
+<br>
+
+※ GitOps의 이점
+
+- SCM의 내용과 상용 및 운영 환경의 내용을 동일하게 가져감
+  - SCM을 통해 모든 내용을 단일화해서 관리하고 히스토리도 관리할 수 있으며 복구도 빠름
+- 배포를 표준화하여 자동 배포 가능
+  - 배포 과정을 미리 정의해서 SCM에 변경된 내용을 선언만 하면 모든 배포 자동 진행
+- 사람의 실수를 줄여줌
+  - 모든 배포 과정이 자동화되어 견고한 시스템 구축 가능
+
+<br>
+<br>
+
+## 쿠버네티스 환경에 적합한 선언적인 배포 환경
+
+- 지금까지는 cluster-admin 역할을 가진 jenkins 서비스 어카운트를 사용해서<br>쿠버네티스 오브젝트를 배포했음
+- 그런데 이 방법에는 외부의 쿠버네티스 클러스터의 권한이 없음
+- 외부 클러스터에 접근하려면 **kubeconfig** 파일을 이용해서<br>외부 클러스터의 API 서버로 접근한 다음 오브젝트를 배포해야 함
+- 그런데 그 방법에도 kubeconfig를 바로 받아 사용할 때 보안적으로 문제가 있음
+- 이 때 필요한 것이 **Kubernetes Continuous Deploy** 플러그인
+- GitOps를 사용한다는 것은 대부분 여러 목적을 가지는 다수 클러스터 환경을 사용하는 경우
+- GitOps의 중요한 기능 중 하나인 '변화 감지'는 젠킨스 기본 플러그인 **Poll SCM** 사용
+
+<br>
+
+※ kubeconfig 확인하기
+
+- 명령어 : `kubectl config view`
+- DATA+OMITTED, REDACTED는 민감한 정보를 생략했다는 뜻
+  - 충분한 권한을 가진 사용자라면 `--raw` 옵션을 통해 확인 가능
+- cluster
+  - 어떤 쿠버네티스 클러스터에 접속할지에 대한 정보
+  - 접속 대상이 되는 클러스터의 정보를 여러 개 포함할 수 있음
+  - 각 클러스터 접속 정보는 API 서버의 주소와 인증 기관 정보로 이루어져 있음
+- contexts
+  - 클러스터 정보와 사용자 정보의 조합이 담겨 있는 부분
+  - `kubectl` 명령어 사용 시 context에 설정된 user의 자격을 가지고<br>설정된 cluster에 접속하게 되는 것
+- current-context
+  - 현재 사용 중인 context가 무엇인지 표시
+- users
+  - 클러스터에 접속하는 사용자가 누구인지 정보 표시
+  - client-certificate-data 및 client-key-data를 속성으로 가지고 있음
