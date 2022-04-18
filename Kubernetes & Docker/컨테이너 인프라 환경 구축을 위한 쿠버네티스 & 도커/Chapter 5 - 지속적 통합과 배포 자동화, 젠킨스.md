@@ -972,3 +972,122 @@ pipeline {
 - 이 표현 방식을 **cron expression** 이라고 함
 - 젠킨스는 `H/* * * *` 방식을 권장함
   - 이 방식을 사용하면 1분에 한번씩 검사하지만 부하가 없는 시점에 실행되므로 정확하지 않음
+
+<br>
+<br>
+
+## 슬랙을 통해 변경 사항 알리기
+
+- GitOps 환경을 보다 안정적으로 구축하기 위해 알림 메시지를 받을 필요가 있음
+- 이런 환경 구현을 위해 젠킨스는 협업 플랫폼과 기능을 연결할 수 있음
+
+<br>
+
+**Slack 연동 단계**
+
+1. 슬랙 채널을 생성하여 젠킨스가 메시지를 보낼 수 있도록 함
+2. 슬랙 채널에 Jenkins CI 앱을 추가하고<br>슬랙 채널 연동을 위한 토큰 및 워크스페이스 도메인 주소 값 확인
+3. 젠킨스 자격 증명에 슬랙의 토큰을 등록하여 외부에 유출되지 않도록 설정
+4. 슬랙 알림 플러그인 설치 후 시스템 설정 메뉴에 토큰 및 워크스페이스 도메인 주소 입력
+
+<br>
+
+※ Slack 연동하는 Jenkinsfile
+
+```sh
+pipeline {
+  agent any
+  stages {
+    stage('deploy start') {
+      steps {
+        slackSend(message: "Deploy ${env.BUILD_NUMBER} Started"
+        , color: 'good', tokenCredentialId: 'slack-key')
+      }
+    }
+    stage('git pull') {
+      steps {
+        // Git-URL will replace by sed command before RUN
+        git url: 'Git-URL', branch: 'main'
+      }
+    }
+    stage('k8s deploy'){
+      steps {
+        kubernetesDeploy(kubeconfigId: 'kubeconfig',
+                         configs: '*.yaml')
+      }
+    }
+    stage('deploy end') {
+      steps {
+        slackSend(message: """${env.JOB_NAME} #${env.BUILD_NUMBER} End
+        """, color: 'good', tokenCredentialId: 'slack-key')
+      }
+    }
+  }
+}
+```
+
+- 'deploy start' stage
+  - 작업 시작 전 슬랙 채널을 통해 몇 번째 빌드 작업의 시작인지 안내 메시지 전달
+  - 설정된 채널로 메시지를 전달하기 위해 `slack-key` 자격 증명 사용
+- 'deploy end' stage
+  - 작업 종료 시 슬랙으로 몇 번째 빌드 작업이 완료됐는지 메시지 전달
+  - 마찬가지로 `slack-key` 자격 증명 사용
+
+<br>
+
+## 배포 변경 사항을 자동 변경하기
+
+- 배포 관련 메시지 뿐만 아니라 코드 변경 내역을 함께 확인하면 더욱 CI/CD 환경에 좋을 것
+- 젠킨스 플러그인 **Last Changes**를 사용하면 편리함
+
+<br>
+
+※ Last Changes를 적용하기 위해 수정된 Jenkinsfile
+
+```sh
+pipeline {
+  agent any
+  stages {
+    stage('Deploy start') {
+      steps {
+        slackSend(message: "Deploy ${env.BUILD_NUMBER} Started"
+        , color: 'good', tokenCredentialId: 'slack-key')
+      }
+    }
+    stage('git pull') {
+      steps {
+        // Git-URL will replace by sed command before RUN
+        git url: 'Git-URL', branch: 'main'
+      }
+    }
+    stage('k8s deploy'){
+      steps {
+        kubernetesDeploy(kubeconfigId: 'kubeconfig',
+                         configs: '*.yaml')
+      }
+    }
+    stage('send diff') {
+      steps {
+        script {
+          def publisher = LastChanges.getLastChangesPublisher "PREVIOUS_REVISION", "SIDE", "LINE", true, true, "", "", "", "", ""
+          publisher.publishLastChanges()
+          def htmlDiff = publisher.getHtmlDiff()
+          writeFile file: "deploy-diff-${env.BUILD_NUMBER}.html", text: htmlDiff
+        }
+        slackSend(message: """${env.JOB_NAME} #${env.BUILD_NUMBER} End
+        (<${env.BUILD_URL}/last-changes|Check Last changed>)"""
+        , color: 'good', tokenCredentialId: 'slack-key')
+      }
+    }
+  }
+}
+```
+
+- 'send diff' stage > script
+  - Last Changes 플러그인에서는 Pipeline 프로젝트에서 사용하는 선언적 문법 적용이 안됨
+  - 그렇기에 Groovy 스크립트 사용
+  - script 이전 배포와 현재 배포의 차이를 찾아서 html 파일로 작성
+  - 작성된 html은 슬랙 메시지로 전달되는 링크 혹은 프로젝트 상세 화면 좌측 메뉴에서 확인 가능
+- 'send diff' stage 나머지 부분
+  - 배표 완료 후 변경 사항을 확인할 수 있는 주소를 슬랙 메시지로 전달
+  - 앞 부분과 똑같이 `slack-key` 자격 증명 사용
