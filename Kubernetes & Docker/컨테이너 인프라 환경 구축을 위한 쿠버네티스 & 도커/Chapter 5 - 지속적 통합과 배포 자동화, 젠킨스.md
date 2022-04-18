@@ -939,3 +939,36 @@ pipeline {
 - users
   - 클러스터에 접속하는 사용자가 누구인지 정보 표시
   - client-certificate-data 및 client-key-data를 속성으로 가지고 있음
+
+<br>
+
+**젠킨스 관리 > Manage Credentials > (global) > Add Credentials**
+
+- 지속적 배포 플러그인이 사용할 새로운 자격 증명 정보를 추가하기 위한 작업
+- Kind
+  - 자격 증명 종류 선택
+  - Username with Password : 마스터 노드 접속 시 유저 이름과 비밀번호를 입력받는 형식
+  - kubernetes configuration (kubeconfig) : 쿠버네티스용 지속적 배포 플러그인이 사용할 설정 파일 등록
+- Scope
+  - 자격 증명 적용 범위
+  - Global(Jenkins, nodes, all child items, etc) : 젠킨스 전역에서 자격 증명 사용
+- Username
+  - 시스템에 접속하기 위한 사용자 이름 입력
+  - 마스터 노드에 접속하는 기본 계정 `root` 입력
+- Password
+  - 시스템에 접속하기 위한 비밀번호
+  - 베이그런트로 만들어진 가상 머신들의 초기 비밀번호는 `vagrant`
+- ID
+  - 자격 증명을 사용할 때 식별하기 위한 값
+- Description
+  - 자격 증명에 대한 간단한 설명 작성
+
+<br>
+
+**Poll SCM**
+
+- 주기적으로 SCM의 변경을 인식하게 할 수 있음
+- `*/10 * * * *` 방식으로 작성 가능
+- 이 표현 방식을 **cron expression** 이라고 함
+- 젠킨스는 `H/* * * *` 방식을 권장함
+  - 이 방식을 사용하면 1분에 한번씩 검사하지만 부하가 없는 시점에 실행되므로 정확하지 않음
