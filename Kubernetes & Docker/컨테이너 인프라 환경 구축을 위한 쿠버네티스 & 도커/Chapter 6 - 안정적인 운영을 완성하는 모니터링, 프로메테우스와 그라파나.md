@@ -536,3 +536,170 @@ helm install prometheus edu/prometheus \
 - 예시 : `histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket[5m])) by (le))`
   - API 서버로부터 가장 느리게 응답받은 시간
   - `le` : Less Than Or Equal To
+
+<br>
+<br>
+
+# 그라파나로 모니터링 데이터 시각화하기
+
+- 메트릭 데이터를 시각화할 때 가장 많이 언급되는 도구
+- 프로메테우스뿐만 아니라 엘라스틱서치, 인플럭스DB 등 여러 종류의 데이터 소스 시각화 가능
+- 프로메테우스의 메트릭을 가져와서 메트릭 시각화를 실제로 구현해볼 것
+
+<br>
+<br>
+
+## 헬름으로 그라파나 설치하기
+
+※ grafana-install.sh
+
+```sh
+#!/usr/bin/env bash
+helm install grafana edu/grafana \
+--set persistence.enabled=true \
+--set persistence.existingClaim=grafana \
+--set service.type=LoadBalancer \
+--set securityContext.runAsUser=1000 \
+--set securityContext.runAsGroup=1000 \
+--set adminPassword="admin"
+```
+
+- helm install
+  - edu 저장소의 grafana 차트로 쿠버네티스 클러스터 위에 grafana 릴리스 설치
+- persistence.enabled=true
+  - 그라파나 디플로이먼트가 삭제되더라도 대시보드 데이터 유지를 위해<br>PVC를 통해 영구적으로 데이터를 저장하도록 설정
+- persistence.existingClaim=grafana
+  - 퍼블릭 클라우드의 PVC 동적 생성을 사용할 수 없는 가상 머신 환경이라는 문제
+  - 그렇기 때문에 grafana라는 이름의 PVC를 사용하도록 설정
+- service.type=LoadBalancer
+  - 차트 설치 시 생성될 서비스 타입을 설정
+  - LoadBalancer를 통해 MetalLB로부터 외부 IP 주소를 할당받도록 함
+- securityContext
+  - 사용자 ID와 그룹 ID를 1000번으로 설정
+
+<br>
+<br>
+
+## 프로메테우스를 데이터 소스로 구성하기
+
+**메뉴 살펴보기**
+
+- Search
+  - 사용자가 만든 대시보드를 태그 또는 이름으로 검색 가능
+- Create
+  - 가장 중요하고 많이 사용하는 메뉴
+  - 새로운 대시보드 구성 및 다른 사람의 대시보드 추가 가능
+  - 대시보드를 분류해서 관리하는 폴더도 여기서 설정
+- Dashboards
+  - 만들어진 여러 대시보드를 연결
+  - 한 화면에 슬라이드 쇼처럼 확인할 수 있는 **Playlists**
+  - 특정 시간의 대시보드 화면을 캡쳐 및 공유하는 **Snapshots**
+- Explore
+  - 데이터 소스를 선택해서 여러 표현식을 확인
+  - PromQL 표현식 테스트 가능
+- Alerting
+  - 그라파나에서 경보를 보내기 위한 채널과 경보 규칙을 설정하는 메뉴
+- Configuration
+  - 대시보드 구성을 설정하는 하위 메뉴들
+  - 주로 사용하는 메뉴는 **Data Sources**
+  - **Plugins** : 대시보드의 기능 강화
+  - **Teams / User** : 조직 구성
+- Server Admin
+  - 새로운 사용자 추가, 애플리케이션 상태와 설정값 확인
+  - 주로 그라파나 관리자가 사용하는 메뉴
+- Dashboard settings
+  - Home을 설정할 수 있는 메뉴
+  - 처음에는 홈 화면 설정 → 대시보드가 추가되면 추가된 대시보드 설정 가능
+- Cycle view mode
+  - 대시보드에 표시된 내용만 집중해서 볼 수 있는 모드로 변경하는 메뉴
+  - 처음 한 번 누르면 왼쪽 메뉴가 사라지는 TV 모드
+  - 한 번 더 누르면 위쪽 메뉴가 사라지는 kiosk 모드
+  - 변환된 모드에서 `esc`를 누르면 다시 일반 모드
+
+※ CoreDNS
+
+- DNS 서비스를 제공하는 디플로이먼트
+- DNS : Domain Name System
+- 파드와 서비스가 배포될 때 IP 주소 정보와 도메인 이름을 자동으로 등록해서<br>도메인 이름으로 연결할 수 있도록 해줌
+- IP로 직접 연결하기보다는 도메인 이름으로 구성해서 IP 변경 시 유연한 대처 가능
+- 프로메테우스 도메인 확인 명령어
+  - `kubectl run net --image=sysnet4admin/net-tools --restart=Never --rm -it -- nslookup 192.168.1.12`
+
+<br>
+<br>
+
+## 노드 메트릭 데이터 시각화하기
+
+- 그라파나는 대시보드를 만들고 그 안에 패널이라는 구성 요소를<br>추가하는 방식으로 메트릭 데이터를 시각화함
+
+<br>
+
+**New Panel > Panel 탭의 Visualization 항목**
+
+- Graph
+  - 그라파나에서 가장 많이 사용되는 기본 옵션
+  - 점의 경로, 선, 막대로 데이터 시각화 가능
+  - 대부분의 시계열 데이터를 사용자가 원하는 형태로 표시
+- Stat
+  - 특정 값과 함께 추이를 꺾은선 그래프로 나타내는 도구
+  - 텍스트 모드를 통해 값만 볼 수도 있음
+  - 주로 여러 대상이나 단일 대상의 상태를 나타내는 데 사용
+- Gauge
+  - 차량의 계기판 같이 값의 범위가 있는 데이터를 표현할 때 유용
+  - 백분율처럼 사용량의 시작과 끝이 있을 때 사용
+- Bar gauge
+  - 게이지와 다르게 원형이 아닌 막대형으로 표현
+  - 게이지보다 범위가 넓으므로 한계를 모르는 경우에 사용
+- Table
+  - 수집된 메트릭 데이터를 그대로 표현
+  - 주로 실제 값을 대시보드에서 확인하는 목적
+- Text
+  - 제작자가 알리고 싶은 정보를 대시보드에 표현할 때 사용
+  - 주로 대시보드의 목적과 사용법 등의 정보를 전달할 때 사용
+- Heatmap
+  - 패널을 다수 구역으로 나눠서 속하는 값이 많을수록 색상을 연하게 표현
+  - 주로 히스토그램과 함께 빈도를 나타내는 용도
+- Alert list
+  - 수집 대상의 문제를 빠르게 확인하기 위한 정보 표시
+  - 가장 최근 경보부터 확인 가능
+- Dashboard list
+  - 최근에 확인한 대시보드와 사용자가 즐겨찾기한 대시보드 등을 만들 때 사용
+- News
+  - RSS 피드와 같은 정보를 나타냄
+  - 기본적으로 그라파나 공식 블로그의 게시글 정보 표시
+- Logs
+  - 외부 로그 데이터를 나타냄
+  - 데이터 소스에서 받아온 로그 데이터를 시각화하는 데 사용
+  - 로그 level에 따라 패널에 색상 변화를 넣을 수 있음
+- Plugin list
+  - 현재 설치된 플러그인 확인
+
+<br>
+<br>
+
+## 파드 메트릭 데이터 시각화하기
+
+- 파드 메트릭의 시각화 방법은 노드 메트릭의 시각화와 동일
+- 그런데 파드는 여러 네임스페이스에 존재하니 사용자가 원하는 네임스페이스에 속한 파드만 확인하도록
+- 그러기 위해서 변수를 선언하고, 변수로 원하는 내용만 선별해서 대시보드에서 확인하도록
+
+<br>
+
+**Dashboard settings > Variables > Add variable**
+
+- Name
+  - 대시보드에서 사용하는 변수 이름
+  - 설정 후 앞에 `$`를 붙여서 사용 가능
+- Label
+  - 대시보드에서 변수 선택 시 변수를 지칭하는 레이블
+- Data Source
+  - 쿼리 실행 시 값을 받아오는 소스
+- Refresh
+  - 변수를 읽어들이는 방법 설정
+- Query
+  - 쿼리를 입력해서 그 결과를 그라파나 변수로 사용하도록 추가
+- Include All option
+  - 모든 네임스페이스를 선택할 수 있는 옵션
+- Custom all value
+  - 'Include All option' 활성화 시 추가되는 옵션
+  - All 선택 옵션의 범위를 사용자가 지정 가능
