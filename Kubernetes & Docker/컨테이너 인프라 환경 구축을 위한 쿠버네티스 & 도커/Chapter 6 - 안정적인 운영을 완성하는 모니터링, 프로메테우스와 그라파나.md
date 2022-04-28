@@ -225,7 +225,7 @@ helm install prometheus edu/prometheus \
 - 프로메테우스의 웹 UI에서 제공하는 가장 중요한 내용을 처리하는 페이지
 - Enable query history
   - 프로메테우스가 적재한 메트릭 데이터를 조회할 수 있는 표현식을 입력하는 곳
-  - 사용하는 표현식은 **PromQL(Prometheus Query Language)**이라는 프로메테우스의 쿼리 언어
+  - 사용하는 표현식은 **PromQL(Prometheus Query Language)** 이라는 프로메테우스의 쿼리 언어
     - 시계열 데이터베이스를 RDBMS처럼 쿼리문을 작성하여 효과적으로 필요한 메트릭 추출
 - Graph
   - PromQL을 통해 메트릭 데이터를 확인할 때 시각적으로 표현해주는 옵션
