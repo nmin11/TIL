@@ -69,6 +69,10 @@ module.exports = {
   - 타이밍과 관련해서 예쁜 스타일을 적용할 수 있음
 - cursor
   - 마우스를 갖다 댔을 때의 마우스 모양에 스타일을 적용할 수 있음
+- space
+  - margin을 일일이 주는 것보다는 상위 div에서<br>`space-x` 같은 걸 적용해서 알아서 margin 값을 갖도록 하는 것이 좋음
+- devide
+  - 어떤 요소 다음에도 요소가 있으면 border를 넣어줌
 
 <br>
 
@@ -129,3 +133,53 @@ module.exports = {
 - 그리고 JIT 덕에 `text-[13579px]` 같은 별도의 사이즈를 가진 스타일도 적용할 수 있게 되었음
   - 당연히 색상을 `text-[#FF2468]` 같이 지정하는 것도 가능
   - 배경 이미지를 넣기 위해 `bg-[url('/vercel.svg')]` 같은 것도 사용 가능
+
+<br>
+
+## function을 활용해서 스타일 적용하는 예시
+
+```js
+function classes(...classnames: string[]) {
+  return classnames.join(" ");
+}
+```
+
+```js
+<button
+  className={classes(
+    "pb-4 font-medium text-sm border-b-2 ",
+    method === "email"
+      ? "border-orange-500 text-orange-400"
+      : "border-transparent hover:text-gray-400 text-gray-500"
+  )}
+  onClick={onEmailClick}
+>Email
+</button>
+
+<button
+  className={classes(
+    "pb-4 font-medium text-sm border-b-2 ",
+    method === "phone"
+      ? "border-orange-500 text-orange-400"
+      : "border-transparent hover:text-gray-400 text-gray-500"
+  )}
+  onClick={onPhoneClick}
+>Phone
+</button>
+```
+
+<br>
+
+## Plugins
+
+- 인기 있는 Plugin들이 모여 있으며, 코어하지 않다는 이유로 별도 설치가 필요하게끔 되어 있음
+- Plugin을 설치하면 추가적으로 class name을 사용할 수 있게 됨
+- Forms plugin은 Form의 기본 스타일을 바꾸고자 한다면 추천
+
+<br>
+
+## Form
+
+- input 태그의 `appearance-none` : input의 기본 스타일 리셋
+- `focus` 관련 설정들을 넣어주면 예쁨
+- input 태그 왼편에 +82 같은 걸 넣고 싶다면 `select-none`
