@@ -175,6 +175,7 @@ function classes(...classnames: string[]) {
 - 인기 있는 Plugin들이 모여 있으며, 코어하지 않다는 이유로 별도 설치가 필요하게끔 되어 있음
 - Plugin을 설치하면 추가적으로 class name을 사용할 수 있게 됨
 - Forms plugin은 Form의 기본 스타일을 바꾸고자 한다면 추천
+- tailwind-scrollber-hide를 사용해서 스크롤바를 가려줄 수 있음
 
 <br>
 
@@ -183,3 +184,21 @@ function classes(...classnames: string[]) {
 - input 태그의 `appearance-none` : input의 기본 스타일 리셋
 - `focus` 관련 설정들을 넣어주면 예쁨
 - input 태그 왼편에 +82 같은 걸 넣고 싶다면 `select-none`
+
+<br>
+
+## Aspect Ratio
+
+- 상자의 기본 종횡비를 알아서 적용해주는 스타일
+- `aspect-ratio` => `aspect-ratio: auto;`
+- `aspect-square` => `aspect-ratio: 1 / 1;`
+- `aspect-video` => `aspect-ratio: 16 / 9;`
+
+<br>
+
+## Max-Width
+
+- 요소의 최대 넓이 지정
+- 예시 : `w-full max-w-xl mx-auto`
+- 예시에서 가운데 max 지정 값에 따라서 화면 최대 크기가 정해짐
+- \_app.tsx에 설정해서, 전체 앱에 최대 크기를 조정할 때 사용해주면 좋음
