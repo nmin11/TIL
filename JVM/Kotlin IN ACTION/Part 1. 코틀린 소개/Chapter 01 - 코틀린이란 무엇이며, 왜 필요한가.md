@@ -2,17 +2,17 @@
 
 ```java
 data class Persion(
-    val name: String,
-    val age: Int? = null    // null이 될 수 있는 ? 타입
+  val name: String,
+  val age: Int? = null    // null이 될 수 있는 ? 타입
 )
 
 fun main(args: Array<String>) {
-    val persons = listOf(
-        Person("Min"),
-        Person("Loko", age=20)  // 이름 붙인 파라미터
-    )
-    val oldest = persons.maxBy { it.age ?: 0 }  // 람다식과 엘비스 연산자
-    println("oldest one : $oldest")     // 문자열 템플릿
+  val persons = listOf(
+    Person("Min"),
+    Person("Loko", age=20)  // 이름 붙인 파라미터
+  )
+  val oldest = persons.maxBy { it.age ?: 0 }  // 람다식과 엘비스 연산자
+  println("oldest one : $oldest")     // 문자열 템플릿
 }
 ```
 
@@ -140,8 +140,32 @@ fun findBob() = findPerson { it.name == "Bob" }
 
 <br>
 
-## 2.4 무료 오픈소스
+### 2.4 무료 오픈소스
 
 - 언어, 컴파일러, 라이브러리 및 코틀린과 관련된 모든 도구는 모두 오픈소스
 - Apache 2 라이선스하에 제공됨
 - GitHub을 통해 개발되고 있음 (https://github.com/jetbrains/kotlin)
+
+<br>
+<br>
+
+## 3. 코틀린 응용
+
+### 3.1 코틀린 서버 프로그래밍
+
+- Java 코드와 매끄럽게 상호운용할 수 있으므로 기존 시스템과의 통합에 용이함
+- 몇 가지 새로운 기술을 활용해서 서버 시스템 개발 가능
+  - Builder pattern을 활용해서 객체로 이뤄진 grpah를 쉽게 구축할 수 있음
+- 깔끔하고 간결한 DSL 기능 제공
+  - [Exposed 프레임워크](https://github.com/jetbrains/exposed) 를 사용하면 SQL DB 구조를 기술할 수 있는 읽기 쉬운 DSL 제공
+
+<br>
+
+### 3.2 코틀린 안드로이드 프로그래밍
+
+- 특별한 컴파일러 플러그인 지원을 통해 개발 생산성을 높이고 개발의 즐거움을 더함
+  - 컨트롤러에 리스너를 추가하거나 레이아웃 요소를 필드와 바인딩하는 등의<br>흔한 안드로이드 개발 작업을 훨씬 더 적은 코드로 달성 가능
+- [Anko 라이브러리](https://github.com/kotlin/anko) 를 사용하면 수많은 안드로이드 API에 대한 코틀린 어댑터를 제공받을 수 있음
+- 애플리케이션의 신뢰성을 더 높일 수 있음
+  - 타입을 정확히 추적하여 NullPointerException 유형의 코드는 컴파일도 되지 않게 함
+- 람다 함수를 inlining하기 때문에 람다를 사용해도 새로운 객체가 만들어지지 않음
