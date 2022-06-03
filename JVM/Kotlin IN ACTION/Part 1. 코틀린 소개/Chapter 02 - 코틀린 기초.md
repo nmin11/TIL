@@ -150,3 +150,87 @@ fun main(args: Array<String>) {
 ```
 
 ※ 한글과 함께 사용할 때 에러가 발생할 수 있으니 `${name}님!` 처럼 감싸주면 좋음<br>사실 `{}`를 습관적으로 써주는 것이 코드를 읽으며 식별하기에 더욱 간편함
+
+<br>
+<br>
+
+## 2. 클래스와 프로퍼티
+
+※ 클래스 선언 Java to Kotlin
+
+```java
+public class Person {
+  private final String name;
+
+  public Person(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+}
+```
+
+↓
+
+```java
+class Person(val name: String)
+```
+
+- 이렇게 코드 없이 데이터만 저장하는 클래스를 **value object**라고 부름
+- `public` 키워드는 코틀린의 기본 가시성이므로 생략 가능
+
+<br>
+
+### 2.1 프로퍼티
+
+클래스의 개념
+
+- 데이터를 캡슐화해서 한 주체 아래 가두는 것
+
+<br>
+
+Java에서의 클래스
+
+- 데이터를 필드에 저장, 멤버 필드의 가시성은 보통 `private`
+- 클라이언트가 데이터에 접근할 수 있도록 **accessor method** 제공
+  - 보통은 필드를 읽기 위한 getter를 제공하고, 변경을 허용할 경우 setter도 제공
+- 필드와 접근자를 묶어서 **property**라고 부름
+
+<br>
+
+Kotlin property
+
+- 언어 기본 기능으로 제공
+- Java의 필드와 접근자 메소드를 완전히 대신함
+- 프로퍼티 선언은 변수 선언과 마찬가지로 `val` 혹은 `var` 사용
+  - `val`은 getter 제공, `var`는 getter 및 setter 제공
+- Java의 `person.getName()` 방식 대신 `person.name` 방식으로 호출 가능
+  - getter 호출 대신 프로퍼티 직접 사용
+  - setter의 경우에도 `person.name = Loko`라고 써주면 됨
+
+<br>
+
+### 2.2 커스텀 접근자
+
+```java
+class Rectangle(val: height: Int, val width: Int) {
+  val isSquare: Boolean
+    get() {
+      return height == width
+    }
+}
+```
+
+- 사각형이 정사각형인지 여부를 별도의 필드에 저장하는 대신 그때그때 조회할 수 있게 하는 코드
+- 블록 대신 `get() = height == width`라고 해도 됨
+- 구현이나 성능상 차이는 없고, 가독성을 고려해야 함
+
+<br>
+
+### 2.3 코틀린 소스코드 구조: 디렉토리와 패키지
+
+- 디스크상 어느 디렉토리에 소스코드 파일을 위치시키든 상관 없고,<br>kt 파일을 패키지처럼 다룰 수도 있음
+- 하지만 대부분의 경우 Java와 같이 패키지별로 디렉토리를 구성하는 것이 좋음
+  - 마이그레이션할 때 문제가 발생할 수 있음
