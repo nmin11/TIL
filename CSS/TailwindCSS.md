@@ -57,6 +57,7 @@ module.exports = {
 - space
   - 요소 사이사이에 margin을 만들어줌
   - 아니면 grid 스타일에 gap으로 줘도 똑같이 margin을 만들어줌
+  - margin을 일일이 주는 것보다는 상위 div에서<br>`space-x` 같은 걸 적용해서 알아서 margin 값을 갖도록 하는 것이 좋음
 - border
   - 위치에 맞춰서 크기를 지정하고 선을 그어줄 수 있음
 - font
@@ -69,8 +70,6 @@ module.exports = {
   - 타이밍과 관련해서 예쁜 스타일을 적용할 수 있음
 - cursor
   - 마우스를 갖다 댔을 때의 마우스 모양에 스타일을 적용할 수 있음
-- space
-  - margin을 일일이 주는 것보다는 상위 div에서<br>`space-x` 같은 걸 적용해서 알아서 margin 값을 갖도록 하는 것이 좋음
 - devide
   - 어떤 요소 다음에도 요소가 있으면 border를 넣어줌
 
