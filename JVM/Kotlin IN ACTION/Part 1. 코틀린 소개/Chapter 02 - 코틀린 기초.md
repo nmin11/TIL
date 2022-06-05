@@ -430,3 +430,198 @@ fun evalWithLogging(e: Expr): Int =
 - **식이 본문인 함수에서 블록을 사용하면 마지막 식이 블록의 결과**
   - 즉, 위 예제에서 Num인 경우에는 `e.value`가, Sum인 경우에는 `left + right`가 반환됨
   - 블록이 본문인 함수라면 반드시 `return`이 있어야 함
+
+<br>
+<br>
+
+## 4. Iteration: while과 for 루프
+
+- 코틀린 특성 중 자바와 가장 비슷한 것이 이터레이션
+- while 루프는 자바와 동일
+- for는 자바의 for-each 루프에 해당하는 형태만 존재
+
+<br>
+
+### 4.1 while 루프
+
+- while과 do-while이 있는데, Java와 완벽히 동일
+
+<br>
+
+### 4.2 수에 대한 이터레이션: 범위와 수열
+
+- Java의 for문처럼 초기값, 증가값, 최종값을 사용하는 대신 **range**를 사용함
+- 범위 표현 방식 : `1..10`
+
+Fizz-Buzz 게임
+
+```java
+fun fizzBuzz(i: Int) = when {
+  i % 15 == 0 -> "FizzBuzz"
+  i % 3 == 0 -> "Fizz"
+  i % 5 == 0 -> "Buzz"
+  else -> "$i"
+}
+
+for (i in 1..100) {
+  print(fizzBuzz(i))
+}
+```
+
+100부터 거꾸로 세되 짝수만으로 진행하는 Fizz-Buzz
+
+```java
+for (i in 100 downTo 1 step 2) {
+  print(fizzBuzz(i))
+}
+```
+
+- `step`은 증가값이며, 음수 지정 시 역방향 수열을 만들 수 있음
+- `downTo`는 범위를 역방향 수열로 만듦
+- `..` 범위는 범위의 마지막 값을 포함
+  - 마지막 값을 빼고 이터레이션하는 경우가 많은데, 이런 경우에는 `until` 함수를 사용
+  - 예시 : `for (x in 0 until size)`
+
+<br>
+
+### 4.3 맵에 대한 이터레이션
+
+문자에 대한 2진 표현을 출력하는 프로그램
+
+```java
+val binaryReps = TreeMap<Char, String>()
+for (c in 'A'..'F') {
+  val binary = Integer.toBinaryString(c.toInt())
+  binaryReps[c] = binary
+}
+for ((letter, binary) in binaryReps) {
+  println("$letter = $binary")
+}
+```
+
+- `..` 범위를 숫자 타입의 값뿐 아니라 문자 타입의 값에도 적용 가능
+- 위 예제에서 map의 key와 value를 `letter`와 `binary`에 대입해서 루프를 돌렸음
+- `get`이나 `put`을 사용하는 대신 `map[key]`를 사용해서 값을 가져오고,<br>`map[key]=value`를 사용해서 값을 설정할 수 있음
+
+Map이 아닌 List 컬렉션에도 구조 분해 구문 사용 가능
+
+```java
+val list = arrayListOf("10", "11", "1001")
+for ((index, element) in list.withIndex()) {
+  println("$index: $element")
+}
+```
+
+- List의 index를 함께 출력할 수 있음
+- `withIndex()`에 대해서는 3챕터에서 알아볼 예정
+
+<br>
+
+### 4.4 in으로 컬렉션이나 범위의 원소 검사
+
+`in`과 `!in`을 활용해서 값이 범위에 속하는지 검사하기
+
+```java
+fun isLetter(c: Char) = c in 'a'..'z' || c in 'A'..'Z'
+fun isNotDigit(c: Char) = c !in '0'..'9'
+```
+
+when식에서 `in`과 `!in` 사용하기
+
+```java
+fun recognize(c: Char) = when (c) {
+  in '0'..'9' -> "It's a digit!"
+  in 'a'..'z', in 'A'..'Z' -> "It's a letter!"
+  else -> "I don't know..."
+}
+```
+
+비교 가능한 클래스라면(java.lang.Comparable 인터페이스를 구현한 클래스라면)<br>클래스의 인스턴스 객체를 사용해서 범위를 만들 수도 있음
+
+```java
+println("Kotlin" in "Java".."Scala")
+//true
+```
+
+- String의 Comparable은 두 문자열을 알파벳 순서로 비교
+
+컬렉션에도 `in` 연산 사용 가능
+
+```java
+println("Kotlin" in setOf("Java", "Scala"))
+//false
+```
+
+<br>
+<br>
+
+## 5. 코틀린의 예외 처리
+
+- 다른 언어의 예외 처리와 비슷
+  - 함수는 오류가 발생하면 예외를 throw
+  - 함수를 호출한 쪽에서 예외를 잡아 처리할 수 있고, 호출 단에서 catch하지 않으면<br>함수 호출 스택을 거슬러 올라가면서 예외를 처리하는 부분이 나올 때까지 rethrow
+
+```java
+if (percentage !in 0..100) {
+  throw IllegalArgumentException(
+    "A percentage value must be between 0 and 100: $percentage")
+}
+```
+
+- 예외 인스턴스에 `new`를 붙일 필요가 없음
+- Java와 달리 `throw`가 식이므로 다른 식에 포함될 수 있음
+
+```java
+val percentage =
+  if (number in 0..100)
+    number
+  else
+    throw IllegalArgumentException(
+      "A percentage value must be between 0 and 100: $percentage")
+```
+
+<br>
+
+### 5.1 try, catch, finally
+
+```java
+fun readNumber(reader: BufferedReader): Int? {
+  try {
+    val line = reader.readLine()
+    return Integer.parseInt(line)
+  } catch (e: NumberFormatException) {
+    return null
+  } finally {
+    reader.close()
+  }
+}
+```
+
+- Java와 달리 throws 절이 코드에 없음
+- checked exception과 unchecked exception을 다루는 부분도 다름
+  - Java는 checked exception 처리를 강제함
+  - 하지만 프로그래머들이 의미 없이 예외를 다시 던지거나,<br>예외를 잡되 처리하지 않고 그냥 무시하는 코드를 작성하는 경우가 비일비재
+  - 위 예시에서, `NumberFormatException`은 Java의 checked exception이 아니므로,<br>프로그래머가 이를 넘겼다가 실제 실행 시점에 예외가 발생하는 모습을 자주 볼 수 있음
+  - 반면에 `BufferedReader.close`는 `IOException`을 던질 수 있는데,<br>이는 checked exception이므로 Java에서는 반드시 처리해야 하지만,<br>실제 스트림을 닫다가 실패하는 경우 특별히 스트림을 사용하는<br>클라이언트 프로그램이 취할 수 있는 의미 있는 동작은 없으며, 결국 무의미한 코드가 생김
+  - 코틀린에서는 함수가 던질 예외를 굳이 선언하지 않아도 됨
+
+<br>
+
+### 5.2 try를 식으로 사용
+
+```java
+fun readNumber(reader: BufferedReader) {
+  val number = try {
+    Integer.parseInt(reader.readLine())
+  } catch (e: NumberFormatException) {
+    null
+  }
+  println(number)
+}
+```
+
+- 코틀린의 `try`는 `if`나 `when`과 마찬가지로 식
+- `try`의 값을 변수에 대입 가능
+- `if`와는 달리 본문을 반드시 `{}`로 둘러싸야 함
+- 다른 문장과 마찬가지로 본문 내부에 여러 식이 있다면 마지막 식의 값이 전체 결과값
+- `catch` 블록도 그 안의 마지막 식이 블록 전체의 값
