@@ -137,3 +137,152 @@ const val UNIX_LINE_SEPARATOR = "\n"
 - 최상위 상수를 저장해둘 수도 있음
   - 이 경우 `public static final`을 사용해야 자연스러우니, `const val`로 초기화하면 됨
   - `const` 키워드는 원시 타입과 String에만 사용 가능
+
+<br>
+<br>
+
+## 3. 메소드를 다른 클래스에 추가: 확장 함수와 확장 프로퍼티
+
+- 완전히 코틀린으로만 이뤄진 프로젝트조차 자바 라이브러리를 기반으로 만들어지는데,<br>그러면 기존 자바 API를 처리할 수 있어야 함
+- 기존 자바 API를 재작성하지 않도록 코틀린이 지원하는 것이 **extension function**
+
+```java
+package strings
+
+fun String.lastChar(): Char = this.get(this.length - 1)
+```
+
+- 추가하려는 함수 이름 앞에 그 함수가 확장할 클래스 이름을 붙이기만 하면 됨
+  - 앞의 클래스 이름 : receiver type
+  - 호출되는 대상이 되는 값(this 부분) : receiver object
+- 어떤 면에서 이는 String 클래스에 새로운 메소드를 추가하는 것과 같음
+- 일반 메소드와 마찬가지로 `this` 키워드는 생략 가능
+
+```java
+package strings
+
+fun String.lastChar(): Char = get(length - 1)
+```
+
+- 캡슐화를 깨지 않음
+  - private 멤버나 protected 멤버를 사용할 수 없음
+
+<br>
+
+### 3.1 임포트와 확장 함수
+
+- 확장 함수를 정의해도 프로젝트 안의 모든 소스코드에서 그걸 사용할 수 있는 것은 아님
+- 사용하기 위해서는 임포트가 필요함
+
+```java
+import strings.lastChar
+
+val c = "Kotlin".lastChar()
+```
+
+- `*`를 사용한 임포트도 가능
+- `as` 키워드를 사용하면 다른 이름으로 부를 수도 있음
+  - 한 파일 안에 다른 여러 패키지의 이름이 같은 함수를 불러올 때<br>이름을 바꿔주면 충돌을 피할 수 있음
+
+```java
+import strings.lastChar as last
+
+val c = "Kotlin".last()
+```
+
+<br>
+
+### 3.2 자바에서 확장 함수 호출
+
+- 내부적으로 확장 함수는 수신 객체를 첫 번째 인자로 받는 정적 메소드
+  - 확장 함수 호출 시 다른 adapter 객체나 실행 부가 비용이 들지 않음
+- 최상위 함수와 마찬가지로 확장 함수가 있는 파일 이름에 따라 결정됨
+
+```java
+char c = StringUtilKt.lastChar("Java");
+```
+
+<br>
+
+### 3.3 확장 함수로 유틸리티 함수 정의
+
+joinToString 최종 버전 만들기
+
+```java
+fun <T> Collection<T>.joinToString(
+  separator: String = ", ",
+  prefix: String = "",
+  postfix: String = ""
+): String {
+  val result = StringBuilder(prefix)
+  for ((index, element) in this.withIndex()) {
+    if (index > 0) result.append(separator)
+    result.append(element)
+  }
+  result.append(postfix)
+  return result.toString()
+}
+```
+
+```java
+val list = arrayListOf(1, 2, 3)
+println(list.joinToString(" "))
+//1 2 3
+```
+
+String에 대해서만 호출할 수 있는 join 함수
+
+```java
+fun Collection<String>.join(
+  separator: String = ", ",
+  prefix: String = "",
+  postfix: String = ""
+) = joinToString(separator, prefix, postfix)
+```
+
+```java
+println(listOf("one", "two", "three").join(" "))
+//one two three
+```
+
+<br>
+
+### 3.4 확장 함수는 오버라이드할 수 없다
+
+- 확장 함수는 클래스의 일부가 아닌, 클래스 밖에 선언된 것
+- 정적 타입에 의존하기 때문에 호출할 수 없음
+
+```java
+View view = new Button();
+ExtensionsKt.showOff(view);
+```
+
+<br>
+
+### 3.5 확장 프로퍼티
+
+- 기존 클래스 객체에 대해 프로퍼티 형식으로 사용할 API를 추가할 수 있음
+- 상태를 저장할 방법이 없기에 아무 상태도 가질 수 없음
+- 더 짧게 코드를 작성할 수 있기에 편리함
+
+```java
+val String.lastChar: Char
+  get() = get(length - 1)
+  set(value: Char) {
+    this.setCharAt(length - 1, value)
+  }
+```
+
+```java
+println("Kotlin".lastChar)
+val sb = StringBuilder("Kotlin?")
+sb.lastChar = '!'
+println(sb)
+
+//n
+//Kotlin!
+```
+
+- 일반적인 프로퍼티와 같지만 수신 객체 클래스가 추가되었을 뿐
+- 기본 getter 구현이 제공되지 않으므로 꼭 정의해야 함
+  - 초기화 코드도 사용 불가
