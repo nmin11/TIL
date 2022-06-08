@@ -286,3 +286,67 @@ println(sb)
 - 일반적인 프로퍼티와 같지만 수신 객체 클래스가 추가되었을 뿐
 - 기본 getter 구현이 제공되지 않으므로 꼭 정의해야 함
   - 초기화 코드도 사용 불가
+
+<br>
+<br>
+
+## 4. 컬렉션 처리
+
+- `vararg` : 호출 시 인자 개수가 달라질 수 있는 함수 정의
+- infix 함수 호출 구문 : 인자가 하나뿐인 메소드를 간편하게 호출
+- destructuring declaration : 복합적인 값을 분해해서 여러 변수에 나눠 담음
+
+<br>
+
+### 4.1 자바 컬렉션 API 확장
+
+- `list.last()`나 `set.max()`는 사실 모두 확장 함수
+- 코틀린 표준 라이브러리는 수많은 확장 함수를 포함
+
+<br>
+
+### 4.2 가변 인자 함수
+
+```java
+fun listOf<T>(vararg values: T): List<T> { ··· }
+```
+
+- `vararg`는 메소드 호출 시 원하는 개수만큼 값을 인자로 넘기면<br>컴파일러가 배열에 그 값들을 넣어주는 기능
+- 자바에서는 타입 뒤에 `...`을 사용하지만 코틀린에서는 타입 앞에 `vararg` 사용
+- 이미 배열이 있는 경우 자바는 그냥 배열을 넘기면 되지만 코틀린에서는 배열을 명시적으로 풀어야 함
+
+```java
+fun main(args: Array<String>) {
+  val list = listOf("args: ", *args)
+  println(list)
+}
+```
+
+- 기술적으로는 spread 연산자를 사용할 수도 있지만, 위와 같이 배열 앞에 `*`을 붙여도 됨
+
+<br>
+
+### 4.3 값의 쌍 다루기: 중위 호출과 구조 분해 선언
+
+```java
+val map = mapOf(1 to "one", 7 to "seven", 53 to "fifty-three")
+```
+
+- 이 코드는 **infix call**이라는 특별한 방식으로
+- 중위 호출은 객체와 유일한 메소드 인자 사이에 메소드 이름을 넣음
+
+```java
+infix fun Any.to(other: Any) = Pair(this, other)
+```
+
+- 함수를 중위 호출되도록 허용할 때는 위처럼 `infix` 변경자를 함수 앞에 추가해야 함
+- Pair는 코틀린 표준 라이브러리 클래스로, 이름 그대로 두 원소로 이뤄진 순서쌍을 표현
+
+```java
+val (number, name) = 1 to "one"
+```
+
+- Pair의 내용으로 두 변수를 즉시 초기화할 수 있음
+- 이를 destructuring declaration이라고 부름
+- Pair 인스턴스 외 다른 객체에도 구조 분해 적용 가능
+  - 예를 들어 key와 value, index와 element
