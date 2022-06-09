@@ -16,8 +16,8 @@ println(strings.last())
 val numbers = setOf(1, 14, 2)
 println(numbers.max())
 
-//third
-//14
+third
+14
 ```
 
 <br>
@@ -31,7 +31,7 @@ toString 호출하기
 val list = listOf(1, 2, 3)
 println(list)
 
-//[1, 2, 3]
+[1, 2, 3]
 ```
 
 이제부터 toString을 위와 같은 디폴트 형식이 아닌 `(1; 2; 3)` 형식으로 출력하는 연습을 해볼 것
@@ -57,7 +57,7 @@ fun <T> joinToString(
 val list = listOf(1, 2, 3)
 println(joinToString(list, "; ", "(", ")"))
 
-//(1; 2; 3)
+(1; 2; 3)
 ```
 
 - 다음으로 이 함수를 좀 더 코틀린답게 변형할 것
@@ -88,11 +88,11 @@ fun <T> joinToString(
 
 ```java
 joinToString(list, ", ", "", "")
-//1, 2, 3
+1, 2, 3
 joinToString(list)
-//1, 2, 3
+1, 2, 3
 joinToString(list, "; ")
-//1; 2; 3
+1; 2; 3
 ```
 
 - 이렇게 하면 일부 인자를 생략해서 호출하는 것이 가능해짐
@@ -100,7 +100,8 @@ joinToString(list, "; ")
 
 ```java
 joinToString(list, postfix=";", prefix="# ")
-//# 1, 2, 3;
+
+# 1, 2, 3;
 ```
 
 <br>
@@ -227,7 +228,8 @@ fun <T> Collection<T>.joinToString(
 ```java
 val list = arrayListOf(1, 2, 3)
 println(list.joinToString(" "))
-//1 2 3
+
+1 2 3
 ```
 
 String에 대해서만 호출할 수 있는 join 함수
@@ -242,7 +244,8 @@ fun Collection<String>.join(
 
 ```java
 println(listOf("one", "two", "three").join(" "))
-//one two three
+
+one two three
 ```
 
 <br>
@@ -279,8 +282,8 @@ val sb = StringBuilder("Kotlin?")
 sb.lastChar = '!'
 println(sb)
 
-//n
-//Kotlin!
+n
+Kotlin!
 ```
 
 - 일반적인 프로퍼티와 같지만 수신 객체 클래스가 추가되었을 뿐
@@ -350,3 +353,92 @@ val (number, name) = 1 to "one"
 - 이를 destructuring declaration이라고 부름
 - Pair 인스턴스 외 다른 객체에도 구조 분해 적용 가능
   - 예를 들어 key와 value, index와 element
+
+<br>
+<br>
+
+## 5. 문자열과 정규식 다루기
+
+### 5.1 문자열 나누기
+
+- 자바의 String.split 메소드는 정규식을 사용하기 때문에 `.`으로 분리할 수 없음
+- 코틀린에서는 다른 조합의 파라미터를 받는 확장 함수를 통해 이를 해결함
+
+```java
+println("12.345-6.A".split("\\.|-".toRegex()))
+
+[12, 345, 6, A]
+```
+
+- 사실 이렇게 간단한 식에 정규식을 사용할 필요는 없음
+
+```java
+println("12.345-6.A".split('.', '-'))
+```
+
+- 확장 함수 중에는 구분 문자를 하나 이상 인자로 받는 함수가 존재
+
+<br>
+
+### 5.2 정규식과 3중 따옴표로 묶은 문자열
+
+파일 전체 경로를 구분하는 예제
+
+- String 확장 함수를 사용하는 버전
+
+```java
+fun parsePath(path: String) {
+  val directory = path.substringBeforeLast("/")
+  val fullName = path.substringAfterLast("/")
+  val fileName = fullName.substringBeforeLast(".")
+  val extension = fullName.substringAfterLast(".")
+  println("Dir: $directory, name: $fileName, ext: $extension")
+}
+```
+
+```java
+parsePatg("/Users/min/kotlin/TIL.md")
+
+Dir: /Users/min/kotlin, name: TIL, ext: md
+```
+
+- 정규식을 활용한 버전
+
+```java
+fun parsePath(path: String) {
+  val regex = """(.+)/(.+)\.(.+)""".toRegex()
+  val matchResult = regex.matchEntire(path)
+  if (matchResult != null) {
+    val (directory, filename, extension) = matchResult.destructured
+    println("Dir: $directory, name: $filename, ext: $extension")
+  }
+}
+```
+
+- 3중 따옴표 문자열에서는 `\`를 포함한 어떤 문자도 이스케이프할 필요가 없음
+- 위 코드에서는 `/`와 `.`을 기준으로 경로를 세 그룹으로 분리
+- 패턴 `.`은 임의의 문자와 매치
+  - 그래서 첫 번째 그룹의 `(.+)`는 마지막 `/`까지 모든 문자와 매치되는 것
+  - 마찬가지로 두 번째 그룹의 `(.+)`는 마지막 `.` 전까지 모든 문자가 들어감
+  - 세 번째 그룹은 남은 모든 문자
+
+<br>
+
+### 5.3 여러 줄 3중 따옴표 문자열
+
+- 3중 따옴표는 이스케이프만을 위한 것이 아니라, 줄 바꿈을 표현할 수도 있음
+
+```java
+val kotlinLogo = """|  //
+                    | //
+                    | / \ """
+println(kotlinLogo.trimMargin("."))
+
+|  //
+| //
+| / \
+```
+
+- 들여쓰기나 줄 바꿈을 포함한 모든 문자가 들어감
+- 그러나 문자열 템플릿을 사용할 때 쓰는 `$`를 사용하기에 불편함
+  - 사용하고자 한다면 `"""${'$'}99.9"""`처럼 `'$'` 문자를 사용해야 함
