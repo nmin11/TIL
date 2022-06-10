@@ -442,3 +442,69 @@ println(kotlinLogo.trimMargin("."))
 - 들여쓰기나 줄 바꿈을 포함한 모든 문자가 들어감
 - 그러나 문자열 템플릿을 사용할 때 쓰는 `$`를 사용하기에 불편함
   - 사용하고자 한다면 `"""${'$'}99.9"""`처럼 `'$'` 문자를 사용해야 함
+
+<br>
+<br>
+
+## 6. 코드 다듬기: 로컬 함수와 확장
+
+- 자바 코드를 작성할 때 **DRY**(Don't Repeat Yourself)를 피하기 어려움
+- 메소드 추출 리팩토링을 통해 메소드를 부분부분 나눠서 재활용할 수도 있지만<br>그런 경우에는 작은 메소드가 많아지고 메소드 간의 관계 파악이 힘들어짐
+- 코틀린에서는 함수에서 추출한 함수를 원 함수 내부에 중첩시킬 수 있음
+
+※ 코드 중복 예제
+
+```java
+class User(val id: Int, val name: String, val address: String)
+
+fun saveUser(user: User) {
+  if (user.name.isEmpty()) {
+    throw IllegalArgumentException(
+      "Can't save user ${user.id}: empty Name")
+  }
+  if (user.address.isEmpty()) {
+    throw IllegalArgumentException(
+      "Can't save user ${user.id}: empty Address")
+  }
+}
+```
+
+※ 로컬 함수로 코드 중복 줄이기
+
+```java
+class User(val id: Int, val name: String, val address: String)
+
+fun saveUser(user: User) {
+  fun validate(value: String, fieldName: String) {
+    if (value.isEmpty()) {
+      throw IllegalArgumentException(
+        "Can't save user ${user.id}: empty $fieldName")
+    }
+  }
+
+  validate(user.name, "Name")
+  validate(user.addredd, "Address")
+}
+```
+
+※ 확장 함수로 추출하기
+
+```java
+class User(val id: Int, val name: String, val address: String)
+
+fun User.validateBeforeSave() {
+  fun validate(value: String, fieldName: String) {
+    if (value.isEmpty()) {
+      throw IllegalArgumentException(
+        "Can't save user $id: empty $fieldName")
+    }
+  }
+
+  validate(name, "Name")
+  validate(addredd, "Address")
+}
+
+fun saveUser(user: User) {
+  user.validateBeforeSave()
+}
+```
