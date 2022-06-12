@@ -785,7 +785,7 @@ public class Car {
 - 정적 멤버는 클래스에 고정된 멤버이므로 클래스 로더가 클래스(바이트 코드)를 로딩해서 메소드 메모리 영역에 적재할 때 클래스별로 관리됨
   - 따라서 클래스 로딩이 끝나면 바로 사용 가능
 
-![정적 멤버 생성](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/%EC%A0%95%EC%A0%81%20%EB%A9%A4%EB%B2%84%20%EC%83%9D%EC%84%B1.png)
+![정적 멤버 생성](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/%EC%A0%95%EC%A0%81%20%EB%A9%A4%EB%B2%84%20%EC%83%9D%EC%84%B1.png)
 
 - 필드 선언 시 인스턴스 필드로 선언할 것인지, 정적 필드로 선언할 것인지에 대한 판단 기준
   - 객체마다 가지고 있어야 할 데이터라면 인스턴스 필드로 선언

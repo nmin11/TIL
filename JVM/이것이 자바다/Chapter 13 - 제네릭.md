@@ -254,7 +254,7 @@ public class Course<T> {
 
 ※ 수강생이 될 수 있는 타입은 다음 4가지 클래스라고 가정
 
-![수강생이 될 수 있는 타입](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/class%20example.png)
+![수강생이 될 수 있는 타입](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/class%20example.png)
 
 ```java
 import java.util.Arrays;
