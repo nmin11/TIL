@@ -125,3 +125,79 @@ abstact class Animated {            //인스턴스를 만들 수 없는 추상 �
 
 - 코틀린에서도 클래스 안에 다른 클래스 선언 가능
 - 코틀린의 nested class는 명시적으로 요청하지 않는 한 바깥쪽 클래스 인스턴스에 대한 접근 권한이 없음
+
+```java
+interface State: Serializable
+
+interface View {
+  fun getCurrentState(): State
+  fun restoreState(state: State) {}
+}
+```
+
+```java
+class Button: View {
+  override fun getCurrentState(): State = ButtonState()
+  override fun restoreState(state: State) {}
+  class ButtonState: State {}
+}
+```
+
+- 자바의 경우에는 중첩 클래스 ButtonState가 static이어야만 직렬화 가능
+- 코틀린에서는 중첩 클래스는 기본적으로 static
+- 코틀린의 **내부 클래스**의 경우에는 `inner` 변경자를 붙여야 함
+
+|        클래스 B 안의 클래스 A        |    in Java     |   in Kotlin   |
+| :----------------------------------: | :------------: | :-----------: |
+| 중첩 클래스(바깥 클래스 참조 저장 X) | static class A |    class A    |
+| 내부 클래스(바깥 클래스 참조 저장 O) |    class A     | inner class A |
+
+- 코틀린에서 바깥쪽 클래스의 인스턴스를 가리키는 참조를 표기하는 방법도 자바와 다름
+
+```java
+class Outer {
+  inner class Inner {
+    fun getOuterReference(): Outer = this@Outer
+  }
+}
+```
+
+<br>
+
+### 1.5 봉인된 클래스
+
+※ 2.3.5에서 살펴본 노드 계산 식 다시 보기
+
+```java
+interface Expr
+class Num(val value: Int): Expr
+class Sum(val left: Expr, val right: Expr): Expr
+fun eval(e: Expr): Int =
+  when (e) {
+    is Num -> e.value
+    is Sum -> eval(e.right) + eval(e.left)
+    else ->
+      throw IllegalArgumentException("Unknown expression")
+  }
+```
+
+- 코틀린의 `when`은 디폴트 분기 `else`를 강제함
+  - 항상 디폴트 분기를 추가하는 것은 편리하지 못함
+  - 오히려 새로운 기능 추가할 때 새로운 처리를 잊어버렸더라도<br>디폴트 분기가 선택되기 때문에 심각한 버그가 발생할 수 있음
+- `sealed` 클래스를 사용하면 하위 클래스에서 정의를 재현할 수 있게 됨
+
+```java
+sealed class Expr {
+  class Num(val value: Int): Expr()
+  class Sum(val left: Expr, val right: Expr): Expr()
+}
+
+fun eval(e: Expr): Int =
+  when (e) {
+    is Expr.Num -> e.value
+    is Expr.Sum -> eval(e.right) + eval(e.left)
+  }
+```
+
+- `sealed` 클래스는 모두 `open`이며, `when`의 디폴트 분기가 필요 없음
+- 나중에 `sealed` 클래스의 새로운 하위 클래스를 추가하면<br>`when` 식이 컴파일되지 않으므로 수정할 부분을 쉽게 알 수 있음
