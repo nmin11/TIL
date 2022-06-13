@@ -201,3 +201,80 @@ fun eval(e: Expr): Int =
 
 - `sealed` 클래스는 모두 `open`이며, `when`의 디폴트 분기가 필요 없음
 - 나중에 `sealed` 클래스의 새로운 하위 클래스를 추가하면<br>`when` 식이 컴파일되지 않으므로 수정할 부분을 쉽게 알 수 있음
+
+<br>
+<br>
+
+## 2. 뻔하지 않은 생성자와 프로퍼티를 갖는 클래스 선언
+
+- 코틀린은 primary constructor와 secondary constructor를 구분함
+- 또한 initializer block을 통해 초기화 로직을 추가할 수 있음
+
+<br>
+
+### 2-1. 클래스 초기화: 주 생성자와 초기화 블록
+
+```java
+class User constructor(_nickname: String) {
+  val nickname: String
+  init {
+    nickname = _nickname
+  }
+}
+```
+
+- 클래스 이름 뒤 `()` 부분이 **primary constructor**
+  - 생성자 파라미터를 정하고 그 생성자 파라미터에 의해 초기화되는 프로퍼티 정의
+- `constructor` 키워드는 주 생성자나 부 생성자 정의를 시작할 때 사용
+- `init` 키워드는 초기화 블록을 시작
+  - 초기화 블록은 주 생성자와 함께 사용됨
+  - 주 생성자는 제한적이기 때문에 별도의 코드를 포함할 수 없으므로 초기화 블록이 필요
+  - 필요하다면 여러 초기화 블록을 선언할 수 있음
+- `_` 부분은 프로퍼티와 생성자 파라미터를 구분해줌
+  - 자바처럼 `this.nickname = nickname` 방식을 사용해도 좋음
+- 사실 위 코드에서 `constructor` 키워드와 `init` 키워드는 생략 가능
+
+```java
+class User(_nickname: String) {
+  val nickname = _nickname
+}
+```
+
+- 위 코드는 주 생성자 파라미터 앞에 `val`을 붙여서 더욱 간략화할 수 있음
+
+```java
+class User(val nickname: String)
+```
+
+- 생성자 파라미터도 디폴트 값 정의 가능
+
+```java
+class User(val nickname: String,
+           val isSubscribed: Boolean = true)
+```
+
+- 클래스의 인스턴스 생성은 `new` 키워드 없이 생성자를 직접 호출하면 됨
+
+```java
+val min = User("Min", false)
+```
+
+- 기반 클래스가 있다면 기반 클래스의 생성자를 호출해야 함
+
+```java
+open class User(val nickname: String) { ··· }
+class TwitterUser(nickname: String): User(nickname) { ··· }
+```
+
+- 클래스를 상속받은 경우 반드시 빈 생성자 `()`라도 붙여야 하지만 인터페이스는 필요 없음
+  - 이를 통해 클래스를 상속받았는지, 인터페이스를 상속받았는지 구분할 수 있음
+- 클래스 외부에서 인스턴스화하지 못하게 막고 싶다면 모든 생성자에 `private` 변경자를 붙이면 됨
+  - 유틸리티 함수를 담아두는 용도이거나 싱글턴인 경우 사용할 수 있음
+
+```java
+class Secretive private constructor() {}
+```
+
+- 실제로 대부분의 경우 클래스의 생성자는 아주 단순
+  - 그래서 코틀린은 간단한 주 생성자 문법을 제공
+- 하지만 어려운 경우에 대비해서 필요에 따라 다양한 생성자를 정의할 수 있게 해두었음
