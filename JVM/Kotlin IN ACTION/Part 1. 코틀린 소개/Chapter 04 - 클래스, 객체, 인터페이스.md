@@ -278,3 +278,107 @@ class Secretive private constructor() {}
 - 실제로 대부분의 경우 클래스의 생성자는 아주 단순
   - 그래서 코틀린은 간단한 주 생성자 문법을 제공
 - 하지만 어려운 경우에 대비해서 필요에 따라 다양한 생성자를 정의할 수 있게 해두었음
+
+<br>
+
+### 2.2 부 생성자
+
+- 일반적으로 코틀린에서는 자바처럼 여러 개의 생성자를 갖는 경우가 드묾
+- 그래도 프레임워크 클래스를 확장하는 등의 경우 여러 방법으로 인스턴스 초기화 가능
+
+```java
+open class View {
+  constructor(ctx: Context) {}
+  constructor(ctx: Context, attr: AttributeSet) {}
+}
+```
+
+- 부 생성자는 `constructor` 키워드와 함께 시작
+- 클래스 확장 시 부모와 똑같이 부 생성자를 정의할 수도 있음
+
+```java
+class MyButton: View {
+  constructor(ctx: Context)
+    : super(ctx) {}
+  constructor(ctx: Context, attr: AttributeSet)
+    : super(ctx, attr) {}
+}
+```
+
+- 자바처럼 `this()`를 사용해서 자신의 다른 생성자 호출도 가능
+
+```java
+class MyButton: View {
+  constructor(ctx: Context): this(ctx, MY_STYLE) {}
+}
+```
+
+<br>
+
+### 2.3 인터페이스에 선언된 프로퍼티 구현
+
+```java
+interface User {
+  val nickname: String
+}
+```
+
+- 위 인터페이스는 추성 프로퍼티 선언이 있음
+- User 인터페이스를 구현하는 클래스는 nickname의 값을 얻을 수 있는 방법을 제공해야 함
+
+```java
+class PrivateUser(override val nickname: String): User
+class SubscribingUser(val email: String): User {
+  override val nickname: String
+    get() = email.substringBefore('@')
+}
+class FacebookUser(val accountId: Int): User {
+  override val nickname = getFacebookName(accountId)
+}
+```
+
+- 인터페이스에서도 getter와 setter가 있는 프로퍼티 선언 가능
+
+```java
+interface User {
+  val email: String
+  val nickname: String
+    get() = email.substringBefore('@')
+}
+```
+
+- 위 인터페이스를 상속받는 경우 email은 반드시 override해야 하지만,<br>nickname은 override 없이도 상속 가능
+
+<br>
+
+### 2.4 getter와 setter에서 뒷받침하는 필드에 접근
+
+```java
+class User(val name: String) {
+  var address: String = "unspecified"
+    set(value: String) {
+      println("""
+        Address was changed for $name:
+        "$field" -> "$value".""".trimIndent())
+      field = value
+    }
+}
+```
+
+- var 프로퍼티의 getter나 setter 중 한쪽만 직접 정의해도 됨
+
+<br>
+
+### 2.5 접근자의 가시성 변경
+
+```java
+class LengthCounter {
+  var counter: Int = 0
+    private set
+  fun addWord(word: String) {
+    counter += word.length
+  }
+}
+```
+
+- 위 코드의 경우 전체 길이 저장은 public이지만, 외부에서 값을 임의로 설정할 수는 없음
