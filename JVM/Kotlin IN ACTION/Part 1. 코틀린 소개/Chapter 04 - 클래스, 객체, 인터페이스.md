@@ -382,3 +382,141 @@ class LengthCounter {
 ```
 
 - 위 코드의 경우 전체 길이 저장은 public이지만, 외부에서 값을 임의로 설정할 수는 없음
+
+<br>
+<br>
+
+## 3. 컴파일러가 생성한 메소드
+
+- 자바 플랫폼에서는 클래스가 `equals` `hashCode` `toString` 등의 메소드를 구현해야 함
+  - 이런 메소드들은 보통 비슷한 방법을 통해 기계적으로 구현 가능
+  - IDE들이 자동 생성을 지원해주지만 코드가 지저분한 건 어쩔 수 없음
+- 코틀린 컴파일러는 이러한 기계적인 작업들을 보이지 않는 곳에서 해결해줌
+
+<br>
+
+### 3.1 모든 클래스가 정의해야 하는 메소드
+
+- 코틀린 클래스도 `toString` `equals` `hashCode` 등을 오버라이드할 수 있음
+
+<br>
+
+**toString()**
+
+```java
+class Client(val name: String, val postalCode: Int) {
+  override fun toString() = "Client(name=$name, postalCode=$postalCode)"
+}
+```
+
+<br>
+
+**equals()**
+
+※ 코틀린에서 `==`는 원시 타입 비교 뿐만 아니라 객체 비교도 가능<br>참조 비교를 위해서는 `===` 사용
+
+```java
+class Client(val name: String, val postalCode: Int) {
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other !is Client)
+      return false
+    return name == other.name &&
+      postalCode == other.postalCode
+  }
+}
+```
+
+- `is` 검사는 자바의 `instanceof`와 같음
+- `override`는 필수이기 때문에 받는 매개 타입도 `Any?`이어야만 함
+
+<br>
+
+**hashCode()**
+
+```java
+class Client(val name: String, val postalCode: Int) {
+  override fun hashCode(): Int = name.hashCode() * 31 + postalCode
+}
+```
+
+- 자바에서는 `equals`를 override할 때 반드시 `hashCode`도 함께 override해야 함
+- JVM 언어에서는 `equals()`가 `true`인 두 객체는<br>반드시 같은 `hashCode()`를 반환해야 한다는 제약이 있음
+
+<br>
+
+### 3.2 데이터 클래스
+
+```java
+data class Client(val name: String, val postalCode: Int)
+```
+
+- `data class`는 필요한 메소드를 컴파일러가 자동으로 만들어줌
+- 주 생성자에 나열된 모든 프로퍼티를 기반으로 자바에서 요구하는 모든 메소드를 자동 생성
+  - 주 생성자 밖에 정의된 프로퍼티는 고려 대상이 아님에 유의
+- 3.1에서 살펴본 3가지 메소드 외에도 몇 가지 유용한 메소드를 더 생성해줌
+
+<br>
+
+**copy()**
+
+- 데이터 클래스의 프로퍼티가 꼭 `val`일 필요는 없지만 불변성을 위해 권장됨
+- `copy` 메소드는 객체를 복사하면서 일부 프로퍼티를 바꿀 수 있게 해줌
+- 복사본은 원본과 다른 생명주기를 가지기에 일부 변경되어도 원본에 영향을 끼치지 않음
+
+<br>
+
+### 3.3 by: 클래스 위임
+
+- 객체지향 시스템에서 시스템을 취약하게 만드는 문제는 보통 구현 상속에 의해 발생
+  - 하위 클래스는 상위 클래스에 의존하는데, 상위 클래스에 변경이 일어나면<br>하위 클래스에서 코드가 정상 작동하지 않게 될 수 있음
+- 그렇기 때문에 코틀린 개발자들이 클래스의 디폴트를 `final`로 둔 것
+  - 이렇게 하면 상속을 염두에 둔 클래스만 `open` 키워드를 통해 열어줘야 함
+- 하지만 종종 상속을 허용하지 않는 클래스에 새로운 동작을 추가해야 할 때가 있는데,<br>이 때 사용하는 일반적인 방법이 **Decorator 패턴**
+  - 이 패턴의 핵심 : 상속을 허용하지 않는 클래스 대신 새로 사용할 클래스를 만들되<br>기존 클래스를 Decorator 내부에 필드로 유지함
+  - 단점 : 준비 코드가 상당히 많이 필요함
+
+※ Collection 인터페이스를 아무 기능 추가 없이 Decorator를 만드는 예제
+
+```java
+class DelegatingCollection<T>: Collection<T> {
+  private val innerList = arrayListOf<T>()
+  override val size: Int get() = innerList.size
+  override fun isEmpty(): Boolean = innerList.isEmpty()
+  override fun contains(element: T): Boolean = innerList.contains(element)
+  override fun iterator(): Iterator<T> = innerList.iterator()
+  override fun containsAll(elements: Collection<T>): Boolean =
+    innerList.containsAll(elements)
+}
+```
+
+- 이러한 구현은 코틀린의 `by` 키워드로 단순화할 수 있음
+
+```java
+class DelegatingCollection<T>(
+  innerList: Collection<T> = ArrayList<T>()
+): Collection<T> by innerList {}
+```
+
+- 클래스 안에 메소드를 명시해줄 필요가 없음
+  - 컴파일러가 자동 생성해주기 때문
+- 기존 클래스의 메소드 구현으로 충분하다면 override를 하지 않아도 기본 구현을 따름
+
+※ 원소를 추가하려고 시도한 횟수를 기록하는 Collection 구현해보기
+
+```java
+class CountingSet<T>(
+  val innerSet: MutableCollection<T> = HashSet<T>()
+): MutableCollection<T> by innerSet {
+  var objectsAdded = 0
+  override fun add(element: T): Boolean {
+    objectsAdded++
+    return innerSet.add(element)
+  }
+  override fun addAll(c: Collection<T>): Boolean {
+    objectAdded += c.size
+    return innerSet.addAll(c)
+  }
+}
+```
+
+- override하려는 메소드 외에는 다 내부 컨테이너에게 위임
