@@ -520,3 +520,66 @@ class CountingSet<T>(
 ```
 
 - override하려는 메소드 외에는 다 내부 컨테이너에게 위임
+
+<br>
+<br>
+
+## 4. object 키워드: 클래스 선언 & 인스턴스 생성
+
+`object` 키워드란?
+
+- 클래스를 정의하면서 동시에 인스턴스를 생성
+- object declaration은 싱글턴을 정의하는 방법 중 하나
+- companion object는 인스턴스 메소드는 아니지만 관련 있는 메소드 및 팩토리 메소드를 담을 때 쓰임
+- 객체 식은 자바의 anonymous inner class 대신 쓰임
+
+<br>
+
+### 4.1 객체 선언: 싱글턴 쉽게 만들기
+
+- 객체지향 시스템을 설계하다 보면 인스턴스가 하나만 필요한 클래스가 유용한 경우가 많음
+- 자바에서는 싱글턴 패턴을 통해 구현하지만<br>코틀린은 **객체 선언** 기능을 통해 싱글턴을 언어에서 기본 지원
+- 객체 선언은 클래스 선언과 해당 클래스에 속한 단일 인스턴스의 선언을 합친 선언
+
+※ 회사 급여 대장을 싱글턴으로 만드는 예제
+
+```java
+object Payroll {
+  val allEmployees = arrayListOf<Person>()
+  fun calculateSalary() {
+    for (person in allEmployees) {
+      ···
+    }
+  }
+}
+```
+
+- 클래스와 마찬가지로 프로퍼티, 메소드, 초기화 블록 등이 들어갈 수 있지만 생성자는 사용 불가
+  - 선언문이 있는 위치에서 즉시 객체가 만들어지기 때문
+- 객체 이름 뒤에 `.`을 붙이면 객체에 속한 메소드나 프로퍼티에 접근 가능
+
+```java
+Payroll.allEmployees.add(Person(...))
+Payroll.calculateSalary()
+```
+
+- 객체 선언도 클래스나 인터페이스 상속 가능
+  - 프레임워크를 사용하기 위해 특정 인터페이스를 구현해야 하는 경우 유용
+
+※ 두 파일을 대소문자 구분 없이 비교해주는 객체 예시
+
+```java
+object CaseInsensitiveFileComparator: Comparator<File> {
+  override fun compare(file1: File, file2: File): Int {
+    return file1.path.compareTo(file2.path, ignoreCase = true)
+  }
+}
+```
+
+※ 코틀린과 싱글턴
+
+- 싱글톤 패턴과 같이, 객체 선언은 대규모 시스템에서는 적합하지 않음
+- 객체 생성을 제어할 방법이 없고 생성자 파라미터를 지정할 수 없기 때문
+- 그렇기에 단위 테스트나 요구 사항 변경에 대한 대응이 어려워짐
+- 그래서 자바와 마찬가지로 의존관계 주입 프레임워크를 사용하기도 함
+  - Guice 사용 가능
