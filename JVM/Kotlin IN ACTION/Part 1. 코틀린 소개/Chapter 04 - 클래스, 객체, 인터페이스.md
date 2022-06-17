@@ -583,3 +583,67 @@ object CaseInsensitiveFileComparator: Comparator<File> {
 - 그렇기에 단위 테스트나 요구 사항 변경에 대한 대응이 어려워짐
 - 그래서 자바와 마찬가지로 의존관계 주입 프레임워크를 사용하기도 함
   - Guice 사용 가능
+
+<br>
+
+### 4.2 동반 객체
+
+- 코틀린은 `static` 키워드를 지원하지 않기 때문에 클래스 안에 정적인 멤버가 없음
+  - 대신 패키지 수준의 최상위 함수와 객체 선언을 활용할 수 있으며, 대부분의 경우 최상위 함수 활용
+  - 하지만 최상위 함수는 `private` 클래스에 접근 불가
+  - 이런 경우 클래스에 중첩된 객체 선언의 멤버 함수로 정의해야 함
+- 클래스 안의 객체에 `companion` 키워드를 붙여서 **동반 객체**를 만들 수 있음
+  - 동반 객체의 프로퍼티나 메소드에 접근하려면 동반 객체가 정의된 클래스 이름 사용
+
+```java
+class A {
+  companion object {
+    fun bar() {
+      println("Companion object called")
+    }
+  }
+}
+```
+
+```java
+A.bar()
+```
+
+- 동반 객체는 `private` 생성자를 호출하기 좋은 위치
+  - 동반 객체는 자신을 둘러싼 클래스의 모든 `private` 멤버에 접근 가능
+  - 바깥쪽 객체의 `private` 생성자 호출도 가능
+  - 따라서 동반 객체는 팩토리 패턴을 구현하기 가장 적합한 위치
+
+※ 부 생성자가 여럿 있는 클래스 예제
+
+```java
+class User {
+  val nickname: String
+  constructor(email: String) {
+    nickname = email.substringBefore('@')
+  }
+  constructor(facebookAccountId: Int) {
+    nickname = getFacebookName(facebookAccountId)
+  }
+}
+```
+
+※ 위 예제를 팩토리 메소드로 대체하기
+
+```java
+class User private constructor(val nickname: String) {
+  companion object {
+    fun newSubscribingUser(email: String) =
+      User(email.substringBefore('@'))
+    fun newFacebookUser(accountId: Int) =
+      User(getFacebookName(accountId))
+  }
+}
+```
+
+팩토리 메소드의 장단점
+
+- 팩토리 메소드의 목적에 따라 이름을 정할 수 있음
+- 생성할 필요가 없는 객체를 생성하지 않을 수 있음
+- 하지만 클래스를 확장하는 경우 동반 객체 멤버를 하위 클래스에서 override 할 수 없음
+  - 이런 경우에는 여러 생성자를 사용하는 편이 더 나음
