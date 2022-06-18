@@ -531,7 +531,7 @@ class CountingSet<T>(
 - 클래스를 정의하면서 동시에 인스턴스를 생성
 - object declaration은 싱글턴을 정의하는 방법 중 하나
 - companion object는 인스턴스 메소드는 아니지만 관련 있는 메소드 및 팩토리 메소드를 담을 때 쓰임
-- 객체 식은 자바의 anonymous inner class 대신 쓰임
+- object expression은 자바의 anonymous inner class 대신 쓰임
 
 <br>
 
@@ -578,7 +578,7 @@ object CaseInsensitiveFileComparator: Comparator<File> {
 
 ※ 코틀린과 싱글턴
 
-- 싱글톤 패턴과 같이, 객체 선언은 대규모 시스템에서는 적합하지 않음
+- 싱글톤 패턴에서도 단점이듯, 객체 선언도 대규모 시스템에서는 적합하지 않음
 - 객체 생성을 제어할 방법이 없고 생성자 파라미터를 지정할 수 없기 때문
 - 그렇기에 단위 테스트나 요구 사항 변경에 대한 대응이 어려워짐
 - 그래서 자바와 마찬가지로 의존관계 주입 프레임워크를 사용하기도 함
@@ -647,3 +647,70 @@ class User private constructor(val nickname: String) {
 - 생성할 필요가 없는 객체를 생성하지 않을 수 있음
 - 하지만 클래스를 확장하는 경우 동반 객체 멤버를 하위 클래스에서 override 할 수 없음
   - 이런 경우에는 여러 생성자를 사용하는 편이 더 나음
+
+<br>
+
+### 4.3 동반 객체를 일반 객체처럼 사용
+
+- 동반 객체는 클래스 안에 정의된 일반 객체
+- 따라서 이름을 붙이거나, 인터페이스를 상속하거나, 안에 확장 함수와 프로퍼티를 정의할 수 있음
+  - 이름을 지었을 경우, 이름으로 참조할 수도 있고 아니면 생략해서 참조할 수도 있음
+
+**동반 객체에서 인터페이스 구현**
+
+```java
+interface JSONFactory<T> {
+  fun fromJSON(jsonText: String): T
+}
+
+class Person(val name: String) {
+  companion object : JSONFactory<Person> {
+    override fun fromJSON(jsonText: String): Person = ...
+  }
+}
+```
+
+**동반 객체 확장**
+
+```java
+// 비즈니스 로직 모듈
+class Person(val firstName: String, val lastName: String) {
+  companion object { /* 비어있는 동반 객체 */ }
+}
+
+// 클라이언트 / 서버 통신 모듈
+fun Person.Companion.fromJSON(json: String): Person {
+  ...
+}
+
+val p = Person.fromJSON(json)
+```
+
+- 확장을 통해 마치 동반 객체 안에서 `fromJSON` 함수를 정의한 것처럼 호출 가능
+- 이렇게 하려면 비어있는 객체라도 꼭 동반 객체를 부모 클래스에 선언해두어야 함
+
+<br>
+
+### 4.4 object expression
+
+- `object` 키워드는 싱글턴 패턴을 구현하고 그 객체에 이름을 짓기 위해서만 존재하는 것이 아님
+- **anonymous object**를 정의할 때에도 `object` 키워드 사용
+- 무명 객체는 자바의 무명 내부 클래스를 대신하는 것
+
+※ 사용 예시
+
+```java
+window.addMouseListener(
+  object : MouseAdapter() {
+    override fun mouseClicked(e: MouseEvent) {}
+    override fun mouseEntered(e: MouseEvent) {}
+  }
+)
+```
+
+- 객체 선언과 비슷하지만 한 가지 뚜렷한 차이점은 이름이 없다는 것
+- 객체 식은 클래스를 정의하고 인스턴스를 생성하지만, 클래스나 인스턴스에 이름을 붙이지 않음
+- 객체 식이 객체 선언과 또 다른 점은 싱글턴이 아니기에 쓰일 때마다 새 인스턴스를 생성한다는 것
+- 자바의 무명 객체와 다른 점
+  - 여러 개의 인터페이스를 구현할 수 있음
+  - final이 아닌 변수도 객체 식 안에서 사용 가능
