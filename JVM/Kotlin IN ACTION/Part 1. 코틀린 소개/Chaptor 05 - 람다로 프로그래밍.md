@@ -261,3 +261,90 @@ println(p)
 fun Person.isAdult() = age >= 21
 val predicate = Person::isAdult
 ```
+
+<br>
+<br>
+
+## 2. 컬렉션 함수형 API
+
+- 함수형 프로그래밍 스타일은 컬렉션을 다룰 때 편리
+  - 대부분의 작업에 라이브러리 함수를 활용할 수 있기에 코드를 간결하게 해줌
+
+<br>
+
+### 2.1 filter & map
+
+```java
+val list = listOf(1, 2, 3, 4)
+println(list.filter { it % 2 == 0 })
+
+//[2, 4]
+```
+
+```java
+val people = listOf(Person("Alice", 29), Person("Bob", 31))
+println(people.filter { it.age > 30 })
+
+//[Person(name=Bob, age=31)]
+```
+
+- `filter` 함수는 컬렉션에서 원치 않는 원소를 제거
+- `map` 함수는 원소를 변환
+
+```java
+val list = listOf(1, 2, 3, 4)
+println(list.map { it * it })
+
+//[1, 4, 9, 16]
+```
+
+```java
+val people = listOf(Person("Alice", 29), Person("Bob", 31))
+println(people.map { it.name })
+
+//[Alice, Bob]
+```
+
+※ 위 코드는 멤버 참조를 사용해서 더 멋지게 작성 가능
+
+```java
+people.map(Person::name)
+```
+
+※ 위와 같은 호출을 연쇄하는 것도 가능
+
+```java
+people.filter { it.age > 30 }.map(Person::name)
+
+//[Bob]
+```
+
+**가장 나이 많은 사람의 이름을 찾는 예제**
+
+```java
+people.filter { it.age == people.maxBy(Person::age)!!.age }
+```
+
+- 목록에 있는 사람들의 나이의 최대값을 구하고 나이가 최대값과 같은 모든 사람을 반환하는 방식
+- 하지만 이 연산은 순회하면서 최대값을 구하는 작업을 계속 반복하게 되므로 비효율적
+
+```java
+val maxAge = people.maxBy(Person::age)!!.age
+people.filter { it.age == maxAge }
+```
+
+- 최대값을 한번만 계산하도록 만들었음
+- 이처럼 람다를 사용할 때는 겉으로는 단순해 보이는 식이 내부적으로 엄청나게 불합리한 계산식이 될 때가 있음
+- 그러므로 작성하는 코드로 인해 어떤 일이 벌어질지 명확히 이해해야만 함
+
+**Map 구조에서의 filter & map**
+
+```java
+val numbers = mapOf(0 to "zero", 1 to "one")
+println(numbers.mapValues { it.value.toUpperCase() })
+
+//{0=ZERO, 1=ONE}
+```
+
+- `filterKeys` `mapKeys` : 키를 걸러내거나 변환
+- `filterValues` `mapValues` : 값을 걸러내거나 변환
