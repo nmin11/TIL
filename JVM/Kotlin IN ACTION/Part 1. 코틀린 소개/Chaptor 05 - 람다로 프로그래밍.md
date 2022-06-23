@@ -348,3 +348,60 @@ println(numbers.mapValues { it.value.toUpperCase() })
 
 - `filterKeys` `mapKeys` : 키를 걸러내거나 변환
 - `filterValues` `mapValues` : 값을 걸러내거나 변환
+
+<br>
+
+### 2.2 all, any, count, find
+
+- `all` `any` : 모든 원소가 어떤 조건을 만족하는지 판단
+- `count` : 조건을 만족하는 원소의 개수 반환
+- `find` : 조건을 만족하는 첫 번째 원소 반환
+
+```java
+val canBeInClub27 = { p: Person -> p.age <= 27 }
+val people = listOf(Person("Alice", 27), Person("Bob", 31))
+```
+
+```java
+println(people.all(canBeInClub27))
+//false
+```
+
+```java
+println(people.any(canBeInClub27))
+//true
+```
+
+- `!all`은 `any`와 같고, `!any`는 `all`과 같으므로 굳이 혼용하여 사용하지 않는 편이 좋음
+
+```java
+val people = listOf(Person("Alice", 27), Person("Bob", 31))
+println(people.count(canBeInClub27))
+
+//1
+```
+
+<br>
+
+※ `count`와 `size` 짚고 넘어가기
+
+```java
+println(people.filter(canBeInClub27).size)
+
+//1
+```
+
+- 이렇게 처리하면 조건을 만족하는 모든 원소가 들어가는 중간 컬렉션이 생겨버림
+- 따라서 count가 훨씬 효율적
+
+<br>
+
+```java
+val people = listOf(Person("Alice", 27), Person("Bob", 31))
+println(people.find(canBeInClub27))
+
+//Person(name=Alice, age=27)
+```
+
+- `find` 조건에 해당하는 원소가 전혀 없는 경우에는 `null` 반환
+  - 그러므로 `firstOrNull`과도 같음
