@@ -405,3 +405,69 @@ println(people.find(canBeInClub27))
 
 - `find` 조건에 해당하는 원소가 전혀 없는 경우에는 `null` 반환
   - 그러므로 `firstOrNull`과도 같음
+
+<br>
+
+### 2.3 groupBy
+
+- 컬렉션의 모든 원소를 어떤 특성에 따라 여러 그룹으로 나눠주는 기능
+
+```java
+val people = listOf(Person("Alice", 31), Person("Bob", 29), Person("Carol", 31))
+println(people.groupBy { it.age })
+
+/*
+{29=[Person(name=Bob, age=29)],
+31=[Person(name=Alice, age=31), Person(name=Carol, age=31)]}
+*/
+```
+
+- 위 예제의 경우 결과 타입은 `Map<Int, List<Person>>`
+
+<br>
+
+※ 멤버 참조를 활용해서 문자열을 첫 글자에 따라 분류하기
+
+```java
+val list = listOf("a", "ab", "b")
+println(list.groupBy(String::first))
+
+//{a=[a, ab], b=[b]}
+```
+
+- `first`는 멤버가 아닌 확장 함수이지만 여전히 멤버 참조를 사용해서 접근 가능
+
+<br>
+
+### 2.4 flatMap, flatten
+
+```java
+val strings = listOf("abc", "def")
+println(strings.flatMap { it.toList() })
+
+//[a, b, c, d, e, f]
+```
+
+- 위 예제에서 문자열에 `toList`를 사용하면 문자열에 속한 모든 문자로 이뤄진 리스트가 만들어짐
+- `flatMap` : 인자로 주어진 람다를 컬렉션의 모든 객체에 적용하고,<br>얻어지는 여러 리스트를 한 리스트로 모음
+- `flatten` : 중첩된 리스트를 특별한 변환 없이 펼쳐서 반환
+
+<br>
+
+※ 저자가 여러 명일 수 있는 책의 저자들만 모으는 예제
+
+```java
+class Book(val title: String, val authors: List<String>)
+```
+
+```java
+val books = listOf(Book("Thursday Next", listOf("Jasper Fforde")),
+Book("Mort", listOf("Terry Pratchett")),
+Book("Good Omens", listOf("Terry Pratchett", "Neil Gaiman")))
+println(books.flatMap { it.authors }.toSet())
+
+//[Jasper Fforde, Terry Pratchett, Neil Gaiman]
+```
+
+- `toSet`은 리스트에서 중복을 없애고 집합으로 만들어줌
+  - `Terry Pratchett`이 한번만 있는 이유
