@@ -471,3 +471,90 @@ println(books.flatMap { it.authors }.toSet())
 
 - `toSet`은 리스트에서 중복을 없애고 집합으로 만들어줌
   - `Terry Pratchett`이 한번만 있는 이유
+
+<br>
+<br>
+
+## lazy 컬렉션 연산
+
+- 앞서 살펴본 `map` `filter`와 같은 함수들은 결과 컬렉션을 **즉시(eagerly)** 생성함
+- 이는 컬렉션 함수를 연쇄하면 매 단계마다 중간 결과를 새로운 컬렉션에 임시로 담는다는 뜻
+- **sequence**를 사용하면 중간 임시 컬렉션을 사용하지 않고도 연쇄할 수 있음
+
+<br>
+
+※ 2번 연쇄하는 예제
+
+```java
+people.map(Person::name).filter { it.startsWith("A") }
+```
+
+- `filter`와 `map`은 리스트를 반환하므로, 이 연쇄 호출은 2개의 리스트를 만듦
+
+※ sequence를 활용해서 최적화하기
+
+```java
+people.asSequence()
+    .map(Person::name)
+    .filter { it.startsWith("A") }
+    .toList()
+```
+
+- 코틀린 지연 계산 시퀀스는 `Sequence` 인터페이스에서 시작
+  - 이 인터페이스는 단지 한 번에 하나씩 열거될 수 있는 원소의 시퀀스를 표현할 뿐
+  - `iterator`라는 단 하나의 메소드를 통해 시퀀스로부터 원소 값을 얻음
+  - 시퀀스의 원소는 필요할 때 비로소 계산되므로, 중간 결과를 저장하지 않음
+  - `asSequence` 확장 함수를 통해 어떤 컬렉션이든 시퀀스로 바꿀 수 있음
+  - 시퀀스를 리스트로 만들 때는 `toList` 사용
+    - 굳이 시퀀스를 컬렉션으로 되돌리는 이유는 API 메소드를 더욱 다양하게 사용하기 위해서
+
+<br>
+
+### 3.1 시퀀스 연산 실행
+
+- **intermediate 연산**
+  - 다른 시퀀스 반환
+  - 반환하는 시퀀스는 최초 시퀀스의 원소를 변환하는 방법을 앎
+  - 항상 지연 계산
+- **terminal 연산**
+  - 결과를 반환
+  - 결과는 최초 컬렉션에 대해 변환을 적용한 시퀀스로부터<br>일련의 계산을 수행해서 얻을 수 있는 컬렉션이나 원소, 숫자 또는 객체
+
+<br>
+
+```java
+listOf(1, 2, 3, 4).asSequence()
+    .map { print("map($it) "); it * it }
+    .filter { print("filter($it) "); it % 2 == 0 }
+```
+
+- 위 코드를 실행하면 결과를 얻을 필요가 없으므로 출력되는 내용이 없음
+
+```java
+listOf(1, 2, 3, 4).asSequence()
+    .map { print("map($it) "); it * it }
+    .filter { print("filter($it) "); it % 2 == 0 }
+    .toList()
+
+//map(1) filter(1) map(2) filter(4) map(3) filter(9) map(4) filter(16)
+```
+
+- 위 출력에서 유심히 살펴봐야 할 것은 **연산 수행 순서**
+  - 컬렉션의 경우 `map` `filter` 연산을 통해 각각 새로운 컬렉션을 반환
+  - 시퀀스의 경우 각 원소에 대해 `map` `filter` 연산을 순차적으로 적용
+  - 따라서 무조건적으로 모든 원소를 연산하는 컬렉션에 비해 성능적 이점을 가짐
+
+<br>
+
+### 3.2 시퀀스 만들기
+
+```java
+val naturalNumbers = generateSequence(0) { it + 1 }
+val numbersTo100 = naturalNumbers.takeWhile { it <= 100 }
+println(numbersTo100.sum())
+
+//5050
+```
+
+- 위 코드에서 `naturalNumbers`와 `numbersTo100`은 모두 시퀀스이며 연산을 지연 계산
+- 최종 연산 `sum`을 하기 전까지 시퀀스의 각 숫자는 계산되지 않음
