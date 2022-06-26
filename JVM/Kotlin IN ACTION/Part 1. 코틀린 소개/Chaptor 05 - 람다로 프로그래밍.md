@@ -182,7 +182,7 @@ printProblemCounts(response)
 //1 client errors, 1 server errors
 ```
 
-- 이처럼 람다 안에서 사용하는 외부 변수를 **'람다가 포획(capture)한 변수'**라고 부름
+- 이처럼 람다 안에서 사용하는 외부 변수를 **람다가 포획(capture)한 변수**라고 부름
 - 하지만 람다를 비동기적으로 실행되는 코드로 활용할 경우에는<br>호출 이후 로컬 변수가 변경될 수도 있음
 
 ```java
