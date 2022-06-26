@@ -558,3 +558,135 @@ println(numbersTo100.sum())
 
 - 위 코드에서 `naturalNumbers`와 `numbersTo100`은 모두 시퀀스이며 연산을 지연 계산
 - 최종 연산 `sum`을 하기 전까지 시퀀스의 각 숫자는 계산되지 않음
+
+<br>
+<br>
+
+## 4. 자바 함수형 인터페이스 활용
+
+- 코틀린을 사용하면서도 사실 자바 API를 상당수 활용하게 될 것
+- 다행인 점은 코틀린 람다를 자바 API에서 사용해도 문제가 없음
+
+<br>
+
+※ 자바에서 Button 클래스의 setOnClickListener 설정 예제
+
+```java
+public class Button {
+  public void setOnClickListener(OnClickListener 1) { ... }
+}
+```
+
+```java
+public interface OnClickListener {
+  void onClick(View v);
+}
+```
+
+- 람다가 없던 자바 8 이전에는 무명 클래스의 인스턴스를 만들어야만 했음
+
+```java
+button.setOnClickListener(new OnClickListener() {
+  @Override
+  public void onClick(View v) { ... }
+});
+```
+
+- 코틀린에서는 무명 클래스 인스턴스 대신 람다를 넘길 수 있음
+
+```java
+button.setOnClickListener { view -> ... }
+```
+
+- `view`의 타입은 `View`인데, `OnClickListener`의 추상 메소드가<br>단 1개이기 때문에 타입을 추론할 수 있는 것
+- 추상 메소드가 하나만 있는 인터페이스를 **functional interface** 또는 **SAM interface** 라고 함
+  - SAM : single abstract method
+- 자바 API에는 `Runnable`이나 `Callable` 같은 함수형 인터페이스를 활용하는 메소드가 많음
+- 코틀린은 무명 클래스 인스턴스를 정의하고 활용할 필요가 없으므로 코틀린다운 코드로 남아있을 수 있음
+
+<br>
+
+### 4.1 자바 메소드에 람다를 인자로 전달
+
+- 함수형 인터페이스를 인자로 원하는 자바 메소드에 코틀린 람다 전달 가능
+
+```java
+void postponeComputation(int delay, Runnable computation);
+```
+
+```java
+postponeComputation(1000) { println(42) }
+```
+
+- 컴파일러는 자동으로 람다를 `Runnable` 인스턴스로 변환
+- 'Runnable 인스턴스'라는 말은 실제로 'Runnable을 구현한 무명 클래스의 인스턴스'라는 뜻
+- 무명 클래스의 유일한 추상 메소드를 구현할 때 람다 본문을 메소드 본문으로 사용
+  - 위 예제의 `Runnable`의 `run`이 바로 그 추상 메소드
+
+※ Runnable을 변수에 저장하고 메소드를 호출할 때마다 그 인스턴스를 사용하게 할 수 있음
+
+```java
+val runnable = Runnable { println(42) }
+fun handleComputation() {
+  postponeComputation(1000, runnable)
+}
+```
+
+※ 주변 영역의 변수를 포획하여 구현하는 방식도 가능
+
+```java
+fun handleComputation(id: String) {
+  postponeComputation(1000) { println(id) }
+}
+```
+
+<br>
+
+### 4.2 SAM 생성자
+
+- 람다를 함수형 인터페이스의 인스턴스로 변환할 수 있게 컴파일러가 자동으로 생성한 함수
+- 컴파일러가 자동으로 람다를 함수형 인터페이스 무명 클래스로 바꾸지 못하는 경우에 사용
+
+```java
+fun createAllDoneRunnable(): Runnable {
+  return Runnable { println("All done!") }
+}
+```
+
+```java
+createAllDoneRunnable().run()
+
+//All done!
+```
+
+- SAM 생성자의 이름은 사용하려는 함수형 인터페이스의 이름과 같음
+- 함수형 인터페이스의 유일 추상 메소드의 본문에 사용할 람다만을 인자로 받아서<br>함수형 인터페이스를 구현하는 클래스의 인스턴스 반환
+
+<br>
+
+※ 람다로 생성한 함수형 인터페이스 인스턴스를 변수에 저장하는 경우에도 SAM 생성자 사용 가능
+
+```java
+val listener = OnClickListener { view ->
+  val text = when (view.id) {
+    R.id.button1 -> "First button"
+    R.id.button2 -> "Second button"
+    else -> "Unknown button"
+  }
+  toast(text)
+}
+
+button1.setOnClickListener(listener)
+button2.setOnClickListener(listener)
+```
+
+- 어떤 버튼이 클릭됐는지에 따라 다른 동작을 구현할 때 사용하기에 좋음
+- 가끔 오버로드한 메소드 중 어떤 타입의 메소드를 선택해서 람다를 변환해 넘겨줄지 모호한 경우<br>명시적으로 SAM 생성자를 사용하는 것이 좋음
+
+<br>
+
+※ 람다와 this
+
+- 람다에는 인스턴스 자신을 가리키는 `this`가 없음
+- 람다 안에서 `this`는 람다를 둘러싼 클래스의 인스턴스
+- 이벤트 리스너가 이벤트 처리 후 리스너 등록을 해제하려면 무명 객체를 사용해야 함
