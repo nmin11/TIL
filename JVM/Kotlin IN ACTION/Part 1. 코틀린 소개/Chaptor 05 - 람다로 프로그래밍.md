@@ -690,3 +690,129 @@ button2.setOnClickListener(listener)
 - 람다에는 인스턴스 자신을 가리키는 `this`가 없음
 - 람다 안에서 `this`는 람다를 둘러싼 클래스의 인스턴스
 - 이벤트 리스너가 이벤트 처리 후 리스너 등록을 해제하려면 무명 객체를 사용해야 함
+
+<br>
+<br>
+
+## 5. 수신 객체 지정 람다: with & apply
+
+- 자바의 람다에는 없는 코틀린 람다의 독특한 기능
+- 그 기능은 바로 수신 객체를 명시하지 않고<br>람다의 본문 안에서 다른 객체의 메소드를 호출할 수 있게 하는 것
+- 그러한 람다를 **lambda with receiver** 라고 부름
+
+<br>
+
+### 5.1 with 함수
+
+※ 알파벳 만들기 예제
+
+```java
+fun alphabet(): String {
+  val result = StringBuilder()
+  for (letter in 'A' .. 'Z') {
+    result.append(letter)
+  }
+  result.append("\nNow I know the alphabet!")
+  return result.toString()
+}
+```
+
+- result에 대해 여러 메소드를 호출했음
+- 이 정도 반복은 나쁘지 않지만 코드가 훨씬 길거나 더 자주 반복했다면?
+
+<br>
+
+※ `with`을 활용한 리팩토링 예제
+
+```java
+fun alphabet(): String {
+  val sb = StringBuilder()
+  return with(sb) {                       //메소드를 호출할 수신 객체 지정
+    for (letter in 'A' .. 'Z') {
+      this.append(letter)                 //this를 명시해서 수신 객체의 메소드 호출
+    }
+    append("\nNow I know the alphabet!")  //this를 생략하고 수신 객체의 메소드 호출
+    this.toString()                       //람다에서 값을 반환
+  }
+}
+```
+
+- `with`의 파라미터는 2개
+  - 위 예제에서 첫 번째 파라미터는 `sb`, 두 번째 파라미터는 람다
+  - 물론 이 방식 대신 `with(sb, {...})`처럼 사용할 수도 있지만 가독성이 나쁨
+- 수신 객체 지정 람다는 일반 함수에 확장 함수가 있듯이,<br>일반 람다에도 수신 객체 지정 람다가 있다고 볼 수 있음
+
+<br>
+
+※ `sb` 변수를 없애는 예제
+
+```java
+fun alphabet() = with(StringBuilder()) {
+  for (letter in 'A' .. 'Z') {
+    append(letter)
+  }
+  append("\nNow I know the alphabet!")
+  toString()
+}
+```
+
+- 식의 결과를 바로 반환하게 되므로, 식을 본문으로 하는 함수로 표현 가능
+- 이 경우 내부적으로 `StringBuilder`의 인스턴스를 만들고 즉시 `with`으로 넘기게 됨
+- `with`이 반환하는 값은 람다 코드를 실행한 결과이며,<br>그 결과는 람다 식의 본문에 있는 마지막 식의 값
+
+<br>
+
+### 5.2 apply 함수
+
+- 거의 `with`과 같음
+- 차이점은 항상 자신에게 전달된 객체를 반환한다는 점뿐
+
+<br>
+
+※ `apply`를 사용한 알파벳 만들기 예제
+
+```java
+fun alphabet() = StringBuilder().apply {
+  for (letter in 'A' .. 'Z') {
+    append(letter)
+  }
+  append("\nNow I know the alphabet!")
+}.toString()
+```
+
+- `apply`는 확장 함수로 정의되어 있음
+- 위 함수에서 `apply`를 실행한 결과는 `StringBuilder` 객체
+- 객체의 인스턴스를 만들면서 즉시 프로퍼티 중 일부를 초기화해야 하는 경우 유용
+- 자바에서는 보통 별도의 `Builder` 객체가 이런 역할을 담당하지만<br>코틀린에서는 라이브러리의 지원 없이도 `apply` 사용 가능
+
+<br>
+
+※ `TextView` 초기화 예제
+
+```java
+fun createViewWithCustomerAttributes(ctx: Context) =
+  TextView(ctx).apply {
+    text = "Sample Text"
+    textSize = 20.0
+    setPadding(10, 0, 0, 0)
+  }
+```
+
+- `apply`를 활용하여 수신 객체의 프로퍼티 값들을 설정할 수 있음
+
+<br>
+
+※ 표준 라이브러리 함수 `buildString`으로 알파벳 만들기
+
+```java
+fun alphabet() = buildString {
+  for (letter in 'A' .. 'Z') {
+    append(letter)
+  }
+  append("\nNow I know the alphabet!")
+}
+```
+
+- `builderString` 함수는 `StringBuilder`를 활용해서 `String`을 만드는 경우 사용할 수 있는 우아한 해법
+
+⭐ 수신 객체 지정 람다는 **Domain Specific Language**를 다룰 때 더욱 흥미진진한 예제를 볼 수 있음
