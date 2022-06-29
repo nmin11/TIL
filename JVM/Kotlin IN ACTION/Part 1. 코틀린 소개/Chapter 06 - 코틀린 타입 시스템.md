@@ -165,3 +165,101 @@ class CopyRowAction(val list: JList<String>): AbstractAction() {
 ```java
 person.company!!.address!!.country
 ```
+
+<br>
+
+### 1.7 `let`
+
+- null이 될 수 있는 식을 더 쉽게 다루도록 해줌
+- 안전한 호출 연산자와 함께 사용하면 식에서 null 여부를 검사하고 결과를 변수에 넣는 작업을 간단하게 처리
+  - nullable type을 non-nullable type으로 바꿔서 람다에 전달
+- 가장 흔한 용례는 nullable type을 받아서 null이 아닌 값만 인자로 넘기는 방식
+
+```java
+fun sendEmailTo(email: String) {
+  println("Sending email to $email")
+}
+```
+
+```java
+var email: String? = "kotlin@example.com"
+email?.let { sendEmailTo(it) }
+```
+
+- `let`을 사용하면 결과를 저장하는 변수를 따로 만들 필요가 없음
+
+※ 명시적인 if 검사 예제
+
+```java
+val person: Person? = getTheBestPersonInTheWorld()
+if (person != null) sendEmailTo(person.email)
+```
+
+↓
+
+※ 이 경우 `person` 변수는 굳이 추가할 필요가 없음
+
+```java
+getTheBestPersonInTheWorld()?.let { sendEmailTo(it.email) }
+```
+
+- `let`은 지나치게 중첩시켜 사용하면 코드가 복잡해지므로 `if`를 사용하는 게 나은 경우도 있음
+
+<br>
+
+### 1.8 `lateinit` 나중에 초기화할 프로퍼티
+
+- 객체 인스턴스를 일단 생성하고 나중에 초기화하는 프레임워크가 많음
+  - 안드로이드에서는 `onCreate`에서 activity 초기화
+  - JUnit에서는 `@Before` 어노테이션이 붙은 메소드 안에서 초기화 로직 수행
+- 코틀린에서는 일반적으로 생성자에서 모든 프로퍼티를 초기화해야 함
+- 따라서 nullable type의 초기화에 null 검사 로직이나 `!!`를 넣어야 하는데, 그러면 코드가 번잡해짐
+
+※ `!!`를 사용하는 못생긴 예제
+
+```java
+class MyService {
+  fun performAction(): String = "foo"
+}
+
+class MyTest {
+  private var myService: MyService? = null
+
+  @Before
+  fun setUp() {
+    myService = MyService()
+  }
+
+  @Test
+  fun testAction() {
+    Assert.assertEquals("foo", myService!!.performAction())
+  }
+}
+```
+
+- `lateinit`을 사용하면 프로퍼티를 나중에 초기화할 수 있음
+
+```java
+class MyService {
+  fun performAction(): String = "foo"
+}
+
+class MyTest {
+  private lateinit var myService: MyService
+
+  @Before
+  fun setUp() {
+    myService = MyService()
+  }
+
+  @Test
+  fun testAction() {
+    Assert.assertEquals("foo", myService!!.performAction())
+  }
+}
+```
+
+- `lateinit` 변수는 항상 `var`이어야만 함
+  - `val`은 `final` 필드이며, 반드시 생성자 안에서 초기화되어야 하므로
+- `lateinit`을 사용하면 nullable type이라도 생성자 안에 초기화할 필요가 없어짐
+- 초기화를 하지 않아서 에러가 발생하더라도 NPE가 아닌, `lateinit` 관련 에러가 발생
