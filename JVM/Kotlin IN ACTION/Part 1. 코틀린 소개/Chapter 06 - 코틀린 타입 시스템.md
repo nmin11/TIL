@@ -254,7 +254,7 @@ class MyTest {
 
   @Test
   fun testAction() {
-    Assert.assertEquals("foo", myService!!.performAction())
+    Assert.assertEquals("foo", myService.performAction())
   }
 }
 ```
