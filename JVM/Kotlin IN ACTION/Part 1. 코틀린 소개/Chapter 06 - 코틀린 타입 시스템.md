@@ -263,3 +263,57 @@ class MyTest {
   - `val`은 `final` 필드이며, 반드시 생성자 안에서 초기화되어야 하므로
 - `lateinit`을 사용하면 nullable type이라도 생성자 안에 초기화할 필요가 없어짐
 - 초기화를 하지 않아서 에러가 발생하더라도 NPE가 아닌, `lateinit` 관련 에러가 발생
+- `lateinit`은 DI 프레임워크와 함께 사용되는 경우가 많음
+
+<br>
+
+### 1.9 nullable type 확장
+
+- nullable type에 대한 확장 함수를 정의하면 null 값을 다루는 강력한 도구로 활용 가능
+- null 검사 없이 직접 변수에 대해 메소드를 호출해도 확장 함수인 메소드가 알아서 null을 처리
+  - 이런 처리는 확장 함수에서만 가능
+  - 일반 멤버 호출은 객체 인스턴스를 통해 직접 dispatch 되므로 null 여부를 검사하지 않음
+- 예를 들어 `String?` 타입의 수신 객체에 대해 호출 가능한 `isNullOrEmpty`나 `isNullOrBlank`가 있음
+
+```java
+fun verifyUserInput(input: String?) {
+  if (input.isNullOrBlank()) {
+    println("Please fill in the required fields")
+  }
+}
+```
+
+- 안전한 호출 없이도 nullable type을 적절히 처리함
+- 이 확장 함수들을 사용한다고 해서 `input`이 non-nullable type이 되는 것은 아님
+
+```java
+fun String?.isNullOrBlank(): Boolean =
+  this == null || this.isBlank()
+```
+
+- 확장 함수 내부에서 `this`는 null이 될 수 있으므로 명시적으로 null 여부를 검사해야 함
+- 자바와 달리 코틀린에서는 `this`가 null이 될 수 있음
+- 하지만 만약 직접 확장 함수를 작성한다면 일단 non-nullable로 설계하고,<br>나중에 nullable 호출이 대부분일 때가 되면 변경해주는 방식이 좋음
+
+<br>
+
+### 1.10 타입 파라미터의 null 가능성
+
+- 코틀린에서 함수나 클래스의 모든 타입 파라미터는 기본적으로 null이 될 수 있음
+- 따라서 타입 파라미터 `T`를 클래스나 함수 안에서<br>타입 이름으로 사용하면 `?`가 없더라도 `T`는 nullable type
+
+```java
+fun <T> printHashCode(t: T) {
+  println(t?.hashCode())
+}
+```
+
+- 위 코드에서 `t`는 nullable type이므로 안전한 호출을 사용해야만 함
+- `T`의 타입은 `Any?`로 추론됨
+- 이 때 타입 파라미터가 null이 아님을 확실히 하려면 **upper bound** 를 지정해야 함
+
+```java
+fun <T: Any> printHashCode(t: T) {
+  println(t.hashCode())
+}
+```
