@@ -317,3 +317,56 @@ fun <T: Any> printHashCode(t: T) {
   println(t.hashCode())
 }
 ```
+
+<br>
+
+### 1.11 Nullable과 자바
+
+- 자바에서도 `@Nullable` 어노테이션을 사용하면 코틀린에서 `?`를 붙인 타입과 같아짐
+  - 그 반대의 어노테이션은 `@NotNull`
+- 코틀린은 JSR-305 표준, 안드로이드, 젯브레인스 도구 등이 지원하는 Nullable 어노테이션을 알아봄
+- 그리고 이런 Nullable 어노테이션이 자바에 없는 경우, 자바의 타입은 **platform type** 이 됨
+
+#### platform type
+
+- 코틀린이 null 관련 정보를 알 수 없는 타입
+- 해당 타입을 nullable type으로 처리해도 되고, non-nullable type으로 처리해도 됨
+- 컴파일러는 모든 연산을 허용
+- 즉, platform type 처리에 대한 책임은 온전히 개발자에게 있다는 것
+- 자바의 대부분의 라이브러리는 null 관련 어노테이션을 사용하지 않으므로<br>마치 모든 타입이 null이 아닌 것처럼 다루기 쉽지만 그렇게 하면 오류가 발생할 수 있음
+- 코틀린에서 platform type을 선언할 수 없고, 자바 코드에서 가져온 타입만 platform type이 됨
+- `String!`과 같은 형태로 뒤에 `!`가 붙어서 전달되며, 이는 null 가능성에 대한 정보가 없다는 뜻
+
+<br>
+
+#### 상속
+
+- 코틀린에서 자바 메소드를 override 하려면 파라미터와 반환 타입에 대한 nullable 여부를 결정해야 함
+
+```java
+interface StringProcessor {
+  void process(String value);
+}
+```
+
+- 위와 같은 자바 코드를 상속할 때, 코틀린은 다음 두 구현을 다 받아들임
+
+```java
+class StringPrinter: StringProcessor {
+  override fun process(value: String) {
+    println(value)
+  }
+}
+
+class NullableStringPrinter: StringProcessor {
+  override fun process(value: String?) {
+    if (value != null) {
+      println(value)
+    }
+  }
+}
+```
+
+- 자바 클래스나 인터페이스를 코틀린에서 구현할 때 nullable을 제대로 처리하는 것이 중요!
+- 코틀린 컴파일러는 non-nullable type에 대해 non-null 검사를 하는 단언문을 만들어줌
+  - 만약 자바에서 이 메소드에 null을 넘기면 예외 발생
