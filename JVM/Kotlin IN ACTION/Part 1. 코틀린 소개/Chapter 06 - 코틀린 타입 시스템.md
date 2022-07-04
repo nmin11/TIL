@@ -489,3 +489,98 @@ foo(42)           //컴파일러는 42를 Long으로 해석
 
 - 코틀린 산수 연산자도 자바와 같이 **overflow** 발생 가능
   - 그러나 코틀린은 overflow를 검사하는 추가 비용이 들지 않음
+
+<br>
+
+### 2.4 `Any` `Any?` 최상위 타입
+
+- 자바에서 `Object`가 클래스 계층의 최상위 타입이듯<br>코틀린에서는 `Any` 타입이 모든 non-nullable 타입의 조상 타입
+- 하지만 자바에서는 참조 타입만 `Object`를 정점으로 하는 타입 계층에 포함
+  - 자바에서 `Object` 타입의 객체가 필요하면 `Integer`와 같은 래퍼 타입으로 감싸야만 함
+- 하지만 코틀린에서는 `Any`가 `Int` 등의 원시 타입을 포함한 모든 타입의 조상 타입
+- 그래도 JVM 내부적으로 코틀린의 `Any`는 자바의 `Object`로 컴파일됨
+- `toString` `equals` `hashCode`는 모두 `Any`에 정의된 메소드를 상속받은 것
+  - 하지만 `Object`에 있는 `wait`이나 `notify` 등의 다른 메소드는 `Any`에서 사용 불가
+- 자바와 마찬가지로 코틀린도 원시 타입 값을 `Any` 변수에 대입하면 자동으로 값을 객체로 감쌈
+
+```java
+val answer: Any = 42
+```
+
+<br>
+
+### 2.5 `Unit` 코틀린의 void
+
+- 관심을 가질 만한 내용을 전혀 반환하지 않는 함수의 반환 타입으로 사용 가능
+
+```java
+fun f(): Unit { ... }
+```
+
+- 이는 반환 타입 선언 없이 정의한 블록이 본문인 함수와 같음
+
+```java
+fun f() { ... }
+```
+
+- 대부분의 경우 `void`와 `Unit`의 차이는 없음
+  - 함수의 반환 타입이 `Unit`이고 제네릭 함수를 override하지 않는다면<br>그 함수는 내부적으로 자바의 `void`로 컴파일됨
+- `Unit`과 `void`의 차이점
+  - `Unit`은 모든 기능을 갖는 일반적인 타입
+  - `void`와 달리 `Unit`을 타입 인자로 사용 가능
+  - `Unit` 타입에 속한 값은 하나뿐이며, 그 이름도 `Unit`
+  - `Unit` 타입의 함수는 `Unit` 값을 묵시적으로 반환
+  - 그러므로 제네릭 파라미터를 반환하는 함수를 override하면서 반환 타입을 `Unit`으로 사용할 때 유용
+
+```java
+interface Processor<T> {
+  fun process(): T
+}
+
+class NoResultProcessor: Processor<Unit> {
+  override fun process() {
+    // 업무 처리 코드
+  }
+}
+```
+
+- 위 코드에서 `process` 함수는 어떤 값을 반환하라고 요구
+  - `Unit` 타입도 `Unit` 값을 제공하기 때문에 `Unit` 값 반환에 문제 없음
+  - `NoResultProcess`에서 명시적으로 `Unit`을 반환할 필요 없음
+  - 컴파일러가 묵시적으로 `return Unit`을 넣어줌
+- 자바에서도 이런 '값 없음' 문제를 깔끔하게 해결하려면 `Void` 타입을 사용해야 할 것
+  - 하지만 `Void` 타입에 대응하는 유일한 값 null을 반환하기 위해 `return null`을 명시해야 함
+- `Unit`이라는 이름을 고른 이유는 함수형 프로그래밍에서 전통적으로 '단 하나의 인스턴스만 갖는 타입'을<br>의미해 왔고 바로 이 차이가 자바의 `void`와 구분 짓는 가장 큰 차이이기 때문
+
+<br>
+
+### 2.6 `Nothing` 결코 정상적으로 끝나지 않는 함수
+
+- 코틀린에는 결코 성공적으로 값을 돌려주지 않아 '반환 값'이 의미 없는 함수가 일부 존재
+- 예를 들어 테스트 라이브러리들은 `fail` 함수를 제공해서 메시지와 함께 테스트를 실패시킬 수 있게 함
+- 이러한 함수를 호출하는 코드를 분석하는 경우 함수가 정상적으로 끝나지 않는다는 것을 알면 유용
+- 이런 경우를 표현하기 위해 코틀린에서는 `Nothing`이라는 특별한 반환 타입 제공
+
+```java
+fun fail(message: String): Nothing {
+  throw IllegalStateException(message)
+}
+```
+
+```java
+fail("Error occurred")
+// java.lang.IllegalStateException: Error occurred
+```
+
+- `Nothing` 타입은 아무 값도 포함하지 않음
+  - 따라서 함수의 반환 타입이나 반환 타입으로 쓰일 타입 파라미터로만 사용 가능
+  - 그 외 용도로 사용하려는 경우에는 선언하더라도 아무 값도 저장할 수 없으므로 아무 의미가 없음
+- `Nothing`을 반환하는 함수를 elvis 연산자의 우항에 사용해서 precondition을 검사할 수 있음
+
+```java
+val address = company.address ?: fail("No address")
+println(address.city)
+```
+
+- 컴파일러는 `Noting`이 반환 타입인 함수가 결코 정상 종료되지 않음을 알고 호출 코드를 분석해줌
+- 위 예제에서는 `address`의 값이 null이 될 수 없음을 추론하게 해줌
