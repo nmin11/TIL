@@ -584,3 +584,60 @@ println(address.city)
 
 - 컴파일러는 `Noting`이 반환 타입인 함수가 결코 정상 종료되지 않음을 알고 호출 코드를 분석해줌
 - 위 예제에서는 `address`의 값이 null이 될 수 없음을 추론하게 해줌
+
+<br>
+<br>
+
+## 3. 컬렉션과 배열
+
+### 3.1 nullable과 컬렉션
+
+```java
+fun readNumbers(reader: BufferedReader): List<Int?> {
+  val result = ArrayList<Int?>()
+  for (line in reader.lineSequence()) {
+    try {
+      val number = line.toInt()
+      result.add(number)
+    } catch(e: NumberFormatException) {
+      result.add(null)
+    }
+  }
+  return result
+}
+```
+
+- `List<Int?>`에는 Int 혹은 null 저장 가능
+- 사실 `String.toIntOrNull`을 사용하면 이 예제를 훨씬 단축할 수 있음
+- 리스트에서 nullable을 다룰 때 조심해야 하는 점 : null이 될 수 있는 건 컬렉션의 원소인가 컬렉션 자체인가?
+  - 둘 다 nullable하다면 `List<Int?>?`로 표현해야 함
+  - 둘 다 nullable한 경우, 리스트에 대해서 null 검사를 한 이후에 각 원소에 대해 다시 null 검사를 해야 함
+- nullable 값으로 이뤄진 컬렉션에서 null 검사는 자주 하므로 코틀린 표준 라이브러리는 `filterNotNull` 함수 제공
+
+```java
+fun addValidNumbers(numbers: List<Int?>) {
+  val validNumbers = numbers.filterNotNull()
+  println("Sum of valid numbers: ${validNumbers.sum()}")
+  println("Invalid numbers: ${numbers.size - validNumbers.size}")
+}
+```
+
+- `filterNotNull`은 컬렉션 안에 null 값이 없음을 보장해주므로 `validNumbers`는 `List<Int>` 타입
+
+<br>
+
+### 3.2 읽기 전용과 변경 가능한 컬렉션
+
+- 코틀린에서는 컬렉션 안의 데이터에 접근하는 인터페이스와 변경하는 인터페이스를 분리했음
+- 이 구분은 코틀린 컬렉션을 다루는 패키지는 `kotlin.collections`부터 시작
+  - `kotlin.collections.Collection`
+  - `kotlin.collections.MutableCollection`
+- `Collection`은 원소에 대한 iteration, 크기 얻기, 어떤 값이 안에 있는지 여부 등 데이터를 읽는 연산들을 수행
+  - 원소를 추가하거나 제거하는 메소드가 없음
+  - `size` `iterator()` `contains()`
+- `MutableCollection`은 `Collection`을 확장하면서 원소 추가, 삭제, 모두 제거 등의 메소드 제공
+  - `add()` `remove()` `clear()`
+- 가능하면 항상 읽기 전용 인터페이스 사용을 원칙으로 삼을 것
+  - 코드가 컬렉션을 변경할 필요가 있을 때만 변경 가능한 버전 사용
+- `val`과 `var` 구분과 마찬가지로, 이렇게 구분하는 이유는 프로그램에서 데이터에 어떤 일이 벌어지는지 예측하기 위함
+- 컬렉션 안의 원소는 다른 컬렉션에 대한 참조인 경우도 있으니 변경 가능성에 대해 신중을 기해야 함
