@@ -641,3 +641,102 @@ fun addValidNumbers(numbers: List<Int?>) {
   - 코드가 컬렉션을 변경할 필요가 있을 때만 변경 가능한 버전 사용
 - `val`과 `var` 구분과 마찬가지로, 이렇게 구분하는 이유는 프로그램에서 데이터에 어떤 일이 벌어지는지 예측하기 위함
 - 컬렉션 안의 원소는 다른 컬렉션에 대한 참조인 경우도 있으니 변경 가능성에 대해 신중을 기해야 함
+
+<br>
+
+### 3.3 코틀린 컬렉션과 자바
+
+- 모든 코틀린 컬렉션은 그에 상응하는 자바 컬렉션 인터페이스의 인스턴스
+- 따라서 코틀린과 자바 사이를 오갈 때 아무 변환도 필요 없음
+- 또한 래퍼 클래스를 만들거나 데이터를 복사할 필요도 없음
+- 하지만 코틀린은 모든 자바 컬렉션 인터페이스마다 읽기 전용과 변경 가능이라는 2가지 representation 제공
+- 예를 들어 자바의 `ArrayList`와 `HashSet`은 코틀린의 `MutableList`와 `MutableSet`
+- 마찬가지로 자바의 `Map` 클래스도 코틀린에서 `Map`과 `MutableMap`으로 나뉨
+
+| 컬렉션 타입 | 읽기 전용 타입 |                  변경 가능 타입                   |
+| :---------: | :------------: | :-----------------------------------------------: |
+|    List     |     listOf     |            mutableListOf, arrayListOf             |
+|     Set     |     setOf      | mutableSetOf, hashSetOf, linkedSetOf, sortedSetOf |
+|     Map     |     mapOf      | mutableMapOf, hashMapOf, linkedMapOf, sortedMapOf |
+
+- `setOf`와 `mapOf`는 현재 완벽한 불변 컬렉션 인터페이스는 아니지만 그렇게 되도록 바뀔 수도 있음
+  - `mapOf`는 원소가 하나인 경우 `singletonMap`을, 아니면 `LinkedHashMap`을 사용
+- 자바와 코틀린을 혼용할 때 변경 가능 여부에 따라 올바른 파라미터 타입을 사용할 책임은 개발자에게 있음
+  - non-nullable 원소로 이루어진 컬렉션 타입에서도 자바는 null을 허용하기 때문에 주의해야 함
+
+<br>
+
+### 3.4 컬렉션을 플랫폼 타입으로 다루기
+
+- 플랫폼 타입은 코틀린 쪽에 null 관련 정보가 없어서, 어느 쪽으로든 허용
+- 마찬가지로 자바에서 선언한 컬렉션 타입 변수를 코틀린에서는 플랫폼 타입으로 봄
+- 플랫폼 타입 컬렉션은 변경 가능성을 알 수 없음
+- 따라서 코틀린은 읽기 전용이든 변경 가능이든 어느 쪽으로든 다룰 수 있음
+- 일반적인 경우에는 원하는 동작이 그냥 잘 수행될 가능성이 높음
+- 하지만 컬렉션 타입이 시그니처에 들어간 자바 메소드 구현을 override하려는 경우 이 차이가 문제가 됨
+- 플랫폼 타입에서 nullable을 다룰 때처럼 이 경우에도<br>override하려는 메소드의 자바 컬렉션 타입을 어떤 코틀린 컬렉션 타입으로 표현할지 결정해야 함
+- 이런 상황에서는 여러 가지를 선택해야 하며, 선택한 내용을 컬렉션 타입에 반영해야 함
+  - 컬렉션이 nullable인가?
+  - 컬렉션의 원소가 nullable인가?
+  - override하는 메소드가 컬렉션을 변경할 수 있는가?
+
+<br>
+
+### 3.5 객체의 배열과 원시 타입의 배열
+
+**코틀린에서 배열 만드는 방법**
+
+- `arrayOf` 함수에 원소 넘기기
+- `arrayOfNulls` 함수에 정수 값 인자를 넣어서 정수 값 만큼의 null이 있는 배열 만들기
+- `Array` 생성자에 배열 크기와 람다를 인자로 넣고 호출
+  - 각 원소가 non-nullable인 배열을 만들어야 하는 경우에 사용
+
+```java
+val letters = Array<String>(26) { i -> ('a' + i).toString() }
+```
+
+- `Array` 생성자에서 인자로 받는 람다는 배열 원소의 인덱스를 인자로 받아서 해당 위치에 들어갈 원소를 반환
+- `<String>`이라는 타입 인자는 명시를 해줬지만 생략해도 컴파일러가 추론해줄 수 있음
+
+<br>
+
+- `toTypedArray` 메소드를 사용하면 컬렉션을 배열로 바꿀 수 있음
+
+```java
+val strings = listOf("a", "b", "c")
+println("%s/%s/%s".format(*strings.toTypedArray()))
+
+// a/b/c
+```
+
+- 다른 제네릭 타입에서처럼 배열 타입의 타입 인자도 항상 객체 타입
+- 따라서 `Array<Int>`의 경우 각 원소는 `Integer` 래퍼 클래스를 사용
+- 원시 타입 배열이 필요하다면 특별 배열 클래스를 사용해야 함
+- 코틀린은 `IntArray` `ByteArray` `CharArray` `BooleanArray` 등의 원시 타입 배열 제공
+  - 이들은 `int[]` `byte[]` `char[]` 등으로 컴파일됨
+  - 따라서 박싱 없이 가장 효율적인 방식으로 저장됨
+- 원시 타입 배열 만드는 방법
+  - 생성자는 `size` 인자를 받아서 해당 원시 타입의 디폴트 값(0)으로 초기화된 size 크기의 배열 반환
+  - `IntArrayOf` 등의 팩토리 함수는 여러 값을 가변 인자로 받아서 배열 반환
+  - 크기와 람다를 인자로 받는 생성자 사용
+
+```java
+val fiveZeros = IntArray(5)
+val fiveZerosToo = intArrayOf(0, 0, 0, 0, 0)
+val squares = IntArray(5) { i -> (i+1) * (i+1) }
+```
+
+- 박싱된 값이 들어있는 컬렉션이나 배열도 `toIntArray` 등의 변환 함수를 사용해서 원시 타입 배열로 변환 가능
+- 원시 타입 배열로 할 수 있는 것들
+  - 배열 길이, 원소 설정, 원소 읽기와 같은 기본 연산
+  - 컬렉션에 사용할 수 있는 모든 확장 함수
+    - `filter` `map` 사용 가능
+    - 다만 이런 함수가 반환하는 값은 배열이 아닌 리스트라는 점에 유의할 것
+
+```java
+fun main(args: Array<String>) {
+  args.forEachIndexed { idx, el -> println("Argument $idx is: $el") }
+}
+```
+
+- `forEachIndexed`는 배열의 모든 원소에 대해 람다 호출
