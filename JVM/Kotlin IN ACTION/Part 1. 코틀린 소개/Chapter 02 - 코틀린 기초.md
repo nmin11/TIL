@@ -215,7 +215,7 @@ Kotlin property
 ### 2.2 커스텀 접근자
 
 ```java
-class Rectangle(val: height: Int, val width: Int) {
+class Rectangle(val height: Int, val width: Int) {
   val isSquare: Boolean
     get() {
       return height == width
