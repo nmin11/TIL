@@ -475,7 +475,7 @@ println(books.flatMap { it.authors }.toSet())
 <br>
 <br>
 
-## lazy 컬렉션 연산
+## 3. lazy 컬렉션 연산
 
 - 앞서 살펴본 `map` `filter`와 같은 함수들은 결과 컬렉션을 **즉시(eagerly)** 생성함
 - 이는 컬렉션 함수를 연쇄하면 매 단계마다 중간 결과를 새로운 컬렉션에 임시로 담는다는 뜻
