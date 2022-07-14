@@ -25,7 +25,7 @@
 - callback 함수 : 이벤트가 발생되었을 때 실행할 함수
 - event loop : 여러 이벤트가 동시에 발생했을 때 어떤 순서로 callback 함수를 호출할지 판단
 - background : event listener들이 대기하는 곳으로, 여러 작업 동시 실행 가능
-- task queue : 정해진 순서대로 callback들이 줄을 서 있는 공간, callback queue라고도 불림
+- task queue : 정해진 순서대로 callback들이 줄을 서 있는 공간, callback queue라고도 불림<br>호출 stack이 비어있는 경우에 실행됨
 
 <br>
 
