@@ -62,7 +62,7 @@
 - RAM(Random Access Memory) : 컴퓨터가 수행해야 할 명령어를 써넣는 공간, 연산의 대상이 되는 데이터 저장
 - CPU(Central Processing Unit) : 메모리에서 명령어와 데이터를 읽어 그에 맞게 계산
 
-(이미지 첨부 CPU & RAM)
+![CPU   RAM](https://user-images.githubusercontent.com/75058239/179157921-92a2c30a-11b3-4f6d-8782-292de0b335c6.png)
 
 ### 메모리
 
