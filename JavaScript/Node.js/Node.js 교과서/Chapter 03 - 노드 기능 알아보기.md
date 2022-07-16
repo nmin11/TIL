@@ -95,3 +95,74 @@ export default checkOddOrEven;
 - `require` & `module.exports` → `import` & `export default`
 - 노드에서도 ES2015 모듈 시스템을 사용할 순 있지만 사용하려면 확장자를 `mjs`로 사용해야 함
   - `js` 확장자를 사용하면서 ES2015 module을 사용하려면 `package.json`에 `type: "module"` 속성을 넣으면 됨
+
+<br>
+<br>
+
+## 노드 내장 객체
+
+- `require`나 `module`을 사용할 수 있는 것은 노드가 기본적으로 제공해주기 때문
+- 브라우저의 `window` 객체와도 비슷하게, 노드 내장 객체 및 내장 모듈을 사용할 수 있음
+
+<br>
+
+### global
+
+- 노드의 전역 객체이며, 브라우저의 `window`와 같음
+- 모든 파일에서 접근 가능
+- `window`처럼 생략 가능
+  - `console` `require` 등은 사실 `global`의 하위 속성
+- 브라우저와의 통일을 위해 `globalThis`를 사용하기도 함
+- `global` 속성의 값을 변경에서 여러 파일들에 함께 사용 가능하지만 매우 안 좋은 방법
+
+<br>
+
+### console
+
+- 보통 디버깅을 위해 사용
+- `console.log` 말고도 다른 로깅 함수들이 많음
+- `console.dir` : 객체 확인에 용이
+- `console.time` `console.timeEnd` : `time`부터 `timeEnd`까지 걸린 시간 (코드의 효율을 알기에 좋음)
+- `console.error` : 에러 로깅
+- `console.trace` : 함수 호출 스택 로깅 (anonymous까지)
+- `console.table` : 배열 안 객체들을 테이블 형식으로 깔끔하게 보여줌
+
+<br>
+
+### 타이머
+
+- `setTimeout(callback, millisecond)` : 주어진 밀리초 이후 콜백 함수 실행
+- `setInterval(callback, millisecond)` : 주어진 밀리초마다 콜백 함수 반복 실행
+- `setImmediate(callback)` : 콜백 함수 즉시 실행
+- `clearTimeout(id)` : setTimeout 취소
+- `clearInterval(id)` : setInterval 취소
+- `clearImmediate(id)` : setImmediate 취소
+
+```js
+const timeout = setTimeout(() => {
+  console.log("1.5초 후 실행");
+}, 1500);
+
+const interval = setInterval(() => {
+  console.log("1초마다 실행");
+}, 1000);
+
+const timeout2 = setTimeout(() => {
+  console.log("실행되지 않음");
+}, 3000);
+
+setTimeout(() => {
+  clearTimeout(timeout2);
+  clearInterval(interval);
+}, 2500);
+
+const immediate = setImmediate(() => {
+  console.log("즉시 실행");
+});
+
+const immediate2 = setImmediate(() => {
+  console.log("실행되지 않음");
+});
+
+clearImmediate(immediate2);
+```
