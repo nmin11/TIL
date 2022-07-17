@@ -166,3 +166,81 @@ const immediate2 = setImmediate(() => {
 
 clearImmediate(immediate2);
 ```
+
+<br>
+
+### \_\_filename & \_\_dirname
+
+- `__filename` : 현재 파일 경로
+- `__dirname` : 현재 폴더 경로
+- 노드는 파일 시스템 접근 관련 보안이 허술
+- 생각보다 자주 쓰임
+  - 나중에 배울 `path`와 함께 쓰임
+
+<br>
+
+### module, exports, require
+
+- `module`은 생략 가능
+- `exports`는 처음부터 빈 객체로 존재
+
+```js
+exports.odd = "홀수";
+exports.even = "짝수";
+```
+
+- 주의사항 : `exports` 객체를 사용할 땐 `module.exports`와의 참조 관계가 깨지지 않도록 주의해야 함
+  - `module.exports`에는 어떤 값이든 대입할 수 있지만 `exports`에는 반드시 객체처럼 속성명과 속성값을 대입해야 함
+  - 만약 `exports`에 객체 대신 다른 값을 대입하면 `module`과의 참조 관계가 끊겨버림
+  - 한 모듈에 `exports`와 `module.exports`를 동시에 사용하지 않는 것이 좋음
+
+**this**
+
+- 노드에서 최상위 스코프의 `this`는 `module.exports`를 가리킴
+- 함수 선언문 내부의 `this`는 `global` 객체를 가리킴
+- 그 외에는 브라우저의 JS와 동일
+
+**require**
+
+- `require.cache` : 한 번 require한 모듈에 대한 캐싱 정보가 들어있음
+  - `require`로 파일을 불러왔다면 그 정보를 다시 조회할 때 캐시를 활용해서 파일을 다시 조회하지 않도록 해줌
+- `require.main` : 노드 실행 시 첫 모듈
+  - 노드를 실행한 첫 파일 이름
+- 여기에 있는 정보들 또한 마음껏 다루기엔 위험하고, 사실 초보가 다루기에는 다소 deep한 내용
+
+**순환 참조**
+
+- 2개의 모듈이 서로를 `require`하는 상황을 기피해야 함
+
+※ dep1.js
+
+```js
+const dep2 = require("./dep2");
+console.log("require dep2", dep2);
+module.exports = () => {
+  console.log("dep2", dep2);
+};
+```
+
+※ dep2.js
+
+```js
+const dep1 = require("./dep1");
+console.log("require dep1", dep1);
+module.exports = () => {
+  console.log("dep1", dep1);
+};
+```
+
+※ dep-run.js
+
+```js
+const dep1 = require("./dep1");
+const dep2 = require("./dep2");
+dep1();
+dep2();
+```
+
+- `dep-run.js`를 실행하면 `dep1`의 `module.exports`는 빈 객체로 표시됨
+- 노드는 순환 참조되는 대상을 빈 객체로 만들어버림
+- 에러가 발생하지 않고 조용히 빈 객체가 되어버리므로, 개발자가 특히 조심해서 설계해야 하는 부분
