@@ -244,3 +244,49 @@ dep2();
 - `dep-run.js`를 실행하면 `dep1`의 `module.exports`는 빈 객체로 표시됨
 - 노드는 순환 참조되는 대상을 빈 객체로 만들어버림
 - 에러가 발생하지 않고 조용히 빈 객체가 되어버리므로, 개발자가 특히 조심해서 설계해야 하는 부분
+
+<br>
+
+### process
+
+- `process.version` : 노드 버전
+- `process.arch` : 프로세서 아키텍처 정보 / x64, arm, ia32 등
+- `process.platform` : 운영체제 플랫폼 정보
+- `process.pid` : 현재 프로세스의 ID
+- `process.uptime()` : 프로세스가 시작된 후 흐른 시간 (초 단위)
+- `process.execPath` : 노드 경로
+- `process.cwd()` : 현재 프로세스가 실행되는 위치
+- `process.cpuUsage()` : 현재 CPU 사용량
+- 이 밖에 `env` `nextTick` `exit()`은 중요하니 따로 정리
+
+**process.env**
+
+- 시스템 환경 변수들이 들어있는 객체
+- 일부 환경 변수들은 노드 실행 시에 영향을 미침
+  - `NODE_OPTIONS` : 노드 실행 옵션들
+  - `UV_THREADPOOL_SIZE` : 노드에서 기본적으로 사용할 스레드풀의 스레드 개수 조절
+- 서버나 DB의 비밀번호, 각종 API 키를 담아두기 위해 상당히 자주 사용됨
+
+**process.nextTick(callback)**
+
+- event loop는 다른 콜백 함수보다 `nextTick`의 콜백 함수를 우선 처리함
+- 남용하면 다른 함수들의 실행 속도를 늦춰버림
+- 비슷한 경우로 `Promise`가 있음
+  - `setImmediate`보다 `Promise`와 `process.nextTick`이 우선 실행됨
+  - 그래서 `Promise`와 `process.nextTick`을 **microtask**라고 따로 구분지어 부름
+
+```js
+setImmediate(() => {
+  console.log("immediate");
+});
+process.nextTick(() => {
+  console.log("nextTick");
+});
+Promise.resolve().then(() => console.log("promise"));
+```
+
+**process.exit(code)**
+
+- 현재 프로세스 중지
+- code 값이 없거나 0이면 정상 종료 / 그 외의 code 값을 가진다면 비정상 종료
+- 서버에서는 서버가 종료되니 잘 사용하지 않지만 독립적인 프로그램에서 수동으로 노드를 멈추기 위해 사용됨
