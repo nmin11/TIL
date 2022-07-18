@@ -909,6 +909,7 @@ readStream.pipe(zlibStream).pipe(writeStream);
 ## Event
 
 - Stream 같은 모듈 내부의 이벤트 말고도, 개발자가 직접 이벤트를 만들 수도 있음
+- 알아두면 편리하고, 자주 사용되는 모듈
 
 ```js
 const EventEmitter = require("events");
@@ -941,3 +942,90 @@ myEvent.removeListener("event1", listener1);
 - `removeListener(name, listener)` : 이벤트에 연결된 리스너 제거
 - `off(name, callback)` : `removeListener`와 기능이 같음
 - `listenerCount` : 현재 연결된 리스너 개수
+
+<br>
+<br>
+
+## Exception
+
+- 노드에서 예외는 실행 중인 노드 프로세스를 중지시킴
+- 노드에서 메인 쓰레드는 하나뿐이므로 그 하나를 소중하게 보호해야 함
+- 따라서 에러 로그를 기억해두고 프로세스는 작동될 수 있도록 설계해야 함
+- 예외는 try/catch 구문으로 처리
+
+```js
+setInterval(() => {
+  try {
+    throw new Error("서버를 고장내주마!");
+  } catch (err) {
+    console.error(err);
+  }
+}, 1000);
+```
+
+- `throw`한 에러는 반드시 `catch`해줘야 프로세스가 종료되지 않음
+
+※ 노드 내장 모듈의 에러는?
+
+```js
+const fs = require("fs");
+
+setInterval(() => {
+  fs.unlink("./test.js", (err) => {
+    if (err) console.error(err);
+  });
+}, 1000);
+```
+
+- 노드 내장 모듈에서 제공하는 에러는 실행 중인 프로세스를 중지시키지 않음
+  - 그러므로 내장 모듈의 에러 처리 가능 여부는 잘 확인해보고 예외 처리를 하자!
+- 또한 Promise의 에러는 catch하지 않더라도 알아서 처리됨
+  - 그렇다 하더라도 노드 버전에 따라 에러 처리 방식이 바뀔 수 있으므로 가급적이면 항상 catch 붙이기를 권장
+
+※ uncaughtException
+
+```js
+process.on("uncaughtException", (err) => {
+  console.error("예기치 못한 에러", err);
+});
+
+setInterval(() => {
+  throw new Error("서버를 고장내주마!");
+}, 1000);
+
+setTimeout(() => {
+  console.log("실행");
+}, 2000);
+```
+
+- try/catch 구문 없이도 위 코드는 실행됨
+- `uncaughtException`은 모든 에러를 한번에 처리해주므로 try/catch 구문의 중복 자체는 덜어줌
+- 그러나 노드 공식 문서에서 최후의 수단으로 사용할 이벤트라고 명시해뒀음
+  - 그러므로 예외 발생 시 로그만 기록해두고 `process.exit()`으로 프로세스를 종료하는 것이 좋음
+
+<br>
+
+### 자주 발생하는 에러들
+
+- `node: command not found` : 노드 설치 및 환경 변수 설정이 안 되었을 때
+- `ReferenceError: [module] is not defined` : 모듈을 require하지 않고 사용할 때
+- `Error: Cannot find module [module]` : 모듈을 설치하지 않았을 때
+- `Error: Cant't set headers after they are sent` : 요청에 대한 응답을 2번 이상 보냈을 때
+- `FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed - JavaScript heap out of memory` : 메모리 부족
+- `UnhandledPromiseRejectionWarning: Unhandled promise rejection` : catch 없이 Promise를 사용할 때
+- `EADDRINUSE [port]` : 해당 포트가 이미 다른 프로세스에 연결되어 있을 때
+- `EACCES` or `EPERM` : 노드가 작업을 수행하는 데 권한이 충분하지 않을 때
+- `EJSONPARSE` : JSON 파일에 문법 오류가 있을 때
+- `ECONNREFUSED` : 요청을 보냈으나 연결이 성립되지 않았을 때
+- `ETARGET` : package.json에 기록한 패키지 버전이 존재하지 않을 때
+- `ETIMEOUT` : 요청을 보냈으나 응답이 일정 시간 내에 오지 않았을 때
+- `ENOENT: no such file or directory` : 지정한 폴더나 파일이 존재하지 않을 때
+
+※ 프로세스 종료 방법
+
+- Windows
+  - 조회 : `netstat -ano | findstr [port]`
+  - 종료 : `taskkill /pid [pid] /f`
+- Linux
+  - 조회 : `lsof -i tcp:[port]`
+  - 종료 : `kill -9 [pid]`
