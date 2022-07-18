@@ -455,10 +455,10 @@ console.log("복호화: ", result2);
 ```
 
 - `crypto.createCipheriv(algorithm, key, iv)` : 어떻게 암호화할지 결정
-- `cipher.update(string, incoding, output-incoding)` : 암호화 대상, 대상에 대한 인코딩, 출력에 대한 인코딩 설정
+- `cipher.update(str, incoding, output-incoding)` : 암호화 대상, 대상에 대한 인코딩, 출력에 대한 인코딩 설정
 - `cipher.final(output-incoding)` : 출력 결과물의 인코딩까지 넣음으로써 암호화 완료
 - `crypto.createDecipheriv(algorithm, key, iv)` : 복호화할 때 사용하며, 암호화할 때와 같은 인자값들을 넣어야 함
-- `decipher.update(string, incoding, output-incoding)` : 암호화된 문장, 그 문장의 인코딩, 복호화할 인코딩 설정
+- `decipher.update(str, incoding, output-incoding)` : 암호화된 문장, 그 문장의 인코딩, 복호화할 인코딩 설정
 - `decipher.final(output-incoding)` : 복호화 결과물의 인코딩을 넣어서 복호화 완료
 - 노드에서의 다른 암호화 방식은 https://nodejs.org/api/crypto.html 에서 확인 가능
 - 사실 위 코드는 암호학을 공부하지 않았다면 이해하기 힘든 코드
@@ -656,3 +656,288 @@ process.stderr.on("data", function (data) {
 - `dgram` : UDP 관련 작업
 - `v8` : V8 엔진 직접 접근
 - `vm` : 가상 머신 직접 접근
+
+<br>
+<br>
+
+## fs
+
+- 파일 시스템에 접근하는 모듈
+- 파일 및 폴더 생성, 삭제, 읽기, 쓰기 기능
+- 웹 브라우저에서는 파일 접근 기능이 제한되어 있으나 노드에서는 권한을 가질 수 있음
+  - 권한이 있는 만큼 보안에 각별히 신경써야 함
+
+※ 기본 사용 예제
+
+```js
+const fs = require("fs");
+
+fs.readFile("./readme.txt", (err, data) => {
+  if (err) throw err;
+  console.log(data);
+  console.log(data.toString());
+});
+```
+
+- 여기서의 파일 경로는 현재 파일 경로가 아닌 `node` 명령어를 실행하는 콘솔 기준
+- `console.log(data)`는 2진법이 16진법으로 변형된 `Buffer`가 출력됨
+- fs 모듈은 또한, Promise 형식으로도 사용 가능!
+  - 대부분의 경우 promises 방식으로 사용하기를 추천!
+
+※ promises 활용 예제
+
+```js
+const fs = require("fs").promises;
+
+fs.readFile("./readme.txt")
+  .then((data) => {
+    console.log(data);
+    console.log(data.toString());
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+※ 파일 쓰기 예제
+
+```js
+const fs = require("fs").promises;
+
+fs.writeFile("./writeme.txt", "글 작성!")
+  .then(() => {
+    return fs.readFile("./writeme.txt");
+  })
+  .then(() => {
+    console.log(data.toString());
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+<br>
+
+### 동기 메소드와 비동기 메소드
+
+- 노드는 대부분의 메소드를 비동기 처리
+- 하지만 몇몇 메소드는 동기 방식으로도 사용 가능하며, fs 모듈에 특히 그런 메소드들이 많음
+
+※ Note: 동기와 비동기, blocking과 non-blocking
+
+- 동기와 비동기 : 백그라운드 작업 완료 확인 여부
+- blocking과 non-blocking : 함수가 바로 return 되는지 여부
+- 노드에서는 **동기 - blocking** 방식과 **비동기 - non-blocking** 방식이 대부분
+- 동기 - blocking : 백그라운드 작업 완료 여부를 계속 확인하면서, 해당 작업이 끝나야 return
+- 비동기 - non-blocking : 호출한 함수를 바로 return하고 다음 작업으로 넘어가며, 나중에 백그라운드가 알림을 줄 때 비로소 처리
+
+※ 같은 파일을 여러 번 읽는 작업을 동기 메소드로
+
+```js
+const fs = require("fs");
+
+let data = fs.readFileSync("./readme.txt");
+console.log("1번", data.toString());
+data = fs.readFileSync("./readme.txt");
+console.log("2번", data.toString());
+data = fs.readFileSync("./readme.txt");
+console.log("3번", data.toString());
+```
+
+- `readFileSync` 메소드를 사용하면 코드를 순서대로, 동기적으로 처리
+- 하지만 그만큼 백그라운드 작업이 길어질 동안 메인 쓰레드가 아무 것도 하지 못하게 되어버림
+- 백그라운드는 fs 작업을 동시에 처리할 수 있는데 `Sync` 메소드를 사용하면 동시 처리도 안됨
+- `writeFileSync`도 있지만 마찬가지의 이유로 거의 사용되지 않음
+- 프로그램 처음 실행 시 초기화 용도로만 사용하기를 권장
+- 비동기 방식으로도 순서대로 실행하고 싶다면
+  - 콜백 지옥을 만들어서 구현 가능
+  - Promise나 async/await으로도 구현 가능
+
+※ 같은 파일을 여러 번 읽는 작업을 Promise로
+
+```js
+const fs = require("fs").promises;
+
+fs.readFile("./readme.txt")
+  .then((data) => {
+    console.log("1번", data.toString());
+    return fs.readFile("./readme.txt");
+  })
+  .then((data) => {
+    console.log("2번", data.toString());
+    return fs.readFile("./readme.txt");
+  })
+  .then((data) => {
+    console.log("3번", data.toString());
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+※ 같은 파일을 여러 번 읽는 작업을 async/await으로
+
+```js
+const fs = require("fs").promises;
+
+async function main() {
+  let data = await fs.readFile("./readme.txt");
+  console.log("1번", data.toString());
+  data = await fs.readFile("./readme.txt");
+  console.log("2번", data.toString());
+  data = await fs.readFile("./readme.txt");
+  console.log("3번", data.toString());
+}
+
+main();
+```
+
+<br>
+
+### Buffer와 Stream
+
+- 파일을 읽거나 쓰는 방식은 크게 Buffer와 Stream 2가지
+- Buffer : 일정한 크기로 모아두는 데이터
+  - 일정한 크기가 되면 한번에 처리
+  - 버퍼링 : 버퍼에 데이터를 채울 때까지 모으는 작업
+- Stream : 데이터의 흐름
+  - 일정한 크기로 나눠서 여러 번에 걸쳐서 처리
+  - 버퍼 또는 청크의 크기를 작게 만들어서 주기적으로 데이터 전달
+  - 스트리밍 : 일정한 크기의 데이터를 지속적으로 전달하는 작업
+- 대부분의 경우 스트림이 효율적
+  - 서버의 메모리를 적게 차지하면서 데이터를 보낼 수 있음
+
+**Buffer 객체의 메소드**
+
+- `from(str)` : 문자열을 버퍼로, length 속성으로 버퍼의 크기 조회 가능 (byte 단위)
+- `toString(buffer)` : 버퍼를 문자열로, base64나 hex 인수를 함께 넣어서 인코딩 가능
+- `concat(arr)` : 배열 안의 버퍼들을 하나로 합침
+- `alloc(byte)` : byte 크기의 빈 버퍼 생성
+
+**Stream**
+
+※ Stream으로 파일 읽기
+
+```js
+const fs = require("fs");
+
+const readStream = fs.createReadStream("./readme.txt", { highWaterMark: 16 });
+const data = [];
+
+readStream.on("data", (chunk) => {
+  data.push(chunk);
+  console.log("data: ", chunk, chunk.length);
+});
+
+readStream.on("end", () => {
+  console.log("end: ", Buffer.concat(data).toString());
+});
+
+readStream.on("error", (err) => {
+  console.log("error: ", err);
+});
+```
+
+- `highWaterMark`는 버퍼 크기를 byte 단위로 지정
+  - 지정하지 않으면 기본값 64KB
+- `createReadStream`은 event listener와 함께 사용
+  - 보통 `data` `end` `error` 사용
+
+※ Stream으로 파일 쓰기
+
+```js
+const fs = require("fs");
+
+const writeStream = fs.createWriteStream("./writeme.txt");
+writeStream.on("finish", () => {
+  console.log("파일 쓰기 완료");
+});
+
+writeStream.write("글 작성");
+writeStream.end();
+```
+
+- `createWriteStream`의 첫번째 인수는 출력 파일명
+- 마찬가지로 event listener 사용
+  - `finish`는 파일 쓰기가 종료될 때 사용되는 콜백 함수 지정
+
+※ 파일을 읽은 스트림을 전달받아 스트림으로 파일 쓰기 (파이핑)
+
+```js
+const fs = require("fs");
+
+const readStream = fs.createReadStream("readme.txt");
+const writeStream = fs.createWriteStream("writeme.txt");
+readStream.pipe(writeStream);
+```
+
+- `pipe` 메소드 하나로 이벤트 처리도 없이 전달할 수 있어서 편리
+- 그러나 노드 8.5 버전 이후에는 새로운 파일 복사 방식 사용 (다음 내용에)
+
+※ gzip 압축 예제
+
+```js
+const zlib = require("zlib");
+const fs = require("fs");
+
+const readStream = fs.createReadStream("./readme.txt");
+const zlibStream = zlib.createGzip();
+const writeStream = fs.createWriteStream("./readme.txt.gz");
+readStream.pipe(zlibStream).pipe(writeStream);
+```
+
+- zlib의 `createGzip` 메소드는 스트림 지원
+- `readStream`과 `writeStream` 중간에 파이핑을 해서 데이터를 압축 및 전달
+
+<br>
+
+### 기타 fs 메소드들
+
+- `fs.access(path, opt, callback)` : 폴더 및 파일에 접근할 수 있는지 여부
+- `fs.mkdir(path, callback)` : 폴더 만들기, 이미 폴더가 있다면 에러 발생
+- `fs.open(path, opt, callback)` : 파일의 ID를 가져옴, 파일이 없다면 파일 생성 후 그 ID를 가져옴
+- `fs.rename(origin-path, new-path, callback)` : 파일 이름 변경
+- `fs.readdir(path, callback)` : 폴더 안 확인
+- `fs.unlink(path, callback)` : 파일 삭제, 파일이 없다면 에러 발생
+- `fs.rmdir(path, callback)` : 폴더 삭제, 폴더 안에 파일이 있어도 에러 발생
+- `fs.copyFile(origin, copied)` : 파일 복사
+- `fs.watch(path, callback)` : 파일에 대한 이벤트 감지
+
+<br>
+<br>
+
+## Event
+
+- Stream 같은 모듈 내부의 이벤트 말고도, 개발자가 직접 이벤트를 만들 수도 있음
+
+```js
+const EventEmitter = require("events");
+
+const myEvent = new EventEmitter();
+const listener1 = () => {
+  console.log("Event 1");
+};
+myEvent.addListener("event1", listener1);
+myEvent.on("event2", () => {
+  console.log("Event 2");
+});
+myEvent.once("event3", () => {
+  console.log("Event 3");
+});
+myEvent.emit("event1");
+myEvent.emit("event2");
+myEvent.emit("event3");
+myEvent.removeAllListeners("event2");
+console.log(myEvent.listenerCount("event1"));
+myEvent.removeListener("event1", listener1);
+```
+
+- `events` 모듈 사용
+- `on(name, callback)` : 이벤트 이름과 이벤트 발생 시의 콜백 연결, 하나의 이벤트명에 여러 이벤트 할당 가능
+- `addListener(name, callback)` : `on`과 기능이 같음
+- `emit(name)` : 이벤트 호출 메소드
+- `once(name, callback)` : 한번만 실행되는 이벤트
+- `removeAllListeners(name)` : 이벤트에 연결된 모든 이벤트 리스너 제거
+- `removeListener(name, listener)` : 이벤트에 연결된 리스너 제거
+- `off(name, callback)` : `removeListener`와 기능이 같음
+- `listenerCount` : 현재 연결된 리스너 개수
