@@ -202,3 +202,138 @@ app.use(bodyParser.text());
 - cookie-parser는 쿠키 생성에 쓰이진 않음
   - 쿠키 생성/제거를 위해서는 `res.cookie` `res.clearCookie` 사용
   - 쿠키 삭제 시 키와 값 외에도 옵션도 정확히 일치해야 삭제 가능
+
+<br>
+
+### express-session
+
+- 세션 관리용 미들웨어
+- 로그인 등을 세션으로 구현하거나 특정 사용자의 데이터를 임시로 저장할 때 유용
+- 세션은 사용자별로 `req.session` 객체 안에 유지
+
+```js
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+    name: "session-cookie",
+  })
+);
+```
+
+**매개인수 살펴보기**
+
+- `resave` : 요청이 올 때 세션에 수정사항이 생기지 않더라도 세션을 다시 저장할 것인지
+- `saveUninitialized` : 세션에 저장할 내역이 없더라도 처음부터 세션을 생성할 것인지
+- `secret` : 세션 쿠키 방식이기 때문에 쿠키를 서명할 값 지정, cookie-parser의 것과 동일하게 하는 것이 좋음
+- `cookie` : 세션 쿠키 설정
+- `name` : 세션 쿠키의 이름, 기본값은 `connect.sid`
+
+<br>
+
+**세션 조작하기**
+
+- `req.session` 객체의 값을 수정해서 세션 변경 가능
+- `req.session.destroy` : 세션 전체 삭제
+- `req.sessionID` : 현재 세션 ID
+
+<br>
+
+### 미들웨어 특성
+
+- 미들웨어는 `req` `res` `next`를 매개변수로 가지는 함수
+- 에러 처리 미들웨어만 예외적으로 `err` `req` `res` `next`
+- 미들웨어를 장착할 때는 `app.use` `app.get` `app.post` 등으로 장착
+- 특정 URL에 대한 미들웨어로 만드려면 첫 번째 인수로 URL을 넣을 것
+- 동시에 여러 개의 미들웨어 장착 가능하며, 다음 미들웨어로 넘어가려면 `next` 호출
+- 미들웨어 모듈들은 대부분 `next`가 내장되어서 생략 가능
+- `next`를 호출하지 않는 미들웨어는 `res.send` `res.sendFile` 등의 메소드로 응답을 보내야 함
+- 미들웨어 장착 순서에 따라 어떤 미들웨어는 작동하지 않을 수도 있음!
+- 만약 `next`도 호출하지 않고 응답도 보내지 않으면 클라이언트는 하염없이 기다리게 됨
+- `next`에는 인수를 넣을 수 있으며, 넣게 되면 특수한 동작 수행
+  - `"route"` : 다음 라우터의 미들웨어로 바로 이동
+  - 그 밖의 인수 : 에러 처리 미들웨어로 이동, 인수는 에러 처리 미들웨어의 `err` 매개변수가 됨
+- `req.data` : 미들웨어 간 데이터를 전달하는 방법
+  - 요청이 끝날 때까지만 유지
+  - 새로운 요청이 오면 초기화
+  - 속성명이 꼭 `data`일 필요는 없지만 다른 미들웨어와 겹치지 않도록 조심해야 함
+    - 예를 들어 `req.body`는 body-parser 미들웨어와 겹침
+- `app.set`은 익스프레스에서 전역적으로 사용되므로 사용자 개개인의 값을 넣지 말 것
+
+※ 미들웨어 안에 미들웨어 넣기
+
+```js
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    morgan("combined")(req, res, next);
+  } else {
+    morgan("dev")(req, res, next);
+  }
+});
+```
+
+- 기존 미들웨어의 기능 확장 가능
+- 환경별로 분기 처리 가능
+
+<br>
+
+### multer
+
+- multipart 형식으로 파일 업로드할 때 사용하는 미들웨어
+- enctype이 `multipart/form-data`인 form을 통해 업로드하는 데이터 형식
+- multer 패키지 안에 여러 종류의 미들웨어가 있음
+
+```js
+const multer = require("multer");
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, "uploads/");
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname);
+      done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+```
+
+- `storage` : 어떤 destination에 어떤 filename으로 저장할지
+- `destination` `filename` : `req` 요청 정보 / `file` 업로드한 파일 정보 / `done` 처리할 함수
+  - `done` : 첫 번째 인자는 에러, 두 번째 인수는 실제 경로나 파일 이름
+- 위 코드에서는 `[파일명 + 현재시간.확장자]` 형식으로 업로드
+- `limits` : 업로드에 대한 제한 사항 설정
+- 위 코드를 실제로 활용하려면 서버에 uploads 폴더가 반드시 존재해야 함
+
+```js
+app.post("/upload", upload.single("image"), (req, res) => {
+  console.log(req.file, req.body);
+  res.send("ok");
+});
+```
+
+- 파일을 하나만 업로드할 경우 **single** 미들웨어 사용
+- 파일 여러 개를 업로드한다면 `upload.array("many")`로 변경해야 함
+  - 파일이 여러 개면 결과도 `req.file` 대신 `req.files` 배열에 들어있음
+- 파일이 여러 개이면서, form data의 키가 다른 경우에는 **fields** 미들웨어를 사용해야 함
+- 업로드 결과 또한 `req.files.image1` `req.files.image2`에 각각 담기게 됨
+
+```js
+app.post(
+  "/upload",
+  upload.fields([{ name: "image1" }, { name: "image2" }]),
+  (req, res) => {
+    console.log(req.files, req.body);
+  }
+);
+```
+
+- 특수한 경우 multipart 형식임에도 파일은 업로드하지 않는 경우가 있는데, 이럴 때는 **none** 미들웨어 사용
+  - 이럴 때는 `req.file`이 없고 `req.body`만 있게 됨
