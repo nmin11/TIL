@@ -351,3 +351,68 @@ app.post(
 
 - 특수한 경우 multipart 형식임에도 파일은 업로드하지 않는 경우가 있는데, 이럴 때는 **none** 미들웨어 사용
   - 이럴 때는 `req.file`이 없고 `req.body`만 있게 됨
+
+<br>
+<br>
+
+## Router 객체로 라우팅 분리
+
+- app.js에서 라우터를 많이 연결하면 app.js 코드가 매우 길어지므로 익스프레스는 라우터 분리 방법 제공
+
+※ 예제 코드 : [routes/index.js](https://github.com/nmin11/Node.js-masterbook/blob/main/express/use_middleware/routes/index.js) [routes/user.js](https://github.com/nmin11/Node.js-masterbook/blob/main/express/use_middleware/routes/user.js)
+
+```js
+const indexRouter = require("./routes");
+const userRouter = require("./routes/user");
+
+app.use("/", indexRouter);
+app.use("/user", userRouter);
+```
+
+- `indexRouter`를 `./routes`로 require할 수 있는 이유는 `index.js`가 생략 가능하기 때문
+- `app.use`로 주소를 연결할 경우 두 주소가 합쳐짐
+
+**next("route")**
+
+```js
+router.get(
+  "/",
+  function (req, res, next) {
+    next("route");
+  },
+  function (req, res, next) {
+    console.log("not executed");
+    next();
+  }
+);
+router.get("/", function (req, res) {
+  console.log("executed");
+  res.send("Hello!");
+});
+```
+
+- `next("route")`를 사용하면 다음 `next()`들은 무시되고, 주소와 일치하는 다음 라우터로 감
+
+**404 응답 미들웨어**
+
+```js
+app.use((req, res, next) => {
+  res.status(404).send("Not found");
+});
+```
+
+- 일치하는 라우터가 없을 때 404 상태 코드를 응답하는 역할
+- 익스프레스가 자제적으로 404 에러로 처리해주기는 하지만 그래도 연결해주는 것이 좋음
+
+**같은 url 다른 http 메소드에 대한 처리**
+
+```js
+router
+  .route("/abc")
+  .get((req, res) => {
+    res.send("GET /abc");
+  })
+  .post((req, res) => {
+    res.send("POST /abc");
+  });
+```
