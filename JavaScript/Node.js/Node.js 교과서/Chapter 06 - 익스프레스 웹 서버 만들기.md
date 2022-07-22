@@ -416,3 +416,122 @@ router
     res.send("POST /abc");
   });
 ```
+
+<br>
+<br>
+
+## req & res
+
+- 익스프레스의 `req` `res`는 http 모듈의 `req` `res`를 확장한 것
+  - http 모듈의 메소드는 물론, 확장된 메소드나 속성도 자유롭게 사용 가능
+  - 다만 익스프레스의 것이 워낙 편리하기 때문에 http 모듈의 것은 잘 사용되지 않음
+
+<br>
+
+### req 객체
+
+- `req.app` : req 객체를 통해 app 객체에 접근, `req.app.get("port")` 방식
+- `req.body` : body-parser 미들웨어가 만드는 요청의 본문을 해석한 객체
+- `req.cookies` : cookie-parser 미들웨어가 만드는 요청의 쿠키를 해석한 객체
+- `req.ip` : 요청의 ip 주소
+- `req.params` : 라우트 매개변수에 대한 정보가 담긴 객체
+- `req.query` : querystring에 대한 정보가 담긴 객체
+- `req.signedCookies` : 서명된 쿠키들이 담긴 객체, 일반 객체는 `req.cookies`에 담김!
+- `req.get(header)` : 헤더의 값을 가져오는 메소드
+
+<br>
+
+### res 객체
+
+- `res.app` : res 객체를 통해 app 객체에 접근
+- `res.cookie(key, val, opt)` : 쿠키 설정 메소드
+- `res.clearCookie(key, val, opt)` : 쿠키 제거 메소드
+- `res.end()` : 데이터 없이 응답 전송
+- `res.JSON(JSON)` : JSON 형식의 응답 전송
+- `res.redirect(url)` : 리다이렉트할 주소와 함께 응답 전송
+- `res.render(view, data)` : 템플릿 엔진을 렌더링해서 응답할 때 사용
+- `res.send(data)` : 데이터와 함께 응답 전송
+- `res.sendFile(path)` : 경로에 위치한 파일로 응답 전송
+- `res.set(header, val)` : 응답의 헤더 설정
+- `res.status(code)` : 응답의 HTTP 상태 코드 지정
+
+<br>
+<br>
+
+## template engine
+
+### Pug (Jade)
+
+- 문법이 간단하지만 HTML과는 문법이 달라서 호불호가 갈림
+- 세팅 방법 : `npm i pug`로 설치 후, app.js에 다음 코드를 삽입해야 함
+
+```js
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
+```
+
+- `views` : 템플릿 파일들이 위치한 폴더
+  - `res.render` 메소드는 이 폴더를 기준으로 템플릿 엔진을 찾아서 렌더링
+  - `res.render("index")`라면 `views/index.pug`를 찾게 됨
+- `view engine` : 사용할 템플릿 종류 지정
+
+**문법**
+
+※ [pug 및 nunjucks 예제 코드들](https://github.com/nmin11/Node.js-masterbook/tree/main/express/use_middleware/views)
+
+- 탭 또는 스페이스로만 태그의 부모·자식 관계 규명
+- 태그명을 적고 한 칸 띄워서 내용 입력
+  - div 태그는 태그명 생략 가능
+- 태그의 id는 `#`으로, class는 `.`으로 표현
+- 텍스트 여러 줄을 한 줄에 입력하고 싶다면 `|` 입력
+- `style.` `script.`으로 스타일 및 스크립트 적용 가능
+
+```js
+router.get("/", function (req, res, next) {
+  res.locals.title = "Express";
+  res.render("index");
+});
+```
+
+- `res.locals` 객체를 사용해서 렌더링하기 전에 변수를 넣어줄 수 있음
+  - 변수는 현재 라우터뿐만 아니라 다른 미들웨어에서도 접근 가능!
+- 서버로부터 받은 변수는 `[tag]=[var]` 형식으로 간단히 연결할 수 있음
+  - 텍스트 중간에 변수를 넣고 싶다면 `#{val}` 템플릿 사용
+- 내부에서 직접 변수를 선언할 때는 `-` 사용
+  - `- const node = "Node.js"`
+- `=`을 사용하면 HTML 양식을 사용해도 HTML과 관련 없는 문자열처럼 보이게 해줌
+  - 이를 원치 않는다면 `!=` 사용
+- `extends`와 `block` 기능을 사용해서 여러 파일을 합쳐서 하나의 파일로 렌더링 가능
+
+<br>
+
+### Nunjucks
+
+※ app.js 세팅 코드
+
+```js
+const nunjucks = require("nunjucks");
+
+nunjucks.configure("views", {
+  express: app,
+  watch: true,
+});
+app.set("view engine", "html");
+```
+
+- `configure`의 첫 번째 인수로 `views` 폴더 경로를 두 번째 인수로 옵션을 넣음
+- 확장자는 html 그대로 사용 가능
+  - `njk`로 사용하려면 `view engine`도 `njk`로 변경
+
+**문법**
+
+※ [pug 및 nunjucks 예제 코드들](https://github.com/nmin11/Node.js-masterbook/tree/main/express/use_middleware/views)
+
+- 변수는 `{{ }}`로 감쌈
+- 내부 변수 선언 : `{% set var = "val" %}`
+- escape : `{{ var | safe }}`
+- 반복문이나 조건문도 모두 `{% %}` 안에서 처리
+  - 조건문의 끝에 `{% endif %}` 반복문의 끝에 `{% endfor %}` 필요
+- include : `{% include "file.html" %}`
+- extends : `{% extends "file.html" %}`
+- block : `{% block content %}` 방식으로 열고, `{% endblock %}` 형식으로 닫음
