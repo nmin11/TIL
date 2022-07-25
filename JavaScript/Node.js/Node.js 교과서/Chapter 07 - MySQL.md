@@ -44,6 +44,8 @@ npm i express morgan mustache sequelize sequelize-cli mysql2
 
 ### MySQL 연결하기
 
+※ models/index.js
+
 ```js
 const Sequelize = require("sequelize");
 const env = process.env.NODE_ENV || "development";
