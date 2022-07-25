@@ -122,6 +122,8 @@ module.exports = db;
 |    UNIQUE     |        unique: true         |
 | DEFAULT now() | defaultValue: Sequelize.NOW |
 
+※ MySQL의 `DATE`을 사용하고 싶다면 Sequelize에서 `DATEONLY`를 사용해야 함
+
 **super.init 두 번째 인자 - 테이블 옵션**
 
 - sequelize : `static init` 메소드의 매개변수와 연결
@@ -130,4 +132,5 @@ module.exports = db;
 - modelName : 모델 이름 설정 / 노드에서 사용됨
 - tableName : 실제 DB의 테이블 이름 / 기본적으로는 소문자 및 복수형으로 만듦
 - paranoid : true일 경우 deletedAt 컬럼 추가 / 나중에 row를 복원하기 위한 용도
+  - soft delete 라고도 불림
 - charset / collate : 한글을 입력하기 위해 각각 utf8 / utf8_general_ci 설정
