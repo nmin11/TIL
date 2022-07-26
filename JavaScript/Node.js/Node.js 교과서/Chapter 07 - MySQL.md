@@ -153,7 +153,7 @@ static associate(db) {
 
 ```js
 static associate(db) {
-  db.Comment.belongsTo(db.User, { foreignKey: "commenter", sourceKey: "id" });
+  db.Comment.belongsTo(db.User, { foreignKey: "commenter", targetKey: "id" });
 }
 ```
 
