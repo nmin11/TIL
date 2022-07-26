@@ -134,3 +134,45 @@ module.exports = db;
 - paranoid : true일 경우 deletedAt 컬럼 추가 / 나중에 row를 복원하기 위한 용도
   - soft delete 라고도 불림
 - charset / collate : 한글을 입력하기 위해 각각 utf8 / utf8_general_ci 설정
+
+<br>
+
+### 관계 정의하기
+
+**1:N**
+
+- Sequelize에서는 `hasMany` 메소드와 `belongsTo` 표현
+- 1 쪽에서 `hasMany` / N 쪽에서 `belongsTo`
+- 다른 모델의 정보가 들어가는 테이블에 `belongsTo`를 사용한다고 생각하면 편함
+
+```js
+static associate(db) {
+  db.User.hasMany(db.Comment, { foreignKey: "commenter", sourceKey: "id" });
+}
+```
+
+```js
+static associate(db) {
+  db.Comment.belongsTo(db.User, { foreignKey: "commenter", sourceKey: "id" });
+}
+```
+
+**1:1**
+
+- `hasOne` 메소드 사용
+
+```js
+db.User.hasOne(db.Info, { foreignKey: "UserId", sourceKey: "id" });
+db.Info.belongsTo(db.User, { foreignKey: "UserId", sourceKey: "id" });
+```
+
+**N:M**
+
+- `belongsToMany` 메소드 사용
+
+```js
+db.Post.belongsToMany(db.Hashtag, { through: "PostHashtag" });
+db.Hashtag.belongsToMany(db.Post, { through: "PostHashtag" });
+```
+
+- `through` 속성에 있는 이름대로 새로 생성된 `PostHashtag` 모델 생성
