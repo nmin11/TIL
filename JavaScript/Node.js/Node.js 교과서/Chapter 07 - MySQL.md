@@ -163,7 +163,7 @@ static associate(db) {
 
 ```js
 db.User.hasOne(db.Info, { foreignKey: "UserId", sourceKey: "id" });
-db.Info.belongsTo(db.User, { foreignKey: "UserId", sourceKey: "id" });
+db.Info.belongsTo(db.User, { foreignKey: "UserId", targetKey: "id" });
 ```
 
 **N:M**
