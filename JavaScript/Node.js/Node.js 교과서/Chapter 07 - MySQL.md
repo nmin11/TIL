@@ -176,3 +176,130 @@ db.Hashtag.belongsToMany(db.Post, { through: "PostHashtag" });
 ```
 
 - `through` 속성에 있는 이름대로 새로 생성된 `PostHashtag` 모델 생성
+
+<br>
+
+### Sequelize 쿼리
+
+- Promise나 async/await과 함께 사용 가능
+
+※ 삽입 예제
+
+```js
+const { User } = require("../models");
+User.create({
+  name: "zero",
+  age: 24,
+  married: false,
+  comment: "introduce myself",
+});
+```
+
+※ 전체 조회 예제
+
+```js
+User.findAll({});
+```
+
+※ 조건별 조회 예제
+
+```js
+User.findOne({});
+```
+
+```js
+User.findAll({
+  attributes: ["name", "married"],
+});
+```
+
+```js
+const { Op } = require("sequelize");
+const { User } = require("../models");
+User.findAll({
+  attributes: ["id", "name"],
+  where: {
+    [Op.or]: [{ married: false }, { age: { [Op.ge]: 30 } }],
+  },
+});
+```
+
+```js
+User.findAll({
+  attributes: ["id", "name"],
+  order: ["age", "DESC"],
+  limit: 1,
+  offset: 1,
+});
+```
+
+- findOne 대신 `limit: 1` 사용 가능
+
+※ 수정 예제
+
+```js
+User.update(
+  {
+    comment: "updated content",
+  },
+  {
+    where: { id: 2 },
+  }
+);
+```
+
+※ 삭제 예제
+
+```js
+User.destroy({
+  where: { id: 2 },
+});
+```
+
+※ 값을 변수에 담을 때는?
+
+```js
+const user = await User.findOne({});
+console.log(user.nickname);
+```
+
+※ JOIN해서 값을 가져오자!
+
+```js
+const user = await User.findOne({
+  include: [
+    {
+      model: Comment,
+    },
+  ],
+});
+const comments = await user.getComments();
+console.log(comments);
+```
+
+- 어떤 모델과 관계가 있는지 `include` 배열에 넣을 것
+- 관계가 설정된 이후에는 `getComments`(조회) `setComments`(수정)<br>`addComment`(단일 생성) `addComments`(복수 생성) `removeComments`(삭제) 메소드 지원
+
+※ 단일 생성 예제
+
+```js
+const user = await User.findOne({});
+const comment = await Comment.create();
+await user.addComment(comment);
+```
+
+※ 복수 생성 예제
+
+```js
+const user = await User.findOne({});
+const comment1 = await Comment.create();
+const comment2 = await Comment.create();
+await user.addComment([comment1, comment2]);
+```
+
+※ SQL 직접 사용
+
+```js
+const [result, metadata] = await sequelize.query("SELECT * FROM comments");
+console.log(result);
+```
