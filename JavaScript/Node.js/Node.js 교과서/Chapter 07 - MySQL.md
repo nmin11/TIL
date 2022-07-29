@@ -144,6 +144,7 @@ module.exports = db;
 - Sequelize에서는 `hasMany` 메소드와 `belongsTo` 표현
 - 1 쪽에서 `hasMany` / N 쪽에서 `belongsTo`
 - 다른 모델의 정보가 들어가는 테이블에 `belongsTo`를 사용한다고 생각하면 편함
+  - A belongs to B : A는 B에 속해 있다
 
 ```js
 static associate(db) {
@@ -209,9 +210,12 @@ User.findOne({});
 
 ```js
 User.findAll({
-  attributes: ["name", "married"],
+  attributes: ["id", "name"],
+  order: [["age", "DESC"]],
 });
 ```
+
+- `order` 값으로 2차원 배열을 사용하는 이유는 정렬 조건을 여러 개 사용할 수도 있기 때문
 
 ```js
 const { Op } = require("sequelize");
@@ -296,6 +300,8 @@ const comment1 = await Comment.create();
 const comment2 = await Comment.create();
 await user.addComment([comment1, comment2]);
 ```
+
+- 아이템이 먼저 떨어지고, 유저가 그것을 주웠을 때 해당 유저의 소유가 된다고 생각하면 편함
 
 ※ SQL 직접 사용
 
