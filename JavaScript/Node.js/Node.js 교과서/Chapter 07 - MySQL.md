@@ -309,3 +309,26 @@ await user.addComment([comment1, comment2]);
 const [result, metadata] = await sequelize.query("SELECT * FROM comments");
 console.log(result);
 ```
+
+<br>
+
+### query 수행
+
+※ [views/sequelize.html](https://github.com/ZeroCho/nodejs-book/blob/master/ch7/7.6/learn-sequelize/views/sequelize.html)
+
+※ [views/error.html](https://github.com/ZeroCho/nodejs-book/blob/master/ch7/7.6/learn-sequelize/views/error.html)
+
+※ [public/sequelize.js](https://github.com/ZeroCho/nodejs-book/blob/master/ch7/7.6/learn-sequelize/public/sequelize.js)
+
+※ [routes/index.js](https://github.com/ZeroCho/nodejs-book/blob/master/ch7/7.6/learn-sequelize/routes/index.js)
+
+- `User.findAll` 메소드로 모든 사용자를 조회하고 sequelize.html을 렌더링할 때 그 값을 넣어줌
+
+※ [routes/users.js](https://github.com/ZeroCho/nodejs-book/blob/master/ch7/7.6/learn-sequelize/routes/users.js)
+
+- `router.route` 메소드를 사용하면 같은 라우트 경로를 하나로 묶을 수 있음
+  - `router.get` `router.post`를 따로 나눌 필요가 없다는 뜻
+  - app.use에서 연결된 라우터 경로에 연결해서 새로운 라우터 설정
+- GET 요청 - index.js와는 다르게 JSON 방식으로 응답
+
+※ [routes/comments.js](https://github.com/ZeroCho/nodejs-book/blob/master/ch7/7.6/learn-sequelize/routes/comments.js)
