@@ -11,3 +11,10 @@
   - 이 중에서도 `ObjectId` `Binary Data` `Timestamp` 외에는 잘 사용되지 않음
   - `ObjectId`는 primary key와 비슷한 역할
 - `Undefined` `Symbol`은 사용되지 않음!
+
+## Mongoose 사용하기
+
+- ODM(Object Document Mapping)
+- 몽고디비 자체가 JS임에도 불구하고 몽고디비의 불편한 기능들이 있기에 몽구스가 있는 것!
+  - 대표적으로 몽구스에서는 **schema**를 도입해서 실수를 줄여줌
+- ES2015 프로미스 문법과 강력하고 가독성이 높은 쿼리 빌더 지원
