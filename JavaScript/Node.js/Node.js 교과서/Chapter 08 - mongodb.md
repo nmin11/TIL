@@ -12,9 +12,15 @@
   - `ObjectId`는 primary key와 비슷한 역할
 - `Undefined` `Symbol`은 사용되지 않음!
 
+※ MySQL에서는 `offset`을 사용했지만 MongoDB는 `skip`을 써야 함!
+
 ## Mongoose 사용하기
 
 - ODM(Object Document Mapping)
+- 드라이버도 내장되어 있음
 - 몽고디비 자체가 JS임에도 불구하고 몽고디비의 불편한 기능들이 있기에 몽구스가 있는 것!
   - 대표적으로 몽구스에서는 **schema**를 도입해서 실수를 줄여줌
+  - JOIN 기능 추가
 - ES2015 프로미스 문법과 강력하고 가독성이 높은 쿼리 빌더 지원
+- 몽구스는 `_id`를 기본 키로 생성하므로 스키마 작성 시 명시해줄 필요가 없음
+- `String` `Number` `Date` `Buffer` `Boolean` `Mixed` `ObjectId` `Array`를 값으로 가질 수 있음
