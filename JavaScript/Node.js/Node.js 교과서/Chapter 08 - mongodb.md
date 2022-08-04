@@ -24,3 +24,7 @@
 - ES2015 프로미스 문법과 강력하고 가독성이 높은 쿼리 빌더 지원
 - 몽구스는 `_id`를 기본 키로 생성하므로 스키마 작성 시 명시해줄 필요가 없음
 - `String` `Number` `Date` `Buffer` `Boolean` `Mixed` `ObjectId` `Array`를 값으로 가질 수 있음
+
+※ Mongoose template
+
+- https://github.com/nmin11/Node.js-masterbook/tree/main/mongo
