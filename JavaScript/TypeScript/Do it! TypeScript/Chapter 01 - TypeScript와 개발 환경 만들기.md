@@ -127,3 +127,61 @@ get().then((values) => console.log(values));
 
 - `Promise` : 웹 브라우저와 Node.js에서 제공하는 기본 타입, 비동기 콜백 함수를 비교적 쉽게 구현
 - `async/await` : 여러 개의 Promise 호출을 더욱 간결하게 구현
+
+<br>
+
+### TypeScript 고유 문법
+
+**type annotation & type inference**
+
+```ts
+let n: number = 1;
+let m = 2;
+```
+
+- `:`과 함께 타입 이름을 붙이면 '타입 주석'
+- 타입을 생략하고 우항의 값을 분석해서 변수의 타입을 결정하면 '타입 추론'
+- 타입 추론은 JS 코드와의 호환성을 보장하는 데 큰 역할을 해줌
+
+**interface**
+
+```ts
+interface Person {
+  name: string;
+  age?: number;
+}
+
+let person: Person = { name: "Jane" };
+```
+
+**tuple**
+
+```ts
+let tuple: [boolean, number, string] = [true, 1, "OK"];
+```
+
+- 물리적으로는 배열과 같음
+- 하지만 배열에 저장되는 아이템의 데이터 타입이 각자 다를 수 있으면 튜플
+
+**generic type**
+
+```ts
+class Container<T> {
+  constructor(public value: T) {}
+}
+let numberContainer: Container<number> = new Container<number>(1);
+let stringContainer: Container<string> = new Conatainer<string>("Hello World");
+```
+
+- 제네릭 타입은 다양한 타입을 한꺼번에 취급할 수 있게 해줌
+
+**대수 타입**
+
+```ts
+type NumberOrString = number | string;
+type AnimalAndPerson = Animal & Person;
+```
+
+- ADT는 추상 데이터 타입(abstract data type)을 의미하기도, 대수 타입(algebraic data type)을 의미하기도 함
+- 대수 타입은 여러 자료형의 값을 가질 수 있음
+- 합집합 타입과 교집합 타입이 있으며, 각각 `|`와 `&`로 표시
