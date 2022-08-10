@@ -1,0 +1,79 @@
+## 1. TypeScript 변수 선언문
+
+### TypeScript 기본 제공 타입
+
+number / boolean / string / object
+
+<br>
+
+### let & const
+
+- var는 ESNext에서 deprecated
+- let은 mutable, const는 immutable
+  - const 변수 선언 시 초기값이 꼭 필요함
+
+<br>
+
+### type annotation
+
+- 변수 선언문을 확장해서 타입 명시 가능
+
+```ts
+let n: number = 1;
+let b: boolean = true;
+let s: string = "hello";
+let o: object = {};
+```
+
+<br>
+
+### type inference
+
+- JS와의 호환성을 위해 타입 주석 생략 가능
+- 생략할 경우, 우항의 값에 따라 타입을 추론
+
+```ts
+let n = 1;
+let b = true;
+let s = "hello";
+let o = {};
+```
+
+<br>
+
+### any 타입
+
+- JS와의 호환을 위해 제공
+- 어떤 종류의 값이라도 저장 가능
+- 모든 타입의 최상위 타입
+
+```ts
+let a: any = 0;
+a = "hello";
+a = true;
+a = {};
+```
+
+<br>
+
+### undefined 타입
+
+- JS에서의 undefined는 값
+- TS에서는 타입이기도 하고 값이기도 함
+- undefined 타입은 undefined 값만 가질 수 있는 최하위 타입
+
+```ts
+let u: undefined = undefined;
+```
+
+<br>
+
+### template string
+
+- 변수에 담긴 값을 조합해서 문자열을 만드는 방법
+
+```ts
+let count = 10,
+  message = "Your count";
+let result = `${message} is ${count}`;
+```
