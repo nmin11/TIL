@@ -77,3 +77,62 @@ let count = 10,
   message = "Your count";
 let result = `${message} is ${count}`;
 ```
+
+<br>
+<br>
+
+## 2. 객체와 인터페이스
+
+**object 타입**
+
+- 클래스와 인터페이스의 상위 타입
+- object 타입으로 선언된 변수는 number, boolean, string 타입의 값을 가질 수 없음
+- 속성 이름이 다른 객체를 모두 자유롭게 담을 수 있음
+- 마치 객체를 대상으로 하는 any 타입과도 같음
+
+```ts
+let o: object = { name: "Loko", age: 28 };
+```
+
+<br>
+
+### 인터페이스 선언문
+
+- interface 타입 : 객체의 타입을 정의할 수 있게 해줌
+- 객체를 의미하는 `{}`를 사용해서 타입들을 나열
+
+```ts
+interface IPerson {
+  name: string;
+  age: number;
+}
+```
+
+<br>
+
+### optional property
+
+- 인터페이스 설계 시 있어도 되고 없어도 되는 속성 지정 가능
+- `?` 기호를 사용해서 표현
+
+```ts
+interface IPerson {
+  name: string;
+  age: number;
+  etc?: boolean;
+}
+```
+
+<br>
+
+### anonymous interface
+
+- interface 키워드 및 이름도 없이 인터페이스를 만들 수 있음
+
+```ts
+let ai: {
+  name: string;
+  age: number;
+  etc?: boolean;
+} = { name: "Loko", age: 28 };
+```
