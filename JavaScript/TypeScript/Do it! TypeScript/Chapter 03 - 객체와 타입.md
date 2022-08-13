@@ -302,3 +302,23 @@ let part1 = { name: "Jane" },
   part3 = { city: "Seoul", country: "Kr" };
 let merged = { ...part1, ...part2, ...part3 };
 ```
+
+<br>
+
+## 5. 객체의 타입 변환
+
+### type conversion
+
+```ts
+let person: object = { name: "Jack", age: 32 };
+let name = (<{ name: string }>person).name;
+```
+
+<br>
+
+### type assertion
+
+- 타입 단언문에는 2가지 형태가 있음
+  - `(<type>obj)`
+  - `(obj as type)`
+- JS의 타입 변환 구문과 구분하기 위해서 타입 단언이라는 용어를 사용
