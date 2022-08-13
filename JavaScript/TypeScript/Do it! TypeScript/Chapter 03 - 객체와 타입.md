@@ -232,3 +232,73 @@ class A {
 
 let initVal = A.initValue;
 ```
+
+<br>
+<br>
+
+## 4. 객체의 비구조화 할당문
+
+- **structuring** : 인터페이스나 클래스를 사용해서 관련된 정보를 묶어 새로운 타입으로 표현하는 것
+
+```ts
+let jack: IPerson = { name: "Jack", age: 28 },
+  jane: IPerson = { name: "Jane", age: 32 };
+
+let apple: ICompany = { name: "Apple Computer Inc", age: 43 },
+  ms: ICompany = { name: "Microsoft", age: 44 };
+```
+
+<br>
+
+### destructuring
+
+- 구조화된 데이터는 어떤 시점에서 데이터의 일부만 사용해야 할 때가 있음
+- 구조화된 데이터를 분해하는 작업을 **destructuring(비구조화)** 라고 함
+
+```ts
+let name = jack.name,
+  age = jack.age;
+```
+
+<br>
+
+### 비구조화 할당
+
+- 배열, 객체, 튜플에 사용 가능
+- 사용법 : 얻고 싶은 속성을 `{}`로 묶음
+
+```ts
+let jack: IPerson = { name: "Jack", age: 32 };
+let { name, age } = jack;
+```
+
+<br>
+
+### rest operator
+
+- `...` 연산자가 사용되는 위치부터 나머지 값들을 한번에 담을 수 있음
+
+```ts
+let address: any = {
+  country: "Korea",
+  city: "Seoul",
+  address1: "Gangnam-gu",
+  address2: "Sinsa-dong 123-456",
+  address3: "789 street, 2 Floor ABC building",
+};
+
+const { country, city, ...detail } = address;
+```
+
+<br>
+
+### spread operator
+
+- 같은 `...` 연산자를 사용하지만 비구조화 할당문이 아닌 경우에는 **전개 연산자** 라고 부름
+
+```ts
+let part1 = { name: "Jane" },
+  part2 = { age: 22 },
+  part3 = { city: "Seoul", country: "Kr" };
+let merged = { ...part1, ...part2, ...part3 };
+```
