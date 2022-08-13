@@ -136,3 +136,99 @@ let ai: {
   etc?: boolean;
 } = { name: "Loko", age: 28 };
 ```
+
+<br>
+<br>
+
+## 3. 객체와 클래스
+
+### 클래스 선언문
+
+class, private, public, protected, implements, extends 키워드 제공
+
+```ts
+class Person {
+  name: string;
+  age?: number;
+}
+```
+
+<br>
+
+### access modifier
+
+- 클래스는 이름 앞에 `public` `private` `protect` 라는 접근 제한자를 붙일 수 있음
+- 생략할 경우 `public` 으로 간주
+
+<br>
+
+### constructor
+
+```ts
+class Person {
+  constructor(public name: string, public age?: number) {}
+}
+```
+
+<br>
+
+### interface
+
+- `implements` 키워드를 사용하여 구현
+- 인터페이스는 규약에 불과하며 물리적으로 해당 속성을 만들지는 않음
+
+```ts
+interface IPerson {
+  name: string;
+  age?: number;
+}
+
+class Person implements IPerson {
+  name: string;
+  age: number;
+}
+```
+
+<br>
+
+### 추상 클래스
+
+- 클래스 키워드 앞에 `abstract` 키워드를 사용해서 추상 클래스를 만들 수 있음
+- 추상 클래스는 자신의 속상이나 메소드 앞에도 `abstract` 키워드를 붙여서 상속받는 클래스에서 구현하도록 함
+
+```ts
+abstract class AbstractPerson {
+  abstract name: string;
+  constructor(public age?: number) {}
+}
+```
+
+<br>
+
+### 클래스 상속
+
+- `extends` 키워드를 사용해서 상속 클래스를 만들 수 있음
+- 자식 클래스는 부모 클래스의 생성자를 `super` 키워드로 호출할 수 있음
+
+```ts
+class Person extends AbstractPerson {
+  constructor(public name: string, age?: number) {
+    super(age);
+  }
+}
+```
+
+<br>
+
+### static 속성
+
+- 클래스는 정적인 속성을 가질 수 있음
+- 클래스의 정적 속성은 `ClassName.staticVar` 형식으로 가져올 수 있음
+
+```ts
+class A {
+  static initValue = 1;
+}
+
+let initVal = A.initValue;
+```
