@@ -102,3 +102,87 @@ function fn(arg1: string, arg2?: number): void {}
 ```ts
 type OptionalArgFunc = (string, number?) => void;
 ```
+
+<br>
+<br>
+
+## 2. 함수 표현식
+
+### 함수는 객체다
+
+- JS는 함수형 언어 sheme과 프로토타입 기반 객체지향 언어 self를 모델로 만들어졌음
+- JS에서 함수는 **Function** 클래스의 instance
+- **function expression** : 함수 선언문에서 이름을 제외한 `function(a, b) { return a + b }`와 같은 코드
+
+<br>
+
+### first-class function
+
+- 프로그래밍 언어가 일등 함수 기능을 제공하면 '함수형 프로그래밍 언어'라고 불림
+- JS와 TS 모두 일등 함수 기능이 존재
+- **일등 함수** : 함수와 변수를 구분하지 않는 것
+
+```ts
+let f = function (a, b) {
+  return a + b;
+};
+f = function (a, b) {
+  return a - b;
+};
+```
+
+<br>
+
+### expression
+
+- 프로그래밍 언어에서 표현식은 literal, 연산자, 변수, 함수 호출 등이 복합적으로 구성된 코드 형태를 의미
+- 표현식은 항상 컴파일러에 의해 계산법이 적용되어 어떤 값이 됨
+
+<br>
+
+### function expression
+
+- 변수에 함수를 대입하는 경우, 대입하는 함수 부분을 함수 표현식이라고 할 수 있음
+
+<br>
+
+### evaluation
+
+- 컴파일러는 표현식을 만나면 계산법을 적용해서 어떤 값을 만듦
+- eager evaluation : 상수를 계산할 때는 즉시 계산
+- lazy evaluation : 참조하는 변수가 있다면 변수값을 알기 위해 지연된 계산
+
+<br>
+
+### function call operator
+
+- 변수가 함수 표현식을 달고 있을 때 변수 이름 뒤에 `()`를 붙여서 호출 가능
+- 함수 호출 : 함수 표현식의 몸통 부분을 실행한다는 뜻
+- 만약 함수가 매개변수를 요구한다면 `()` 안에 필요한 매개변수 명시
+
+```ts
+let functionExpression = function (a, b) {
+  return a + b;
+};
+let value = functionExpression(1, 2);
+```
+
+- 컴파일러는 함수 호출문을 만났을 때 eager evaluation을 적용해서 함수 표현식을 값으로 바꿈
+
+<br>
+
+### anonymous function
+
+- 함수 표현식은 사실 다른 프로그래밍 언어에서 자주 등장하는 익명 함수의 다른 표현
+
+```js
+let value = (function (a, b) {
+  return a + b;
+})(1, 2);
+```
+
+<br>
+
+### const 키워드와 함수 표현식
+
+- 함수 표현식을 담는 변수는 `const`를 사용하여 선언하는 것이 바람직
