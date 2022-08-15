@@ -182,7 +182,28 @@ let value = (function (a, b) {
 ```
 
 <br>
+<br>
 
-### const 키워드와 함수 표현식
+## 3. 화살표 함수와 표현식 문
 
-- 함수 표현식을 담는 변수는 `const`를 사용하여 선언하는 것이 바람직
+- ESNext JS와 TS는 `=>` 기호로 만드는 화살표 함수 제공
+- 화살표 함수의 몸통은 `{}`를 사용하거나 생략할 수 있음
+
+```ts
+const arrow1 = (a: number, b: number): number => {
+  return a + b;
+};
+const arrow2 = (a: number, b: number): number => a + b;
+```
+
+- `{}` 사용 여부에 따라 TS는 **실행문** 방식과 **표현식 문** 방식으로 달라짐
+
+<br>
+
+### 실행문과 표현식 문
+
+- 프로그래밍 언어는 실행문 지향 언어와 표현식 지향 언어로 구분되어 왔음
+- ES5는 실행문 지향이지만 ESNext와 TS는 실행문과 표현식 문을 동시 지원
+  - 이러한 언어를 multi-paradigm language 라고 부름
+- 실행문 : CPU에서 실행되는 코드, return 문이 없다면 결과를 알려주지 않음
+- 표현식 문 : return문이 없어도 결과를 알려줌
