@@ -207,3 +207,82 @@ const arrow2 = (a: number, b: number): number => a + b;
   - 이러한 언어를 multi-paradigm language 라고 부름
 - 실행문 : CPU에서 실행되는 코드, return 문이 없다면 결과를 알려주지 않음
 - 표현식 문 : return문이 없어도 결과를 알려줌
+
+<br>
+
+## 4. 일등 함수 살펴보기
+
+- 매개변수 형태로 동작하는 함수를 **callback function** 이라고 부름
+
+```ts
+export const init = (callback: () => void): void => {
+  console.log("default initialization finished.");
+  callback();
+  console.log("all initialization finished.");
+};
+```
+
+- 위의 `init` 함수는 중간에 매개변수로 받은 `callback` 함수를 실행
+
+```ts
+import { init } from "./init";
+init(() => console.log("custom initialization finished."));
+```
+
+<br>
+
+### 중첩 함수
+
+- 함수 안에 또 다른 함수를 중첩해서 구현 가능
+
+```ts
+const calc = (value: number, cb: (number) => void): void => {
+  let add = (a, b) => a + b;
+  function multiply(a, b) {
+    return a * b;
+  }
+  let result = multiply(add(1, 2), value);
+  cb(result);
+};
+
+calc(30, (result: number) => console.log(`result is ${result}`));
+```
+
+<br>
+
+### 고차 함수, 클로저, 부분 함수
+
+- **high-order function** 은 또 다른 함수를 반환하는 함수
+  - 함수형 프로그래밍에서 매우 중요한 기능
+
+```ts
+export type NumberToNumberFunc = (number) => number;
+export const add = (a: number): NumberToNumberFunc => {
+  const _add: NumberToNumberFunc = (b: number): number => {
+    return a + b;
+  };
+  return _add;
+};
+```
+
+- `return a + b` 부분을 **closure** 라고 부름
+  - 고차 함수는 closure 기능이 반드시 필요
+
+```ts
+import { NumberToNumberFunc, add } from "./add";
+
+let fn: NumberToNumberFunc = add(1);
+let result = fn(2);
+
+console.log(result); //3
+console.log(add(1)(2)); //3
+```
+
+- `add(1)` 만을 변수에 담았을 때는 단지 임시 변수의 역할만 하며,<br>나머지 값을 함수 호출연산자를 통해 받아야만 값이 됨
+
+```ts
+const multiply = (a) => (b) => (c) => a * b * c;
+```
+
+- `multiply` 함수는 함수 호출연산자가 3개 필요
+- 함수 호출연산자를 1개 혹은 2개 사용했다면 이를 partial application 혹은 partially applied function 이라고 부름
