@@ -286,3 +286,74 @@ const multiply = (a) => (b) => (c) => a * b * c;
 
 - `multiply` 함수는 함수 호출연산자가 3개 필요
 - 함수 호출연산자를 1개 혹은 2개 사용했다면 이를 partial application 혹은 partially applied function 이라고 부름
+
+<br>
+<br>
+
+## 5. 함수 구현 기법
+
+### 매개변수 기본값
+
+**default parameter**
+
+```ts
+export type Person = { name: string; age: number };
+export const makePerson = (name: string, age: number = 10): Person => {
+  const person = { name: name, age: age };
+  return person;
+};
+
+console.log(makePerson("Jack")); // { name: 'Jack', age: 10 }
+console.log(makePerson("Jane", 33)); // { name: 'Jack', age: 33 }
+```
+
+<br>
+
+### 객체 생성 시 값 부분 생략
+
+**shorthand**
+
+```ts
+const makePerson = (name: string, age: number) => {
+  const person = { name, age };
+};
+```
+
+- 매개변수의 이름과 똑같은 이름의 속성을 가진 객체를 만들 때는 속성값 부분을 생략 가능
+
+<br>
+
+### 객체를 반환하는 화살표 함수
+
+```ts
+export const makePerson = (name: string, age: number = 10): Person => ({
+  name,
+  age,
+});
+```
+
+- 화살표 함수의 실행문에 `{}`만을 사용할 경우 복합 실행문으로 판단하기 때문에<br>객체를 그대로 반환하고 싶다면 추가적으로 `()`를 사용해서 감싸줘야 함
+
+<br>
+
+### 매개변수에 비구조화 할당문 사용
+
+- 객체와 마찬가지로 함수에서도 매개변수에 비구조화 할당문을 사용할 수 있음
+
+```ts
+export type Person = { name: string; age: number };
+const printPerson = ({ name, age }: Person): void =>
+  console.log(`name: ${name}, age: ${age}`);
+
+printPerson({ name: "Jack", age: 10 }); // name: Jack, age: 10
+```
+
+<br>
+
+### 색인 키와 값으로 객체 만들기
+
+```ts
+const makeObject = (key, value) => ({ [key]: value });
+```
+
+- 객체의 속성 이름을 변수로 만들고자 할 때 사용
