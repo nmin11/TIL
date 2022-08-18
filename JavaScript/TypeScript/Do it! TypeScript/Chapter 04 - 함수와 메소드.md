@@ -357,3 +357,61 @@ const makeObject = (key, value) => ({ [key]: value });
 ```
 
 - 객체의 속성 이름을 변수로 만들고자 할 때 사용
+
+<br>
+<br>
+
+## 6. class method
+
+### this
+
+- TS에서는 `function` 키워드로 만든 함수에 `this` 키워드 사용 가능
+  - 화살표 함수는 사용 불가
+
+<br>
+
+### method
+
+- TS에서 method는 `function`으로 만든 함수 표현식을 담고 있는 속성
+
+```ts
+export class A {
+  value: number = 1;
+  method: () => void = function (): void {
+    console.log(`value: ${this.value}`);
+  };
+}
+```
+
+- 위 코드에서 `this.value`는 속성 값을 변경하지 않는 한 1을 참조하게 됨
+
+<br>
+
+### class method 구문
+
+- TS에서는 클래스 속성 중 함수 표현식을 담는 것은 `function` 키워드를 생략 가능하게 함
+
+```ts
+export class B {
+  constructor(public value: number = 1) {}
+  method(): void {
+    console.log(`value: ${this.value}`);
+  }
+}
+```
+
+<br>
+
+### static method
+
+- 클래스와 마찬가지로 메소드 또한 `static` 키워드와 함께 정적 메소드로 만들 수 있음
+
+```ts
+export class C {
+  static whoAreYou(): string {
+    return `I'm class C`;
+  }
+}
+
+console.log(C.whoAreYou());
+```
