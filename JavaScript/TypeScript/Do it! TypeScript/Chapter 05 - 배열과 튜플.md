@@ -54,3 +54,12 @@ for (let name of ["Jack", "Jane", "Steve"]) console.log(name);
 ```ts
 const identity = <T>(n: T): T => n;
 ```
+
+<br>
+
+## 2. 선언형 프로그래밍과 배열
+
+- 함수형 프로그래밍은 선언형 프로그래밍과 깊은 관련이 있음
+  - 함수형 프로그래밍이 넓은 범위에서 선언형 프로그래밍을 포함
+- 배열은 선언형 프로그래밍을 구현할 때 절대적으로 필요한 문법 기능
+- 명령형이 CPU 친화적인 low-level 이라면 선언형은 인간 친화적인 high-level
