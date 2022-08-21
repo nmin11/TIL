@@ -137,3 +137,44 @@ export const mergeArray = <T>(...arrays: readonly T[][]): T[] => {
 <br>
 
 ※ 순수 함수를 고려하면 JS 배열이 제공하는 많은 메소드를 사용할 수 없으므로,<br>전개 연산자 등의 메커니즘을 적극 활용해야 함
+
+<br>
+<br>
+
+## 5. Tuple
+
+```ts
+const tuple: [boolean, string] = [true, "the result is ok"];
+```
+
+### tuple & alias
+
+- 보통 tuple을 사용할 때는 alias로 tuple의 의미를 명확하게 함
+
+```ts
+export type ResultType = [boolean, string];
+```
+
+```ts
+import { ResultType } from "./ResultType";
+
+export const doSomething = (): ResultType => {
+  try {
+    throw new Error("Some error occurs...");
+  } catch (e) {
+    return [false, e.message];
+  }
+};
+```
+
+<br>
+
+### tuple과 비구조화 할당
+
+- tuple은 물리적으로는 배열이므로 배열과 같이 인덱스 연산자나 비구조화 할당문 사용 가능
+
+```ts
+import { doSomething } from "./doSomething";
+
+const [result, errorMessage] = doSomething();
+```
