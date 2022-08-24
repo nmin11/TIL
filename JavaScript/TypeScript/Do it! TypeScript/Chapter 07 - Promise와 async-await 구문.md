@@ -77,3 +77,88 @@ readFile("./package.json", (err: Error, buffer: Buffer) => {
 ```
 
 - `Promise`는 이런 콜백 지옥에서 빠져나오고 좀 더 다루기 쉬운 형태의 코드로 만들기 위해 고안됨
+
+<br>
+<br>
+
+## 2. Promise
+
+- 클래스이므로 `new` 연산자를 적용해서 객체를 만들어야 함
+- `resolve` `reject` 2개의 매개변수를 가짐
+
+※ 기본 형태
+
+```ts
+new Promise<T>((resolve: (successValue: T) => void, reject: (any) => void) => {
+  // code implement
+});
+```
+
+<br>
+
+### resolve, reject 함수
+
+```ts
+import { readFile } from "fs";
+
+export const readFilePromise = (filename: string): Promise<string> =>
+  new Promise<string>(
+    (resolve: (value: string) => void, reject: (error: Error) => void) => {
+      readFile(filename, (err: Error, buffer: Buffer) => {
+        if (err) reject(err);
+        else resolve(buffer.toString());
+      });
+    }
+  );
+```
+
+- 에러가 발생했을 때는 `reject` 함수 호출, 정상 실행되었을 때는 `resolve` 함수 호출
+
+```ts
+import { readFilePromise } from "./readFilePromise";
+
+readFilePromise("./package.json")
+  .then((content: string) => {
+    console.log(content);
+    return readFilePromise("./tsconfig.json");
+  })
+  .then((content: string) => {
+    console.log(content);
+    return readFilePromise("."); // 고의로 에러 발생
+  })
+  .catch((error: Error) => console.log("error:", err.message))
+  .finally(() => console.log("Finish"));
+```
+
+- `readFilePromise` 함수에서 `resolve` 함수를 호출한 값은 `then` 메소드의 콜백 함수에 전달<br>`reject` 함수를 호출한 값은 `catch` 메소드의 콜백 함수에 전달
+
+<br>
+
+### Promise.resolve
+
+- Promise 클래스는 `resolve`라는 정적 메소드를 제공
+- `Promise.resolve(value)` 형태로 호출하면 `value` 값은 `then` 메소드에서 얻을 수 있음
+
+```ts
+Promise.resolve([1, 2, 3]).then((value) => console.log(value));
+```
+
+<br>
+
+### Promise.reject
+
+- `Prmise.reject(Error)` 메소드에서 Error 객체는 `catch` 메소드의 콜백 함수에서 얻을 수 있음
+
+```ts
+Promise.reject(new Error("에러 발생")).catch((err: Error) =>
+  console.log("error:", err.message)
+);
+```
+
+<br>
+
+### then-chain
+
+- `then` 인스턴스 메소드의 콜백 함수는 값을 반환할 수 있음
+- 이 때 반환하는 값은 또 다른 `then` 메소드를 호출해서 값을 수신할 수 있음
+- 반환된 값이 Promise 타입이라면 이를 resolve한 값을 받게 됨
