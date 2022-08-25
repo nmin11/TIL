@@ -162,3 +162,69 @@ Promise.reject(new Error("에러 발생")).catch((err: Error) =>
 - `then` 인스턴스 메소드의 콜백 함수는 값을 반환할 수 있음
 - 이 때 반환하는 값은 또 다른 `then` 메소드를 호출해서 값을 수신할 수 있음
 - 반환된 값이 Promise 타입이라면 이를 resolve한 값을 받게 됨
+
+```ts
+Promise.resolve(1)
+  .then((value: number) => {
+    console.log(value);
+    return Promise.resolve(true);
+  })
+  .then((value: boolean) => {
+    console.log(value);
+    return [1, 2, 3];
+  })
+  .then((value: number[]) => {
+    console.log(value);
+    return { name: "jack", age: 32 };
+  })
+  .then((value: { name: string; age: number }) => {
+    console.log(value);
+  });
+```
+
+<br>
+
+### Promise.all
+
+- Promise 객체들을 배열 형태로 받아서 모든 객체를 대상으로 resolve 된 값들의 배열 반환
+- resolve 된 배열을 Promise 타입으로 반환하므로 이 배열은 then 메소드를 호출해서 얻어야 함
+- 배열에 담긴 객체 중 reject 객체가 발생하면 해당 reject value 를 담은 Promise.reject 반환
+  - catch 메소드로 reject 값을 얻음
+
+```ts
+const getAllResolvedResult = <T>(promises: Promise<T>[]) =>
+  Promise.all(promises);
+
+getAllResolvedResult<any>([
+  Promise.resolve(true),
+  Promise.resolve("hello"),
+]).then((result) => console.log(result));
+
+getAllResolvedResult<any>([
+  Promise.reject(new Error("error")),
+  Promise.resolve(1),
+])
+  .then((result) => console.log(result))
+  .catch((error) => console.log("error:", error.message));
+```
+
+<br>
+
+### Promise.race
+
+- 배열에 담긴 Promise 객체 중 하나라도 resolve 되면 이 값을 담은 Promise.resolve 객체 반환
+- 만약 reject 값이 가장 먼저 발생하면 Promise.reject 객체 반환
+
+```ts
+Promise.race([Promise.resolve(true), Promise.resolve("hello")]).then((value) =>
+  console.log(value)
+);
+
+Promise.race([Promise.resolve(true), Promise.reject(new Error("hello"))])
+  .then((value) => console.log(value))
+  .catch((error) => console.log(error.message));
+
+Promise.race([Promise.reject(new Error("error")), Promise.resolve(true)])
+  .then((value) => console.log(value))
+  .catch((error) => console.log(error.message));
+```
