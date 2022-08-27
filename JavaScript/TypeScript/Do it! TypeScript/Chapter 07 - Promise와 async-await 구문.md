@@ -278,3 +278,38 @@ const asyncReturn = async () => {
 
 asyncReturn.then((value) => console.log(value));
 ```
+
+<br>
+
+### async 함수 예외 처리
+
+- Promise 객체의 catch 메소드를 호출하는 형태로 예외를 처리해야 함
+
+```ts
+const awaitReject = async () => {
+  await Promise.reject(new Error("error"));
+};
+
+awaitReject().catch((err) => console.log("error:", err.message));
+```
+
+<br>
+
+### async 함수와 Promise.all
+
+```ts
+import { readFilePromise } from './readFilePromise'
+
+const readFilesAll = async (filenames: string[]) => {
+  return await Promise.all(
+    filenames.map(filename => readFilePromise(filename))
+  )
+}
+
+readFilesAll(['./package.json', './tsconfig.json'])
+  .then([packageJson, tsconfigJson]: string[]) => {
+    console.log('<package.json>: ', packageJson)
+    console.log('<tsconfig.json>: ', tsconfigJson)
+  }
+  .catch(err => console.log('error:', err.message))
+```
