@@ -228,3 +228,53 @@ Promise.race([Promise.reject(new Error("error")), Promise.resolve(true)])
   .then((value) => console.log(value))
   .catch((error) => console.log(error.message));
 ```
+
+<br>
+<br>
+
+## 2. async / await 구문
+
+- 2013년 MS에서 C# 5.0을 발표하면서 처음으로 async / await 구문 등장
+- 이후 JS에서 이 구문을 차용
+
+```js
+const test = async () => {
+  const value = await Promise.resolve(1);
+  console.log(value);
+};
+test();
+```
+
+<br>
+
+### await 키워드
+
+- operand 의 값을 반환
+- 만일 operand 가 Promise 객체이면 then 메소드를 호출해서 얻은 값 반환
+
+<br>
+
+### async 함수 수정자
+
+- `await` 키워드는 `async`라는 함수 수정자가 있는 함수 몸통이 반드시 필요
+
+<br>
+
+### async 함수의 2가지 성질
+
+- 일반 함수처럼 사용 가능
+- Promise 객체로 사용 가능
+
+<br>
+
+### async 함수가 반환하는 값의 의미
+
+- async 함수의 반환값은 Promise 형태로 변환되므로 then 메소드 호출을 통해 얻을 수 있음
+
+```ts
+const asyncReturn = async () => {
+  return [1, 2, 3];
+};
+
+asyncReturn.then((value) => console.log(value));
+```
