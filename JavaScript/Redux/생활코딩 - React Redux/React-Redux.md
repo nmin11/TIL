@@ -7,7 +7,7 @@
 
 <br>
 
-## index.js 설정
+## index.js에 Provider 설정
 
 ```js
 root.render(
@@ -38,3 +38,10 @@ root.render(
   - presentational component를 인자로 전달
 - 내부적으로 컴포넌트가 렌더링될 때 subscribe를 해주고, 꺼질 때 unsubscribe도 해주기 때문에 효율적
 - [connect.js explained](https://gist.github.com/gaearon/1d19088790e70ac32ea636c025ba424e)
+
+<br>
+
+## useSelector & useDispatch
+
+- connect 메소드의 2가지 인자가 분리된 함수
+- 용도에 알맞게 한 가지 씩만 활용 가능
