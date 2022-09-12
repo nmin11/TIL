@@ -1,18 +1,6 @@
-import { Provider, useSelector, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import store from './store';
-import { up } from './counterSlice';
-
-function Counter() {
-  const dispatch = useDispatch();
-  const count = useSelector(state => state.counter.value);
-
-  return (
-    <div>
-      <button onClick={() => dispatch(up(2))}>+</button>
-      {count}
-    </div>
-  )
-}
+import Counter from './Counter';
 
 export default function App() {
   return (
