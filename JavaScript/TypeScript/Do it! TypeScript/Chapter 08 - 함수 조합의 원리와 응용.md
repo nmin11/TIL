@@ -36,3 +36,64 @@
 - TS는 함수형 언어에서 중요하게 여겨지는 패턴 매칭과 고차 타입이라는 기능을 생략해서 구문을 쉽게 만듦
   - 다른 고급 함수형 언어들의 구문이 어렵게 느껴지는 이유는 패턴 매칭과 고차 타입 관련 구문 때문!
   - 이런 이유로 Kotlin이나 Swift도 패턴 매칭 구문만 있고 고차 타입 구문은 존재하지 않음
+
+<br>
+<br>
+
+## 2. 제네릭 함수
+
+### TypeScript의 제네릭 함수 구문
+
+```ts
+function g1<T>(a: T): void {}
+function g2<T, Q>(a: T, b: Q): void {}
+```
+
+- TS에서 제네릭 타입은 함수와 인터페이스, 클래스, 타입 별칭에 적용 가능
+- `<T>` `<T, Q>`와 같은 형식으로 표현
+
+```ts
+type TypeFunc<T, Q, R> = (T, Q) => R;
+```
+
+- 타입 별칭에 제네릭 타입을 적용할 수 있음
+
+<br>
+
+### 함수의 역할
+
+- 수학에서 함수는 `x`에 수식 `f`를 적용해서 또 다른 값 `y`를 만드는 것
+
+```ts
+(x) => (f) => y;
+```
+
+- 프로그래밍 언어로 수학의 함수를 구현할 때는 변수들의 타입을 고려해야 함
+
+```ts
+(x: T) => f => (y: R)
+```
+
+- 수학에서는 이러한 관계를 일대일 관계라 하며, 이러한 함수를 mapping 혹은 map 이라고 표현
+
+```ts
+type MapFunc<T, R> = (T) => R;
+```
+
+<br>
+
+### Identity 함수
+
+- 맵 함수의 가장 단순한 형태는 입력값 `x`를 가공 없이 그대로 반환하는 것
+  - 입력과 출력이 같음
+- 함수형 프로그래밍에서는 이러한 함수를 `identity` 혹은 `I`로 표기
+
+```ts
+type MapFunc(T, R) = (T) => R
+type IdentityFunc<T> = MapFunc<T, T>
+
+const numberIdentity: IdentityFunc<number> = (x: number): number => x
+const stringIdentity: IdentityFunc<string> = (x: string): string => x
+const objectIdentity: IdentityFunc<object> = (x: object): object => x
+const arrayIdentity: IdentityFunc<any[]> = (x: any[]): any[] => x
+```
