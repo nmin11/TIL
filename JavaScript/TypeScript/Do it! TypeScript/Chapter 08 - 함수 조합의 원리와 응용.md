@@ -97,3 +97,25 @@ const stringIdentity: IdentityFunc<string> = (x: string): string => x
 const objectIdentity: IdentityFunc<object> = (x: object): object => x
 const arrayIdentity: IdentityFunc<any[]> = (x: any[]): any[] => x
 ```
+
+<br>
+<br>
+
+## 3. 고차 함수와 커리
+
+- 함수에서 매개변수의 개수를 arity 라고 함
+- `f()`는 arity 0개, `f(x)`는 arity 1개
+- 만약 함수 f, g, h 모두 arity가 1이라면 연결해서 사용 가능
+
+```ts
+x -> f -> g -> h -> y
+```
+
+- 이를 프로그래밍 언어로 표현하면 다음과 같음
+
+```ts
+y = h(g(f(x)));
+```
+
+- 함수형 프로그래밍 언어에서는 `compose`나 `pipe`라는 이름의 함수를 사용해서 새로운 함수를 만들 수 있음
+- 이를 이해하기 위해 먼저 고차 함수가 무엇인지 알아야 함
