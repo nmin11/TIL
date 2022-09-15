@@ -101,7 +101,7 @@ const arrayIdentity: IdentityFunc<any[]> = (x: any[]): any[] => x
 <br>
 <br>
 
-## 3. 고차 함수와 커리
+## 3. 고차 함수와 curry
 
 - 함수에서 매개변수의 개수를 arity 라고 함
 - `f()`는 arity 0개, `f(x)`는 arity 1개
@@ -119,3 +119,86 @@ y = h(g(f(x)));
 
 - 함수형 프로그래밍 언어에서는 `compose`나 `pipe`라는 이름의 함수를 사용해서 새로운 함수를 만들 수 있음
 - 이를 이해하기 위해 먼저 고차 함수가 무엇인지 알아야 함
+
+<br>
+
+### 고차 함수란?
+
+- 어떤 함수가 또 다른 함수를 반환한다면 그 함수는 고차 함수(high-order function)
+  - 단순히 값을 반환하는 함수는 1차 함수(first-order function)
+
+```ts
+export type FirstOrderFunc<T, R> = (T) => R;
+export type SecondOrderFunc<T, R> = (T) => FirstOrderFunc<T, R>;
+export type ThirdOrderFunc<T, R> = (T) => SecondOrderFunc<T, R>;
+```
+
+- 1차 함수 예시
+
+```ts
+import { FirstOrderFunc } from "./function-signature";
+
+export const inc: FirstOrderFunc<number, number> = (x: number): number => x + 1;
+```
+
+- 2차 함수 예시
+
+```ts
+import { FirstOrderFunc, SecondOrderFunc } from "./function-signature";
+
+export const add: SecondOrderFunc<number, number> =
+  (x: number): FirstOrderFunc<number, number> =>
+  (y: number): number =>
+    x + y;
+```
+
+- 2차 함수 활용 예시
+
+```ts
+import { add } from "./second-order-func";
+
+console.log(add(1)(2));
+```
+
+- 2차 함수를 호출할 때는 함수 호출 연산자를 2번 연속 사용
+- 함수형 프로그래밍에서는 이를 **curry** 라고 부름
+
+<br>
+
+### 부분 적용 함수와 curry
+
+- 자신의 차수보다 함수 호출 연산자를 덜 사용하면 **partially applied function** 또는 **partial function** 이라고 불림
+
+```ts
+import { FirstOrderFunc, SecondOrderFunc } from "./function-signature";
+import { add } from "./second-order-func";
+
+const add1: SecondOrderFunc<number, number> = add(1);
+console.log(add1(2), add(1)(2));
+```
+
+- 위 코드에서 `add1`이라는 부분 함수를 생성
+- 부분 함수는 1차 함수이므로 함수 호출 연산자를 1개 사용해서 일반 함수처럼 호출 가능
+
+<br>
+
+### closure
+
+- 고차 함수의 몸통에서 선언되는 변수들은 closure라는 유효 범위를 가짐
+- closure는 persistence scope(지속 가능한 유효 범위) 를 뜻함
+
+```ts
+function add(x: number): (number) => number {
+  return function (y: number): number {
+    return x + y;
+  };
+}
+```
+
+- `return x + y`는 outer scope에 있는 변수 `x`를 참조
+- 하지만 사실 inner scope에서 `x`는 이해할 수 없는 변수
+- 이처럼 범위 안에서는 그 의미를 알 수 없는 변수를 **free variable** 이라고 부름
+- TS는 자유 변수가 있을 때 그 변수의 의미를 outer scope에서 찾아내어 컴파일함
+- closure가 지속 가능한 유효 범위라고 표현되는 이유는 부분 함수 호출 시 변수가 메모리에서 해제되지 않기 때문
+  - 고차 함수를 부분 함수로 나눠서 실행할 때는 모든 차수가 실행되어야 변수가 메모리에서 해제됨
+  - 그러므로 closure는 자유 변수의 메모리가 해제되는 유효 범위라고 볼 수 있음
