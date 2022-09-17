@@ -202,3 +202,51 @@ function add(x: number): (number) => number {
 - closure가 지속 가능한 유효 범위라고 표현되는 이유는 부분 함수 호출 시 변수가 메모리에서 해제되지 않기 때문
   - 고차 함수를 부분 함수로 나눠서 실행할 때는 모든 차수가 실행되어야 변수가 메모리에서 해제됨
   - 그러므로 closure는 자유 변수의 메모리가 해제되는 유효 범위라고 볼 수 있음
+
+<br>
+<br>
+
+## 4. function composition
+
+- 작은 기능을 구현한 함수를 여러 번 조합해서 의미 있는 함수를 만들어 내는 기법
+- 함수 조합을 할 수 있는 언어들은 `compose` 혹은 `pipe`라는 이름의 함수를 제공하거나 만들 수 있음
+- 이번 챕터에서는 아래의 수식을 만들어내는 `compose`와 `pipe`에 대해서 알아볼 것
+
+```ts
+y = h(g(f(x)));
+```
+
+<br>
+
+### compose 함수
+
+```ts
+export const compose =
+  <T, R>(...functions: readonly function[]): Function =>
+  (x: T): ((T) => R) => {
+    const deepCopiedFunctions = [...functions];
+    return deepCopiedFunctions
+      .reverse()
+      .reduce((value, func) => func(value), x);
+  };
+```
+
+- 가변 인수 스타일로 함수들의 배열을 입력받고 함수들을 조합해서 매개변수 x를 입력받는 1차 함수 반환
+
+```ts
+import { f, g, h } from "./f-g-h";
+import { compose } from "./compose";
+
+const composedFGH = compose(h, g, f);
+console.log(composedFGH("x")); // h(g(f(x)))
+```
+
+※ +1 함수로 `compose`를 3번 연속하는 심플한 예제
+
+```ts
+import { compose } from "./compose";
+
+const inc = (x) => x + 1;
+const composed = compose(inc, inc, inc);
+console.log(compose(1)); // 4
+```
