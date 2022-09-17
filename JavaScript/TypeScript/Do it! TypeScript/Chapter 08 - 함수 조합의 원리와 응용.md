@@ -250,3 +250,95 @@ const inc = (x) => x + 1;
 const composed = compose(inc, inc, inc);
 console.log(compose(1)); // 4
 ```
+
+<br>
+
+### pipe 함수
+
+```ts
+export const pipe =
+  <T>(...functions: readonly Function[]): Function =>
+  (x: T): T => {
+    return functions.reduce((value, func) => func(value), x);
+  };
+```
+
+- `compose`와는 다르게 매개변수들을 해석하는 순서가 반대
+  - 그래서 `compose` 예제와는 다르게 `reverse` 메소드를 사용하지 않았음
+
+```ts
+import { f, g, h } from "./f-g-h";
+import { pipe } from "./pipe";
+
+const piped = pipe(f, g, h);
+console.log(piped("x")); // h(g(f(x)))
+```
+
+<br>
+
+### 부분 함수와 함수 조합
+
+- 고차 함수의 부분 함수는 함수 조합에 사용될 수 있음
+
+```ts
+import { pipe } from "./pipe";
+
+const add = (x) => (y) => x + y;
+const inc = add(1);
+const pipedAdd = pipe(inc, add(2));
+
+console.log(pipedAdd(1)); // 4
+```
+
+<br>
+
+### pointless function
+
+```ts
+export const map = (f) => (a) => a.map(f);
+```
+
+- 위 함수는 함수 조합을 고려해서 설계된 포인트가 없는 함수
+- `map(f)` 형태의 부분 함수를 만들면 `compose`나 `pipe`에서 활용 가능
+
+```ts
+import { map } from "./map";
+
+const square = (value) => value * value;
+export const squareMap = map(square);
+// export const squareMap = a => map(square)(a)   포인트가 '있는' 함수
+```
+
+```ts
+import { pipe } from "./pipe";
+import { squareMap } from "./squareMap";
+
+const fourSquare = pipe(squareMap, squareMap);
+console.log(fourSquare([3, 4])); // [81, 256]
+```
+
+※ `reduce`를 사용하는 포인트 없는 함수 만들고 활용하기
+
+```ts
+export const reduce = (f, initValue) => (a) => a.reduce(f, initValue);
+```
+
+```ts
+import { reduce } from "./reduce";
+
+const sum = (result, value) => result + value;
+export const sumArray = reduce(sum, 0);
+```
+
+```ts
+import { pipe } from "./pipe";
+import { squareMap } from "./squareMap";
+import { sumArray } from "./sumArray";
+
+const pitagoras = pipe(squareMap, sumArray, Math.sqrt);
+
+console.log(pitagoras([3, 4])); // 5
+```
+
+- `squareMap` `sumArray` `Math.sqrt` 함수들의 구현 내용은 그리 복잡하지 않음
+- 함수 조합은 복잡하지 않은 함수들을 `compose` 혹은 `pipe` 함수로 조합해서 복잡한 내용을 쉽게 만든다는 사실을 알 수 있음
