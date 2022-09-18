@@ -181,3 +181,34 @@ const newArray = pipe(
   tap((a) => console.log(a)) // [-9, -8, -7, -6, -5, -4, -3, -2, -1]
 )(range(1, 10));
 ```
+
+<br>
+<br>
+
+## 4. 서술자와 조건 연산
+
+- `Array.filter`처럼 콜백 함수가 boolean 타입 값을 반환해서<br>조건을 만족하는지 확인하는 함수를 **predicate(서술자)** 라고 부름
+
+<br>
+
+### 수의 크기를 판단하는 서술자
+
+```ts
+lt(a)(b): boolean   // a < b
+lte(a)(b): boolean  // a <= b
+gt(a)(b): boolean   // a > b
+gte(a)(b): boolean  // a >= b
+```
+
+- 주로 다른 함수와 결합해서 포인트 없는 함수 형태로 사용됨
+
+```ts
+import { pipe, filter, lte, tap, range } from "ramda";
+
+pipe(
+  filter(lte(3)),
+  tap((n) => console.log(n)) // [3, 4, 5, 6, 7, 8, 9, 10]
+)(range(1, 11));
+```
+
+- 이는 직관적으로 `3 <= x`의 의미로 와닿지 않기 때문에 `flip(gte(3))`처럼 변형해서 사용하기도 함
