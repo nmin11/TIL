@@ -212,3 +212,66 @@ pipe(
 ```
 
 - 이는 직관적으로 `3 <= x`의 의미로 와닿지 않기 때문에 `flip(gte(3))`처럼 변형해서 사용하기도 함
+
+<br>
+
+### allPass / anyPass
+
+※ min <= x < max
+
+```ts
+import { allPass, lte, gt } from "ramda";
+
+type NumberToBooleanFunc = (n: number) => boolean;
+export const selectRange = (min: number, max: number): NumberToBooleanFunc =>
+  allPass([lte(min), gt(max)]);
+```
+
+※ filter 함수와 결합해서 포인트 없는 함수로 구현하기
+
+```ts
+import { pipe, filter, tap, range } from "ramda";
+import { selectRange } from "./selectRange";
+
+pipe(
+  filter(selectRange(3, 7)),
+  tap((n) => console.log(n))
+)(range(1, 11));
+```
+
+<br>
+
+### not 함수
+
+- true이면 false 반환, false이면 true 반환
+
+```ts
+import { pipe, not } from "ramda";
+import { selectRange } from "./selectRange";
+
+export const notRange = (min: number, max: number) =>
+  pipe(selectRange(min, max), not);
+```
+
+<br>
+
+### ifElse 함수
+
+- 3개의 매개변수 포함
+  - true/false를 반환하는 서술자
+  - 선택자가 true일 때 실행할 함수
+  - 선택자가 false일 때 실행할 함수
+
+※ 1 ~ 10 중에서 중간값인 6보다 작은 수는 -1 하고 나머지는 +1 하는 예제
+
+```ts
+import { range, pipe, map, ifElse, lte, inc, dec, tap } from "ramda";
+
+const input: number[] = range(1, 11),
+  halfValue = input[input.length / 2];
+const subtractOrAdd = pipe(
+  map(ifElse(lte(halfValue), inc, dec)),
+  tap((a) => console.log(a)) // [0, 1, 2, 3, 4, 7, 8, 9, 10, 11]
+);
+const result = subtractOrAdd(input);
+```
