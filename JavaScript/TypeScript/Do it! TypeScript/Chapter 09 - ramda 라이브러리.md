@@ -275,3 +275,14 @@ const subtractOrAdd = pipe(
 );
 const result = subtractOrAdd(input);
 ```
+
+<br>
+<br>
+
+## 5. 문자열 다루기
+
+- `trim` : 문자열 앞뒤 공백 제거
+- `toLower` : 소문자 전환
+- `toUpper` : 대문자 전환
+- `split` : 문자열을 구분자를 활용해서 배열로 전환
+- `join` : 문자열 배열을 구분자를 활용해서 문자열로 전환
