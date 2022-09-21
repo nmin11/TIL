@@ -286,3 +286,23 @@ const result = subtractOrAdd(input);
 - `toUpper` : 대문자 전환
 - `split` : 문자열을 구분자를 활용해서 배열로 전환
 - `join` : 문자열 배열을 구분자를 활용해서 문자열로 전환
+
+<br>
+<br>
+
+## 6. chance 패키지로 객체 만들기
+
+- `chance` 패키지는 그럴듯한 가짜 데이터를 만들어주는 라이브러리
+- ramda와 직접 관련된 것은 아니지만, 객체를 다루는 함수들을 사용하려면 그럴듯한 객체 데이터 필요
+- 한 마디로, dummy data를 만들 때 유용
+
+```ts
+import { ICoordinates } from "./ICoordinates";
+import { makeIcoordinates } from "./makeICoordinates";
+import Chance from "chance";
+
+const c = new Chance();
+
+export const makeRandomICoordinates = (): ICoordinates =>
+  makeICoordinates(c.latitude(), c.longitude());
+```
