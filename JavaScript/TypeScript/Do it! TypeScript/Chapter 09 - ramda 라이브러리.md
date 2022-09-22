@@ -306,3 +306,80 @@ const c = new Chance();
 export const makeRandomICoordinates = (): ICoordinates =>
   makeICoordinates(c.latitude(), c.longitude());
 ```
+
+<br>
+<br>
+
+## 7. lens를 활용한 객체 속성 다루기
+
+### what is lens?
+
+- 하스켈 언어의 `Control.Lens` 라이브러리 내용 중 JS에서 동작할 수 있는 getter/setter 기능만 ramda 함수로 구현한 것
+
+※ 활용 방법
+
+1. `lens` 함수로 객체의 특정 속성에 대한 lens 생성
+2. lens를 `view` 함수에 적용해서 속성값을 얻어냄
+3. lens를 `set` 함수에 적용해서 속성값이 바뀐 새로운 객체를 얻어냄
+4. lens와 속성값을 바꾸는 함수를 `over` 함수에 적용해서 값이 바뀐 새로운 객체를 얻어냄
+
+<br>
+
+### prop & assoc
+
+- `prop`
+  - 'property'
+  - 객체의 특정 속성값을 가져오는 함수
+  - **getter**
+  - `prop('name')(person)`
+- `assoc`
+  - **setter**
+  - `assoc('name', 'Loko')(person)`
+
+<br>
+
+### lens 함수
+
+- lens 기능을 사용하려면 일단 lens를 만들어야 함
+- `lens` `prop` `assoc`의 조합으로 만듦
+
+```ts
+export const makeLens = (propName: string) =>
+  lens(prop(propName), assoc(propName));
+```
+
+<br>
+
+### view & set & over
+
+- getter / setter 를 생성할 수 있게 해주는 함수들
+
+```ts
+import { lens, assoc, view, set, over } from "ramda";
+
+export const makeLens = (propName: string) =>
+  lens(prop(propName), assoc(propName));
+
+export const getter = (lens) => view(lens);
+export const setter =
+  (lens) =>
+  <T>(newValue: T) =>
+    set(lens, newValue);
+export const setterUsingFunc =
+  (lens) =>
+  <T, R>(func: (T) => R) =>
+    over(lens, func);
+```
+
+<br>
+
+### lensPath 함수
+
+- person.location.coordinates.longitude와 같은 긴 속성값을 쓰지 않게 해주는 함수
+  - 이러한 중첩 속성을 '경로'라고도 부름
+
+```ts
+const longitudeLens = lensPath(["location", "coordinates", "longitude"]);
+const getLongitude = getter(longitudeLens);
+const setLongitude = setter(longitudeLens);
+```
