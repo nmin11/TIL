@@ -383,3 +383,75 @@ const longitudeLens = lensPath(["location", "coordinates", "longitude"]);
 const getLongitude = getter(longitudeLens);
 const setLongitude = setter(longitudeLens);
 ```
+
+<br>
+<br>
+
+## 객체 다루기
+
+### toPairs & fromPairs
+
+`toPairs`: 객체의 속성들을 분해해서 배열로 만듦
+
+- 배열의 각 아이템은 `[string, any]` 타입의 튜플
+
+```ts
+const pairs: [string, any][] = toPairs(person);
+```
+
+`fromPairs`: `[key, value]` 형태의 아이템을 가진 배열을 다시 객체로 만듦
+
+```ts
+const person: IPerson = fromPairs(pairs) as IPerson;
+```
+
+<br>
+
+### keys & values
+
+`keys`: 객체의 속성 이름만 추려서 `string[]` 타입으로 반환
+
+```ts
+const keys: string[] = keys(makeRandomIPerson());
+```
+
+`values`: 객체의 속성값만 추려서 `any[]` 타입으로 반환
+
+```ts
+const values: any[] = values(makeRandomIPerson());
+```
+
+<br>
+
+### zipObj 함수
+
+- 키 배열과 값 배열을 결합해서 객체로 만듦
+
+```ts
+const zippedPerson: IPerson = zipObj(keys, values) as IPerson;
+```
+
+<br>
+
+### mergeLegt & mergeRight
+
+- 2개의 객체를 입력받아서 속성들을 결합한 새로운 객체 생성
+- `Left`인지 `Right`인지에 따라 우선순위를 결정
+  - 서로 같은 이름의 속성이 있고, 값은 다를 때 선택하기 위함
+
+```ts
+const left = { name: "Jack" },
+  right = { name: "Jane", age: 32 };
+const person1 = mergeLeft(left, right); // { name: 'Jack', age: 32 }
+const person2 = mergeRight(left, right); // { name: 'Jane', age: 32 }
+```
+
+<br>
+
+### mergeDeepLeft & mergeDeepRight
+
+- 객체의 속성에 담긴 객체도 바꾸려고 할 때 사용
+
+```ts
+const newPerson = mergeDeepRight(person, { location: newLocation });
+```
