@@ -523,3 +523,201 @@ const ageSortedPersons = sortBy(prop("age"))(persons);
 ```ts
 const nameSortedPersons = sortWith([descend(prop("name"))])(persons); // name 속성을 기준으로 내림차순 정렬
 ```
+
+<br>
+<br>
+
+## 10. 조합 논리
+
+- 함수형 프로그래밍의 이론적인 배경
+  - lambda calculus (람다 수학)
+  - combinatory logic (조합 논리학)
+  - category theory (카테고리 이론)
+- 람다 수학의 모든 이론을 프로그래밍 언어로 표현할 순 없으므로<br>제한 범위 내에서 람다 수학을 구현하기 위한 조합 논리학 탄생
+
+<br>
+
+### combinator
+
+- 조합 논리학은 combinator(조합자)라는 특별한 형태의 고차 함수들을 결합해서 새로운 조합자를 만들어 내는 것
+- 함수형 언어의 컴파일러를 만드는 데 필요한 이론을 검증하고 개발할 때 주로 사용됨
+- 대부분의 함수형 라이브러리들은 조합 논리로 개발된 몇 가지 유용한 조합자들 제공
+
+| 조합자 이름 |     의미     | 람다 함수 이름 |
+| :---------: | :----------: | :------------: |
+|      I      |   identity   |    identity    |
+|      K      |   constant   |     always     |
+|      T      |    thrush    |    applyTo     |
+|      W      | duplication  |     unnest     |
+|      C      |     flip     |      flip      |
+|      S      | substitution |       ap       |
+
+- 이들을 포함한 몇몇 함수의 동작 방식을 이해하는 과정은 무척 까다로움
+- 우선 `chain` 함수를 통해 조합자들을 결합한다는 것에 대한 의미를 파악할 것
+
+<br>
+
+### chain 함수
+
+- 매개변수로 callback 함수 1개 또는 2개를 받아서 동작하는 함수
+  - 매개변수가 1개일 때와 2개일 때의 동작이 다름
+
+```ts
+import { chain, head, pipe, tap } from "ramda";
+
+const arr = [1, 2, 3];
+
+pipe(
+  chain((n) => [n, n]),
+  tap((n) => console.log(n)) // [1, 1, 2, 2, 3, 3]
+)(arr);
+
+pipe(
+  chain(append, head),
+  tap((n) => console.log(n))
+)(arr);
+```
+
+- 매개변수가 1개일 때는 아래와 같이 동작
+
+```ts
+import { flatten, map, pipe } from "ramda";
+
+export const flatMap = (f) => pipe(map(f), flatten);
+```
+
+- 매개변수가 2개일 때는 아래와 같이 동작
+
+```ts
+export const chainTwoFunc = (firstFn, secondFn) => (x) =>
+  firstFn(secondFn(x), x);
+```
+
+<br>
+
+### flip 조합자
+
+- 2차 함수의 매개변수 순서를 서로 바꿔줌
+
+```ts
+const flip = (cb) => (a) => (b) => cb(b)(a);
+```
+
+<br>
+
+### identity 조합자
+
+```ts
+const identity = (x) => y;
+```
+
+- 가장 단순한 조합자이지만, 조합자 구조상 반드시 함수가 있어야 하는 곳에 위치할 때 그 위력을 발휘
+
+```ts
+import { flip, gte, ifElse, pipe, subtract, tap } from "ramda";
+
+type NumToNumFunc = (n: number) => number;
+const applyDiscount = (minimum: number, discount: number): NumToNumFunc =>
+  pipe(
+    ifElse(flip(gte)(minimum), flip(subtract)(discount), identity),
+    tap((amount) => console.log(amount))
+  );
+const calcPrice = applyDiscount(5000, 500);
+
+const discountedPrice = calcPrice(6000); // 5500
+const notDiscountedPrice = calcPrice(4500); // 4500
+```
+
+<br>
+
+### always 조합자
+
+```ts
+const always = (x) => (y) => x;
+```
+
+- 2개의 고차 매개변수 중 첫 번째 것을 반환
+- constant라는 의미에서 'K-조합자'라고도 불림
+  - K는 독일어 Konstante
+- 2개의 매개변수가 필요한 조합자에 마치 `identity`처럼 사용됨
+
+```ts
+const always = (a) => (b) => a;
+const flip = (cb) => (a) => (b) => cb(b)(a);
+
+const first =
+  <T>(a: T) =>
+  (b: T): T =>
+    always(a)(b);
+const second =
+  <T>(a: T) =>
+  (b: T): T =>
+    flip(always)(a)(b);
+
+console.log(
+  first(1)(2), // 1
+  second(1)(2) // 2
+);
+```
+
+<br>
+
+### applyTo 조합자
+
+```ts
+const applyTo = (value) => (cb) => cb(value);
+```
+
+```ts
+import { add, applyTo, pipe, tap } from "ramda";
+
+const T = (value) =>
+  pipe(
+    applyTo(value),
+    tap((value) => console.log(value))
+  );
+
+const value100 = T(100);
+const sameValue = value100(identity); // 100
+const add1Value = value100(add(1)); // 101
+```
+
+<br>
+
+### ap 조합자
+
+```ts
+const ap =
+  ([callback]) =>
+  (arr) =>
+    [callback](arr);
+```
+
+- callback 함수들의 배열을 첫 번째 매개변수로, 배열을 두 번째 매개변수로 받음
+- callback 함수가 1개일 때는 `map` 함수처럼 동작
+
+```ts
+import { ap, multiply, pipe, tap } from "ramda";
+
+const callAndAppend = pipe(
+  ap([multiply(2)]),
+  tap((a) => console.log(a))
+);
+
+const input = [1, 2, 3];
+const result = callAndAppend(input); // [2, 4, 6]
+```
+
+- callback 함수가 2개일 때는 `chain(n => [n, n])` 형태로 동작
+
+```ts
+import { add, ap, multiply, pipe, tap } from "ramda";
+
+const callAndAppend = pipe(
+  ap([multiply(2), add(10)]),
+  tap((a) => console.log(a))
+);
+
+const input = [1, 2, 3];
+const result = callAndAppend(input); // [2, 4, 6, 11, 12, 13]
+```
