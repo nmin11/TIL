@@ -455,3 +455,71 @@ const person2 = mergeRight(left, right); // { name: 'Jane', age: 32 }
 ```ts
 const newPerson = mergeDeepRight(person, { location: newLocation });
 ```
+
+<br>
+<br>
+
+## 9. 배열 다루기
+
+### prepend & append
+
+`prepnd`: 배열 맨 앞에 아이템 삽입
+
+```ts
+const newArr = prepend(1)(arr);
+```
+
+`append`: 배열 맨 뒤에 아이템 삽입
+
+```ts
+const newArr = append(1)(arr);
+```
+
+<br>
+
+### flatten 함수
+
+- 다차원의 복잡한 배열을 1차원의 평평한 배열로
+
+```ts
+const flattendArr = flatten(arr);
+```
+
+<br>
+
+### unnest 함수
+
+- `flatten`보다 조금 정교하게 배열을 가공
+- 예를 들어 3차원 배열이 있다면 `unnest` 한번에 2차원 배열이 되고,<br>한번 더 `unnest`를 하면 `flatten`과 같은 1차원 배열이 됨
+
+<br>
+
+### sort 함수
+
+- 배열이 `number[]`일 때 `sort` 함수로 내림차순 및 오름차순 정렬 가능
+
+```ts
+sortedArr = sort((a: number, b: number) => a - b)(arr); // 오름차순 정렬
+```
+
+<br>
+
+### sortBy 함수
+
+- 객체의 배열을 특정 속성값에 따라 정렬
+- 오름차순 정렬만 가능
+
+```ts
+const ageSortedPersons = sortBy(prop("age"))(persons);
+```
+
+<br>
+
+### sortWith
+
+- `sortBy`와는 다르게, 오름차순과 내림차순 모두 가능
+  - `ascend` `descend` 함수를 활용하면 됨
+
+```ts
+const nameSortedPersons = sortWith([descend(prop("name"))])(persons); // name 속성을 기준으로 내림차순 정렬
+```
