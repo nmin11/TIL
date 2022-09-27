@@ -76,3 +76,76 @@ export const pick = <T, K extends keyof T>(obj: T, keys: K[]) =>
     .map((key) => ({ [key]: obj[key] }))
     .reduce((result, value) => ({ ...result, ...value }), {});
 ```
+
+<br>
+<br>
+
+## 3. 대수 데이터 타입
+
+- 객체지향 프로그래밍 언어에서 ADT는 abstract data type
+- 함수형 프로그래밍 언어에서 ADT는 algebraic data type
+- TS에서 대수 데이터 타입은 union type과 intersection type 2가지가 있음
+- 객체지향 언어들은 상속에 기반을 두지만 함수형 언어들은 대수 데이터 타입을 선호함
+
+### union type
+
+- `|` 기호를 연결해서 만든 타입
+
+```ts
+type NumberOrString = number | string;
+let ns: NumberOrString = 1;
+ns = "hello";
+```
+
+<br>
+
+### intersection type
+
+- `&` 기호를 연결해서 만든 타입
+- 대표적인 예는 2개의 객체를 통합해서 새로운 객체를 만들 때
+
+```ts
+export const mergeObject = <T, U>(a: T, b: U): T & U => ({ ...a, ...b });
+```
+
+<br>
+
+### discriminated union
+
+- 식별 합집합 구문을 사용하려면 인터페이스들이 모두 같은 속성을 가지고 있어야 함
+
+```ts
+export interface ISquare {
+  tag: "square";
+  size: number;
+}
+export interface IRectangle {
+  tag: "rectangle";
+  width: number;
+  height: number;
+}
+export interface ICircle {
+  tag: "circle";
+  radius: number;
+}
+
+export type IShape = ISquare | IRectangle | ICircle;
+```
+
+- 이제 `tag` 속성을 활용해서 각각의 타입을 '식별'할 수 있음
+
+```ts
+import { IShape } from "./IShape";
+
+export const calcArea = (shape: IShape): number => {
+  switch (shape.tag) {
+    case "square":
+      return shape.size * shape.size;
+    case "rectangle":
+      return shape.width * shape.height;
+    case "circle":
+      return Math.PI * shape.radius * shape.radius;
+  }
+  return 0;
+};
+```
