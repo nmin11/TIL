@@ -149,3 +149,61 @@ export const calcArea = (shape: IShape): number => {
   return 0;
 };
 ```
+
+<br>
+<br>
+
+## 4. type guard
+
+### instanceof 연산자
+
+```ts
+export class Bird {
+  fly() {
+    console.log(`I'm flying.`);
+  }
+}
+export class Fish {
+  swim() {
+    console.log(`I'm swimming.`);
+  }
+}
+```
+
+```ts
+import { Bird, Fish } from "./BirdAndFish";
+
+export const flyOrSwim = (o: Bird | Fish): void => {
+  if (o instanceof Bird) {
+    (o as Bird).fly();
+  } else if (o instanceof Fish) {
+    (<Fish>o).swim();
+  }
+};
+```
+
+<br>
+
+### type guard
+
+- TS에서 `instanceof` 연산자는 type guard 기능을 가짐
+- 타입 가드를 통해 변환하지 않는 코드로 인한 프로그램 비정상 종료를 막아줌
+
+```ts
+import { Bird, Fish } from "./BirdAndFish";
+
+export const flyOrSwim = (o: Bird | Fish): void => {
+  if (o instanceof Bird) {
+    o.fly();
+  } else if (o instanceof Fish) {
+    o.swim();
+  }
+};
+```
+
+```ts
+import { Bird, Fish } from "./BirdAndFish";
+import { flyOrSwim } from "./flyOrSwim";
+
+[new Bird(), new Fish()].forEach(flyOrSwim); // I'm flying. I'm swimming
+```
