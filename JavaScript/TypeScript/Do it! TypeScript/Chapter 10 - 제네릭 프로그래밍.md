@@ -207,3 +207,46 @@ import { flyOrSwim } from "./flyOrSwim";
 
 [new Bird(), new Fish()].forEach(flyOrSwim); // I'm flying. I'm swimming
 ```
+
+<br>
+
+## 5. F-바운드 다형성
+
+### this 타입과 F-바운드 다형성
+
+- TS에서 `this` 키워드는 타입으로도 사용됨
+- 이로 인해 객체지향 언어의 다형성(polymorphism) 효과가 나타남
+- `this` 타입으로 인한 다형성을 일반적인 다형성과 구분하기 위해 **F-bound polymorphism**이라고 부름
+
+**F-바운드 타입**
+
+- 자신을 구현하거나 상속하는 subtype을 포함하는 타입
+
+```ts
+export interface IAddable<T> {
+  add(value: T): this;
+}
+```
+
+```ts
+import { IValueProvider, IAddable } from "../interfaces";
+
+class Calculator implements IValueProvider<number>, IAddable<number> {
+  constructor(private _value: number = 0) {}
+  value(): number {
+    return this._value;
+  }
+  add(value: number): this {
+    this._value = this._value + value;
+    return this;
+  }
+}
+```
+
+```ts
+import { Calculator } from "../classes/Calculator";
+
+const value = new Calculator(1).add(2).add(3).value(); // 6
+```
+
+- `IValueProvider` `IAddable` 같은 함수는 자신을 구현한 클래스에 따라 다르게 동작할 수 있게 됨
