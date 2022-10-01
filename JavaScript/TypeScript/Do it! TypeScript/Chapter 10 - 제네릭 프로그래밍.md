@@ -250,3 +250,53 @@ const value = new Calculator(1).add(2).add(3).value(); // 6
 ```
 
 - `IValueProvider` `IAddable` 같은 함수는 자신을 구현한 클래스에 따라 다르게 동작할 수 있게 됨
+
+<br>
+
+## 6. nullable 타입과 프로그램 안정성
+
+### what is nullable type?
+
+- JS와 TS의 변수는 초기화되지 않으면 `undefined`를 기본값으로 가짐
+- `null`은 `undefined`와 사실상 같은 의미로, 심지어 같은 타입인 마냥 서로 호환됨
+
+```ts
+let u: undefined = undefined;
+let n: null = null;
+u = null;
+n = undefined;
+```
+
+- `undefined`와 `null` 타입을 통틀어서 **nullable 타입**이라고 함
+
+```ts
+export type nullable = undefined | null;
+export const nullable: nullable = undefined;
+```
+
+- nullable 타입들은 프로그램을 비정상 종료시키는 주요 원인이 되기도 하여, 프로그램의 안정성을 해침
+- 함수형 언어들은 이를 방지하기 위한 연산자나 클래스를 제공해줌
+
+<br>
+
+### option chaining operator
+
+- `?.` 연산자를 활용하는 기능
+
+```ts
+let longitude = person?.location?.coords?.longitude;
+```
+
+- 이를 **safe navigation operator**라고 부르기도 함
+
+<br>
+
+### nullish coalescing operator
+
+- `??` 연산자를 활용하는 기능
+
+```ts
+let longitude = person?.location?.coords?.longitude ?? 0;
+```
+
+- 체이닝 연산자 부분이 `undefined`이면 0을 반환
