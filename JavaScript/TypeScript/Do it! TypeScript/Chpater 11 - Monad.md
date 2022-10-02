@@ -50,7 +50,7 @@ callMonad((a: number[]) => a.map((value) => value + 1))([1, 2, 3, 4]); // [2, 3,
 
 - 1940년대에 시작된 수학의 한 분야로, 함수형 프로그래밍 언어의 중요한 이론적 배경이 되었음
 
-(이미지 첨부 - 카테고리 이론 대표 이미지)
+![category theory](https://user-images.githubusercontent.com/75058239/193435539-1217ed05-5ed7-4bc7-b320-a593b04e6ef7.png)
 
 - X, Y, Z: category
 - f, g: morphism
@@ -71,7 +71,7 @@ callMonad((a: number[]) => a.map((value) => value + 1))([1, 2, 3, 4]); // [2, 3,
 
 ※ fantasy-land 규격 이미지
 
-(이미지 첨부 - fantasy-land)
+![fantasy-land](https://user-images.githubusercontent.com/75058239/193435548-502fbf09-b89d-4ffb-bc67-3beb059e4abb.png)
 
 - fantasy-land 규격은 하스켈 표준 라이브러리 구조를 JS 방식으로 재구성한 것
 - Monad는 4가지 요소를 구현한 것으로, 이 4가지를 만족한다면 해당 클래스는 Monad
