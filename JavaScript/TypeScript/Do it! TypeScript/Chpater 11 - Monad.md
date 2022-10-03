@@ -95,3 +95,88 @@ callMonad((a: number[]) => a.map((value) => value + 1))([1, 2, 3, 4]); // [2, 3,
 
 - 하스켈 `Prelude` 표준 라이브러리는 `Maybe`와 같은 미리 구현된 Monad 제공
 - TS는 표준 라이브러리가 없으므로 fantasy-land 규격에 맞춰 필요한 Monad를 직접 작성해야 함
+
+<br>
+<br>
+
+## 2. Identity 모나드 이해와 구현
+
+※ [entire source code](https://github.com/nmin11/TIL/tree/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad)
+
+<br>
+
+### IValuable\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IValuable.ts)
+- 어떤 타입 `T`가 있을 때 `T[]`는 같은 타입의 아이템을 여러 개 가진 컨테이너
+  - 보통 컨테이너란 용어는 이처럼 흔히 배열을 뜻함
+- 모든 타입 `T`의 값을 가질 수 있는 제네릭 컨테이너 클래스를 구상해볼 수 있음
+  - 이를 **value container**라고 부름
+
+<br>
+
+### 왜 Identity인가?
+
+- 함수형 프로그래밍에서 **Identity**는 항상 다음을 구현함
+
+```ts
+const identity = <T>(value: T): T => value;
+```
+
+- Identity는 `map` `ap` `of` `chain` 같은 기본 메소드만 구현한 Monad
+- 카테고리 이론에서 자신의 타입에서 다른 타입으로 갔다가 돌아올 때 값이 변경되지 않는 카테고리를 Identity라고 함
+
+<br>
+
+### ISetoid\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/ISetoid.ts)
+- fantasy-land 규격에서 **setoid**는 `equals`라는 이름의 메소드를 제공하는 인터페이스를 의미
+
+<br>
+
+### IFunctor\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IFunctor.ts)
+- fantasy-land 규격에서 **functor**는 `map` 메소드를 제공하는 인터페이스
+- 카테고리 이론에서 functor는 **endofunctor**라는 특별한 성질을 만족해야 함
+
+<br>
+
+### what is endofunctor?
+
+- endofunctor: 특정 카테고리에서 출발해도 도착 카테고리는 다시 출발 카테고리가 되게하는 functor
+  - **endo**는 일종의 접두사
+- 타입 `T`가 `U`로 바뀔 수 있지만, 카테고리는 여전히 Identity에 머물게 함
+
+<br>
+
+### IApply\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IApply.ts)
+- fantasy-land 규격에서 **apply**는 자신이 functor이면서 동시에 `ap` 메소드를 제공하는 인터페이스
+- `IApply`를 구현하는 컨테이너는 값 컨테이너로서뿐만 아니라 고차 함수 컨테이너로서도 동작
+
+<br>
+
+### IApplicative\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IApplicative.ts)
+- fantasy-land 규격에서 **applicativ**는 자신이 apply이면서 동시에 `of` 클래스 메소드를 제공하는 인터페이스
+
+<br>
+
+### IChain\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IChain.ts)
+- fantasy-land 규격에서 **chain**은 자신이 apply이면서 동시에 `chain` 메소드를 제공하는 인터페이스
+- `chain` 메소드는 functor의 `map`과 달리 endofunctor로 구현할 의무가 없음
+  - `map`과 달리 `chain`은 자신이 머무르고 싶은 카테고리를 스스로 정해야 함
+
+<br>
+
+### IMonad\<T> 인터페이스
+
+- [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IMonad.ts)
+- fantasy-land 규격에서 **monad**는 chain과 applicative를 구현한 것
+- 이처럼 선언형 프로그래밍을 염두에 두고 설계되었음
