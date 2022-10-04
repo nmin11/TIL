@@ -99,7 +99,7 @@ callMonad((a: number[]) => a.map((value) => value + 1))([1, 2, 3, 4]); // [2, 3,
 <br>
 <br>
 
-## 2. Identity 모나드 이해와 구현
+## 2. Identity Monad
 
 ※ [entire source code](https://github.com/nmin11/TIL/tree/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad)
 
@@ -180,3 +180,50 @@ const identity = <T>(value: T): T => value;
 - [source code](https://github.com/nmin11/TIL/blob/main/JavaScript/TypeScript/Do%20it!%20TypeScript/monad/identity-monad/interfaces/IMonad.ts)
 - fantasy-land 규격에서 **monad**는 chain과 applicative를 구현한 것
 - 이처럼 선언형 프로그래밍을 염두에 두고 설계되었음
+
+<br>
+<br>
+
+## 3. Maybe Monad
+
+### what is Maybe Monad?
+
+- 오류가 발생할 때와 정상 작동할 때를 모두 고려하면서도 사용하는 코드를 간결하게 작성할 수 있게 해줌
+- 즉, 데이터의 유무에 따라 코드가 적절하게 동작하도록 설계되어 있음
+- `Option`의 `Some` `None`과 비슷한 의미를 가진 `Just` `Nothing` 타입이 있음
+- 사실 Maybe는 그 자체가 모나드가 아니라, `Just<T>`의 `Nothing` 타입이 모나드
+
+```ts
+export class Maybe<T> {
+  static Just<U>(value: U) {
+    return new Just<U>(value);
+  }
+  static Nothing = new Nothing();
+}
+```
+
+- 이렇게 설계되는 이유는 코드의 안정성을 함수형 방식으로 보장하기 위함
+- 예를 들어 어떤 수를 `0`으로 나누면 `Infinity` 값이 생기며, 프로그램이 종료되지는 않음
+  - 프로그램이 비정상 종료되지 않더라도 로직에 혼동을 줄 수 있으므로 가급적 피하는 것이 좋음
+- Maybe는 `undefined` `null` `Infinity` 등의 값을 처리할 때 유용함
+
+```ts
+import { Maybe, IMaybe } from "../classes/Maybe";
+const divide =
+  (a: number) =>
+  (b: number): IMaybe<number> =>
+    b ? Maybe.Just(a / b) : Maybe.Nothing;
+```
+
+- 위 코드는 `b`의 값이 `undefined` `null` `0`이 아닐 때 `Maybe.Just(a/b)` 반환<br>반대일 때는 `Maybe.Nothing` 반환
+
+```ts
+import { add } from "ramda";
+console.log(
+  divide(1)(1).map(add(1)).getOrElse(0),
+  divide(1)(0).map(add(1)).getOrElse(0)
+);
+```
+
+- 첫번째 연산은 `1 + 1`이 되어 `2` 출력
+- 두번째 연산은 `Nothing`에 대한 `add`가 동작하지 않고, `getOrElse(0)`의 `0` 출력
