@@ -227,3 +227,14 @@ console.log(
 
 - 첫번째 연산은 `1 + 1`이 되어 `2` 출력
 - 두번째 연산은 `Nothing`에 대한 `add`가 동작하지 않고, `getOrElse(0)`의 `0` 출력
+
+<br>
+<br>
+
+## 4. Validation Monad
+
+### what is Validation Monad
+
+- **Maybe Monad**가 데이터 유무에 따라 코드가 적절하게 동작하는 것을 확인한다면,<br>**Validation Monad**는 데이터는 있고 해당 데이터가 유효한지를 판단
+- fantasy-land의 Apply 규격에 의존하며 동작
+- Maybe와 비슷하게 **Success**와 **Failure** 2가지 모나드로 구성됨
