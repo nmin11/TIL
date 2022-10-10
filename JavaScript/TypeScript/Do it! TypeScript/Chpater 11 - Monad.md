@@ -186,8 +186,6 @@ const identity = <T>(value: T): T => value;
 
 ## 3. Maybe Monad
 
-### what is Maybe Monad?
-
 - 오류가 발생할 때와 정상 작동할 때를 모두 고려하면서도 사용하는 코드를 간결하게 작성할 수 있게 해줌
 - 즉, 데이터의 유무에 따라 코드가 적절하게 동작하도록 설계되어 있음
 - `Option`의 `Some` `None`과 비슷한 의미를 가진 `Just` `Nothing` 타입이 있음
@@ -238,3 +236,24 @@ console.log(
 - **Maybe Monad**가 데이터 유무에 따라 코드가 적절하게 동작하는 것을 확인한다면,<br>**Validation Monad**는 데이터는 있고 해당 데이터가 유효한지를 판단
 - fantasy-land의 Apply 규격에 의존하며 동작
 - Maybe와 비슷하게 **Success**와 **Failure** 2가지 모나드로 구성됨
+
+<br>
+<br>
+
+## 5. IO Monad
+
+### what is IO Monad
+
+- 비동기 함수가 호출 결과를 기다리는 방식으로 작동
+
+<br>
+
+### 왜 IO인가?
+
+- 여러 개의 파일 입출력을 선언형 프로그래밍 방식으로 작성할 수 있게 고안되었음
+
+<br>
+
+### IO Monad의 주의점
+
+- pure function을 만들기 위해선 비동기 함수도 동기 함수 버전으로 사용해야 함
