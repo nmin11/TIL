@@ -6,8 +6,6 @@
 - main 패키지 안에 `func main`이 또한 존재해야 함
 - 공유되는 패키지에는 main이 없을 수 있음
 
-<br>
-
 ## Packages and Imports
 
 ※ fmt: formatting을 위한 패키지
@@ -15,16 +13,12 @@
 - 함수를 export하고 싶다면 가장 앞 문자를 대문자로 써주면 됨
 - VSC를 활용하면 import를 자동으로 완성해줌
 
-<br>
-
 ## Variables and Constants
 
 - 상수는 앞에 `const`를 붙여서 선언
 - 변수는 앞에 `var`를 붙여서 선언
 - 타입은 변수명 뒤에 지정할 수 있음
 - 변수에 값을 할당할 때 `:=` 키워드를 활용하면 타입 추론
-
-<br>
 
 ## Functions
 
@@ -75,8 +69,6 @@ func lenAndUpper(name string) (length int, uppercase string) {
 defer fmt.Println("I'm done")
 ```
 
-<br>
-
 ## for, range, ...args
 
 ※ for + range
@@ -90,8 +82,6 @@ func superAdd(numbers ...int) {
 ```
 
 - 원한다면 index 부분은 `_` 처리할 수 있음
-
-<br>
 
 ## If, Switch
 
@@ -138,8 +128,6 @@ func main() {
 - `&`는 변수의 주소값을 나타냄
 - `*`는 주소값이 담고 있는 값을 나타냄
 
-<br>
-
 ## Arrays and Slices
 
 ※ array
@@ -161,8 +149,6 @@ names = append(names, "cool guy")
 - 길이를 지정해줄 필요가 없음
 - 새 항목을 추가하기 위해 `append` 함수를 실행해야 하는데, 이는 새 slice를 반환
 
-<br>
-
 ## Maps
 
 ```go
@@ -174,7 +160,24 @@ for key, value := range loko {
 
 - 만약 객체 안에 더 다양한 타입의 value들을 넣고 싶다면 struct를 사용해야 함
 
-<br>
+※ key에 해당하는 value가 없는 경우 error 반환하기
+
+```go
+func (d Dictionary) Search(word string) (string, error) {
+  value, exists := d[word]
+  if exists {
+    return value, nil
+  }
+  return "", errors.New("not found")
+}
+```
+
+※ 특정 key 업데이트 혹은 삭제
+
+```go
+d["word"] = "definition"
+delete(d, "word")
+```
 
 ## Structs
 
@@ -189,3 +192,44 @@ func main() {
   fmt.Println(loko)
 }
 ```
+
+## 생성자
+
+- Go에서는 생성자가 따로 없음
+- 그래서 특유의 생성자를 만들어내는 패턴이 존재
+
+```go
+func NewAccount(owner string) *Account {
+  account := Account{owner: owner, balance: 0}
+  return &account
+}
+```
+
+- 객체를 복사해서 반환하지 않기 위해 객체의 주소값을 반환
+
+## Methods
+
+```go
+func (a *Account) Deposite(amount int) {
+  a.balance += amount
+}
+```
+
+- struct를 함수 이름 앞에서 지정
+- `*`을 붙이지 않으면 받아온 a는 복사본일 뿐
+  - 조회만 할 경우 복사본을 활용할 수도 있을 것
+
+## Errors
+
+```go
+func (a *Account) Withdraw(amount int) error {
+  if a.balance < amount {
+    return errors.New("cannot withdraw")
+  }
+  a.balance -= amount
+  return nil
+}
+```
+
+- `nil`은 null과 같음
+- Go는 exception을 발생시키지 않기 때문에 이 함수를 실행한 쪽에서 에러가 발생했는지 체크해야 함
