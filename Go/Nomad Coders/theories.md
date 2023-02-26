@@ -19,6 +19,7 @@
 - 변수는 앞에 `var`를 붙여서 선언
 - 타입은 변수명 뒤에 지정할 수 있음
 - 변수에 값을 할당할 때 `:=` 키워드를 활용하면 타입 추론
+  - `:=`를 사용하면 const가 아님
 
 ## Functions
 
@@ -179,6 +180,12 @@ d["word"] = "definition"
 delete(d, "word")
 ```
 
+※ empty map 생성 방법
+
+```go
+var results = make(map[string]string)
+```
+
 ## Structs
 
 ```go
@@ -233,3 +240,57 @@ func (a *Account) Withdraw(amount int) error {
 
 - `nil`은 null과 같음
 - Go는 exception을 발생시키지 않기 때문에 이 함수를 실행한 쪽에서 에러가 발생했는지 체크해야 함
+
+## Goroutines
+
+- 동시성을 갖는 함수
+- 함수를 호출할 때 앞에 `go`만 붙이면 됨
+- 다만 goroutine은 프로그램이 작동하는 중에만 유효하다는 것을 명심해야 함
+
+※ `main`에서 모두가 goroutine을 사용해버리면 프로그램의 작동이 끝나고 종료됨
+
+```go
+func main() {
+  go sexyCount("loko")
+  go sexyCount("min")
+}
+```
+
+- `main`은 모든 goroutine들을 기다려주지 않음
+- goroutine은 함수의 반환값을 변수에 담을 수 없음
+
+## Channels
+
+```go
+func main() {
+  c := make(chan bool)
+	people := [3]string{"loko", "min", "sherdi"}
+	for _, person := range people {
+		go isSexy(person, c)
+	}
+	for i := 0; i < len(people); i++ {
+    fmt.Println(<-c)
+  }
+}
+
+func isSexy(person string, c chan bool) {
+	time.Sleep(time.Second * 5)
+	fmt.Println(person)
+	c <- true
+}
+```
+
+- `make(chan type)`으로 채널을 만들 수 있음
+- goroutine으로 실행된 함수가 채널을 받았다면, 해당 채널에 지정된 타입의 값을 넣어줄 수 있음
+  - `c <- value`
+- goroutine 실행 후 채널의 메시지를 사용하는 경우, main 함수는 프로그램을 종료시키지 않고 goroutine의 응답을 기다림
+  - 코드 상에 `<-c` 가 있으면 기다리게 되는 셈
+  - blocking operation
+
+※ 송신만 가능하고 수신은 할 수 없도록 하기
+
+```go
+func hitUrl(url string, c chan<- result) {}
+```
+
+- `chan<-` 키워드를 통해 send only 설정
