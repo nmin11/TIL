@@ -294,3 +294,10 @@ func hitUrl(url string, c chan<- result) {}
 ```
 
 - `chan<-` 키워드를 통해 send only 설정
+
+<br>
+
+## 추가로 알아두면 좋은 것들
+
+※ [Echo](https://echo.labstack.com/guide/)는 꼭 사용하게 될 것이니 꼭 확인해볼 것!
+※ [Buffalo](https://gobuffalo.io/)를 사용하면 풀스택 애플리케이션을 제작할 수 있음
