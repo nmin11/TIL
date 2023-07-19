@@ -9,7 +9,7 @@
 - 컴퓨터는 수없이 많은 트랜지스터를 사용해서 연산
 - 트랜지스터는 CPU, 메모리, 그래픽카드 등에 사용됨
 
-(npn-transistor)
+![npn-transistor](https://github.com/nmin11/TIL/assets/75058239/90d1d876-1eb3-4ec3-9d59-a139e7eb3fee)
 
 - 트랜지스터는 N형과 P형의 실리콘을 겹쳐서 만듦
 - 가운데 실리콘 부분을 Base라고 부르고, 양쪽 실리콘 부분을 Emitter, Collector 라고 부름
