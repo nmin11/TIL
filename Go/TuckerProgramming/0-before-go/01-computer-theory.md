@@ -72,7 +72,7 @@
 
 - 실제로 동작하는 컴퓨터 최초 구현
 
-(von-neumann-architecture)
+![von-neumann-architecture](https://github.com/nmin11/TIL/assets/75058239/2329ae34-430d-471e-b6aa-3ae2a33ccd8b)
 
 - 현대 컴퓨터에서도 사용되는 기본 구조
 - 중앙 처리 장치 CPU에서 명령 수행
