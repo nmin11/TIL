@@ -21,3 +21,10 @@ https://madnight.github.io/githut/#/pull_requests/2023/2
 |      포인터       | 있음                                 |
 | 제네릭 프로그래밍 | 지원하지 않음                        |
 |   네임스페이스    | 없고, 모든 코드는 패키지 단위로 분리 |
+
+## how to build
+
+- `go build` 명령어는 Go 코드를 기계어로 변환해서 실행 파일을 만듦
+- `GOOS`와 `GOARCH` 환경변수를 조정해서 운영체제 및 아키텍처에 맞게 실행 파일을 만듦
+- `go tool dist list` 명령어를 통해 빌드 가능한 운영체제 및 아키텍처 목록을 볼 수 있음
+- 빌드 명령어 예시: `GOOS=linux GOARCH=amd64 go build`
