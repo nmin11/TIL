@@ -28,3 +28,11 @@ https://madnight.github.io/githut/#/pull_requests/2023/2
 - `GOOS`와 `GOARCH` 환경변수를 조정해서 운영체제 및 아키텍처에 맞게 실행 파일을 만듦
 - `go tool dist list` 명령어를 통해 빌드 가능한 운영체제 및 아키텍처 목록을 볼 수 있음
 - 빌드 명령어 예시: `GOOS=linux GOARCH=amd64 go build`
+
+## basic
+
+- Go 언어의 모든 코드는 반드시 패키지 선언으로 시작
+- `main` 패키지는 프로그램 시작점을 포함하는 특별한 패키지 (entry point)
+- 프로그램은 항상 `main()` 함수에서 시작되고 `main()` 함수로 끝남
+- 외부로 공개되는 함수 앞에 함수명으로 시작하는 주석을 달아서 함수를 설명해주는 것이 코딩 규약
+  - 외부 공개 함수나 객체에 주석을 달고 `godoc` 프로그램을 실행하면 주석들을 활용해서 HTML 문서 자동 생성
