@@ -25,3 +25,19 @@
   - https://golang.org/pkg
 - 외부 패키지에서도 원하는 기능을 적극적으로 찾아보자!
   - https://github.com/avelino/awesome-go
+
+## how to use
+
+### unused package
+
+- 패키지를 import하고 사용하지 않으면 에러 발생
+- 패키지를 직접 사용하진 않고 부가효과만 얻고자 할 때는 `_`를 사용
+  - `import _ "fmt"`
+
+### install
+
+- import로 패키지를 포함시키면 `go build` 할 때 패키지들을 포함한 실행 파일을 만들어줌
+- Go가 import된 패키지를 찾는 3가지 방법
+  - Go 설치 경로에 있는 기본 패키지에서 찾음
+  - 외부 저장소의 패키지를 `GOPATH/pkg`에 다운로드
+  - 같은 모듈 안에 있는 패키지는 폴더 내에서 찾음
