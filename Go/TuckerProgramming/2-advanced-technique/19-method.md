@@ -17,3 +17,22 @@ func (a myInt) add(b int) int {
   return int(a) + b
 }
 ```
+
+## why use a method
+
+- 결합도(coupling)를 낮추고 응집도(cohesion)를 높이기 위해
+- 메소드는 데이터와 관련된 기능을 묶어서 코드 응집도를 높여줌
+- 응집도가 낮으면 새 기능을 추가할 때 흩어진 모든 부분을 검토하고 고치는 산탄총 수술 문제 발생
+
+### object oriented programming
+
+- 과거의 절차 중심 프로그래밍은 기능 호출 순서를 나타내는 flowchart를 중요하게 여겼음
+- 메소드 기능이 생기면서 데이터와 기능이 묶인 object들이 동작할 수 있게 되었음
+- object: 데이터와 기능을 갖는 타입
+- object instance: 객체 타입의 인스턴스
+- 객체 인스턴스들이 서로 유기적으로 소통하고 관계를 맺게 되면서 프로그래밍 패러다임의 변화가 생겼음
+- 이제는 flowchart보다 class diagram을 더 중시하게 됐음
+- Go 언어가 OOP 언어인가
+  - 클래스, 상속 지원 X
+  - 메소드, 인터페이스 지원 O
+  - 그래도 객체 간의 상호관계 중심으로 프로그래밍을 할 수 있으므로 충분한 OOP라고 볼 수 있음
