@@ -1,0 +1,4 @@
+- 제목: 필독! 개발자 온보딩 가이드
+- 원제: The Missing README: A Guide for the New Software Engineer
+- 저자: 크리스 리코미니, 드미트리 리아보이
+- 역자: 장현희
