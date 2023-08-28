@@ -67,3 +67,66 @@ func main() {
   - 서비스 제공자는 그저 구체화된 객체만 제공
   - 서비스 이용자는 필요에 따라 그때그때 인터페이스를 정의해서 사용
   - 다른 언어라면 인터페이스 지원 여부를 사용자가 아닌 대상이 스스로 명시해야 할 것
+
+## additional features
+
+### nested interface
+
+- 구조체가 다른 구조체를 포함할 수 있듯, 인터페이스도 다른 인터페이스를 포함할 수 있음
+
+```go
+type Reader interface {
+  Read() (n int, err error)
+  Close() error
+}
+
+type Writer interface {
+  Write() (n int, err error)
+  Close() error
+}
+
+type ReadWriter interface {
+  Reader
+  Writer
+}
+```
+
+- 위 예제의 경우 `Close()`는 같은 형식이므로 하나로 퉁쳐짐
+
+### empty interface
+
+- `interface{}`는 메소드를 가지지 않는 빈 인터페이스
+- 모든 타입에 대응할 수 있음
+- 따라서 어떤 값이든 받을 수 있는 함수, 메소드, 변수값을 만들 때 사용됨
+
+```go
+func PrintVal(v interface{}) {
+  switch t := v.(type) {
+  case int:
+    fmt.Printf("v is int %d\n", int(t))
+  case float64:
+    fmt.Printf("v is float64 %f\n", float64(t))
+  case string:
+    fmt.Printf("v is string %s\n", string(t))
+  default:
+    fmt.Printf("Not supported type: %T:%v\n", t, t)
+  }
+}
+```
+
+### interface default value nil
+
+```go
+type Attacker interface {
+  Attack()
+}
+
+func main() {
+  var att Attacker
+  att.Attack()
+}
+```
+
+- 위 예제의 경우 `att`는 초기값이 없기 때문에 `nil`이 됨
+- `att.Attack()`은 유효하지 않은 nil 주소를 참조하게 되어 runtime error 발생
+- ⭐ nil 때문에 발생한 에러라면 `invalid memory address` 구문을 찾을 수 있을 것!
