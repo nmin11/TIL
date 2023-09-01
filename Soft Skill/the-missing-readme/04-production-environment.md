@@ -49,3 +49,22 @@ throw early
 catch exception late
 
 - 예외를 처리할 적절한 위치에 도착할 때까지 호출 스택을 통해 전파시켜야 함
+
+## metrics
+
+- 지표를 통해 애플리케이션이 어떤 동작을 하는지 살펴보자
+- 지표: 숫자로 표현한 로그와 같음
+- counter, gauge, histogram 3가지 유형이 보편적
+  - counter: 특정 이벤트 발생 횟수 측정
+  - gauge: 특정 시점을 기준으로 값 측정
+  - histogram: 이벤트를 규모에 따라 특정 범위로 구분
+- 시스템 성능
+  - P99와 같은 백분위수(threshold percentiles)의 지표값으로 측정
+  - 어떤 시스템은 추적할 데이터를 줄이기 위해 백분위수를 설정하도록 요구하기도 함
+- 애플리케이션 지표
+  - DataDog, LogicMonitor, Prometheus 같은 중앙식 observability system에서 수집
+  - control theory: 시스템의 출력을 통해 현재 상태 파악이 얼마나 용의한지를 정의
+  - 모니터링 도구와 대시보드 제공
+- autoscaling
+  - 지표는 시스템을 자동으로 확장하거나 축소하는데에도 사용할 수 있음
+- 직접 만들기보다는 표준 지표 라이브러리를 적극 활용할 것!
