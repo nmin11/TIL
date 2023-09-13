@@ -157,3 +157,88 @@ func main() {
 - 실행 취소 기능: 문서 편집기 등에서 일정 개수의 명령을 저장하고 실행 취소하는 경우
 - 고정 크기 버퍼 기능
 - 리플레이 기능: 고정된 길이의 리플레이 기능을 제공할 때
+
+## map
+
+- 키와 값 형태로 데이터를 저장하는 자료구조
+- 키를 사용해서 값을 저장하거나 변경할 수 있음
+- 언어에 따라 dictionary, hash table, hash map 등으로 불림
+  - Go에서는 map
+- list나 ring과는 달리 container 패키지가 아닌 Go 기본 내장 타입
+  - 그만큼 자주 사용됨
+
+```go
+type Product struct {
+  Name  string
+  Price int
+}
+
+func main() {
+  m := make(map[int]Product)
+
+  m[16] = Product{ "볼펜", 500 }
+  m[46] = Product{ "지우개", 200 }
+  m[78] = Product{ "자", 1000 }
+  m[345] = Product{ "샤프", 3000 }
+  m[897] = Product{ "샤프심", 500 }
+
+  for k, v := range m {
+    fmt.Println(k, v)
+  }
+}
+```
+
+- map에 대한 순회는 정렬되지 않음
+
+### delete an element
+
+```go
+delete(m, key)
+```
+
+- 맵 변수와 삭제할 키 값을 인수로 받음
+- 삭제된 요소를 다시 조회하면 해당 요소 타입의 기본값 출력
+- 없는 값과 기본값을 구분하기 위해 요소 존재 여부를 확인해볼 필요가 있음
+
+```go
+v, ok := m[3]
+```
+
+### array vs list vs slice
+
+- array: 요소가 많을수록 추가 및 삭제 작업이 오래 걸림
+- list: 요소가 많을수록 읽기 작업이 오래 걸림
+- map: 요소 개수와 상관없이 일정하게 빠른 속도
+
+| 구분 | array, slice | list | map  |
+| :--: | :----------: | :--: | :--: |
+| 추가 |     O(N)     | O(1) | O(1) |
+| 삭제 |     O(N)     | O(1) | O(1) |
+| 읽기 |     O(1)     | O(N) | O(1) |
+
+## how map works
+
+### hash function
+
+1. 같은 입력 = 같은 결과
+2. 다른 입력 = 되도록 다른 결과
+3. 입력값의 범위 = 무한대, 결과 = 특정 범위를 가짐
+
+### simple example
+
+```go
+const M = 10
+func hash(d int) int {
+  return d % M
+}
+
+func main() {
+  m := [M]int{}
+
+  m[hash(23)] = 10
+  m[hash(259)] = 50
+}
+```
+
+- 실제로는 매우 복잡하고 다양한 해시 함수들이 사용되고 있음
+- 요소와 상관 없이 고정된 시간을 갖는 함수이기 때문에 O(1) 시간복잡도를 가짐
