@@ -64,7 +64,7 @@ func square(wg *sync.WaitGroup, ch chan int) {
 - 내부에 데이터를 보관할 수 있는 메모리 영역 buffer와 함께 채널 만들기
 
 ```go
-var ch string messages = make(chan string, 2)
+var messages chan string = make(chan string, 2)
 ```
 
 - 버퍼를 다 채우면 버퍼가 없을 때와 마찬가지로 보관함에 빈자리가 생길 때까지 대기
