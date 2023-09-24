@@ -69,3 +69,138 @@ var ch string messages = make(chan string, 2)
 
 - 버퍼를 다 채우면 버퍼가 없을 때와 마찬가지로 보관함에 빈자리가 생길 때까지 대기
   - 빼가는 로직이 없으면 똑같이 deadlock
+
+### close channel
+
+```go
+func square(wg *sync.WaitGroup, ch chan int) {
+  for n := range ch {
+    fmt.Printf("Square: %d\n", n*n)
+    time.Sleep(time.Second)
+  }
+  wg.Done()
+}
+
+func main() {
+  var wg sync.WaitGroup
+  ch := make(chan int)
+
+  wg.Add(1)
+  go square(&wg, ch)
+
+  for i := 0; i < 10; i++ {
+    ch <- i * 2
+  }
+  close(ch)
+  wg.Wait()
+}
+```
+
+- `for n := range ch` 구문은 채널에 데이터가 들어올 때까지 무작정 기다리게 함
+- 따라서 `close()` 메소드를 호출해서 채널을 닫아줘야 함
+
+### select
+
+- 채널에 데이터가 없을 때 다른 작업을 하거나 여러 채널을 동시에 대기할 때 사용
+- 여러 채널을 기다리는 경우 하나만 실행해도 종료되기 때문에 for문과 함께 사용해야 함
+
+```go
+func square(wg *sync.WaitGroup, ch chan int, quit chan bool) {
+  for {
+    select {
+    case n := <-ch:
+      fmt.Printf("Square: %d\n", n*n)
+      time.Sleep(time.Second)
+    case <-quit:
+      wg.Done()
+      return
+    }
+  }
+}
+
+func main() {
+  var wg sync.WaitGroup
+  ch := make(chan int)
+  quit := make(chan bool)
+
+  wg.Add(1)
+  go square(&wg, ch, quit)
+
+  for i := 0; i < 10; i++ {
+    ch <- i * 2
+  }
+
+  quit <- true
+  wg.Wait()
+}
+```
+
+### producer consumer pattern
+
+- goroutine과 mutex를 사용하지 않기 위해서 채널을 활용해볼 수 있음
+
+```go
+type Car struct {
+  Body  string
+  Tire  string
+  Color string
+}
+
+var wg sync.WaitGroup
+var startTime = time.Now()
+
+func main() {
+  tireCh := make(chan *Car)
+  paintCh := make(chan *Car)
+
+  fmt.Printf("Start Factory\n")
+
+  wg.Add(3)
+  go MakeBody(tireCh)
+  go InstallTire(tireCh, paintCh)
+  go PaintCar(paintCh)
+
+  wg.Wait()
+  fmt.Println("Close the factory")
+}
+
+func MakeBody(tireCh chan *Car) {
+  tick := time.Tick(time.Second)
+  after := time.After(10 * time.Second)
+  for {
+    select {
+    case <-tick:
+      car := &Car{}
+      car.Body = "Sports car"
+      tireCh <- car
+    case <-after:
+      close(tireCh)
+      wg.Done()
+      return
+    }
+  }
+}
+
+func InstallTire(tireCh, paintCh chan *Car) {
+  for car := range tireCh {
+    time.Sleep(time.Second)
+    car.Tire = "Winter tire"
+    paintCh <- car
+  }
+  wg.Done()
+  close(paintCh)
+}
+
+func PaintCar(paintCh chan *Car) {
+  for car := range paintCh {
+    time.Sleep(time.Second)
+    car.Color = "Red"
+    duration := time.Now().Sub(startTime)
+    fmt.Printf("%.2f Complete Car: %s %s %s\n", duration.Seconds(), car.Body, car.Tire, car.Color)
+  }
+  wg.Done()
+}
+```
+
+- 처음 차를 만들 때는 3초가 걸리지만, 이후로는 1초에 하나씩 만들 수 있게 됨
+- Producer Consumer Pattern: 한쪽에서 데이터를 넣어주면 다른 쪽에서 데이터를 빼오는 방식
