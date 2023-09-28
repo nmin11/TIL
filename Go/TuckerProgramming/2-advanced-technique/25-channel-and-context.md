@@ -204,3 +204,86 @@ func PaintCar(paintCh chan *Car) {
 
 - 처음 차를 만들 때는 3초가 걸리지만, 이후로는 1초에 하나씩 만들 수 있게 됨
 - Producer Consumer Pattern: 한쪽에서 데이터를 넣어주면 다른 쪽에서 데이터를 빼오는 방식
+
+## context
+
+- 작업 가능 시간, 작업 취소 등 작업 조건을 지시하는 작업 명세서 역할
+- 새 goroutine으로 작업을 시작할 때 일정 시간 동안만 작업하게 하거나 외부에서 작업을 취소할 때 사용
+- 작업 설정에 관한 데이터를 전달할 수도 있음
+
+### cancel context
+
+```go
+var wg sync.WaitGroup
+
+func main() {
+  wg.Add(1)
+  ctx, cancel := context.WithCancel(context.Background())
+  go PrintEverySecond(ctx)
+  time.Sleep(5*time.Second)
+  cancel()
+  wg.Wait()
+}
+
+func PrintEverySecond(ctx context.Context) {
+  tick := time.Tick(time.Second)
+  for {
+    select {
+    case <-ctx.Done():
+      wg.Done()
+      return
+    case <-tick:
+      fmt.Println("Tick")
+    }
+  }
+}
+```
+
+- `context.WithCancel()`
+  - context를 인수로 넣으면 해당 context를 감싸는 새로운 context 생성
+  - 2번째 반환값인 취소 함수를 사용해서 context를 취소할 수 있음
+- `context.Background()`: 가장 기본적인 context 생성
+- `cancel()`을 실행하면 `context.Done()` 시그널이 전송된다는 것을 확인할 수 있음
+
+### set timeout on context
+
+- context 취소와 비슷
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+```
+
+- 2번째 인수로 넣은 시간이 지나면 `context.Done()` 시그널 전송
+- `cancel()` 함수 역시 함께 받을 수 있음
+
+### context with value
+
+- 작업에 대한 지시사항을 추가할 때 사용
+
+```go
+var wg sync.WaitGroup
+
+func main() {
+  wg.Add(1)
+  ctx := context.WithValue(context.Background(), "number", 9)
+  go square(ctx)
+  wg.Wait()
+}
+
+func square(ctx context.Context) {
+  if v := ctx.Value("number"); v != nil {
+    n := v.(int)
+    fmt.Printf("Square: %d", n*n)
+  }
+  wg.Done()
+}
+```
+
+※ 취소도 되고 값도 설정할 수 있는 context
+
+```go
+ctx, cancel := context.WithCancel(context.Background())
+ctx = context.WithValue(ctx, "keyword", "Lilly")
+```
+
+- 구글에 "golang concurrency patterns"를 검색해서 더 많은 활용법들을 찾아보자!
