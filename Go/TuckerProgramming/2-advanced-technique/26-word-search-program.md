@@ -118,3 +118,24 @@ func Contains(s, substr string) bool
 
 - strings 패키지의 단어 검색 함수
 - 문자열 `s` 안에 찾고자 하는 `substr`이 있는지 여부를 반환
+
+※ 현재 폴더 및 하위 폴더의 모든 파일 가져오기
+
+```go
+func GetFileList(pattern string) ([]string, error) {
+	filelist := []string{}
+	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			matched, _ := filepath.Match(pattern, info.Name())
+			if matched {
+				filelist = append(filelist, path)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return []string{}, err
+	}
+	return filelist, nil
+}
+```
