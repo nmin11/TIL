@@ -4,7 +4,7 @@
 
 1. 테스트 코드는 파일명이 `_test.go`로 끝나는 파일 안에 있어야 함
 2. `testing` 패키지를 import 해야 함
-3. 테스트 코드를 구현하는 함수들은 `func TestXxxx(t *testing T)` 형태이어야 함
+3. 테스트 코드를 구현하는 함수들은 `func TestXxxx(t *testing.T)` 형태이어야 함
 
 ### how to write a test code
 
@@ -90,3 +90,31 @@ stretchr/testify 의 다른 유용한 패키지들
 
 - mock: 모듈의 행동을 가장하는 mockup 객체 제공
 - suite: 테스트 준비 작업과 테스트 종료 후 뒤처리 작업을 쉽게 할 수 있도록 도와줌
+
+## benchmark
+
+벤치마크 코드 작성 규약
+
+1. 벤치마크 코드는 파일명이 `_test.go`로 끝나는 파일 안에 있어야 함
+2. `testing` 패키지를 import 해야 함
+3. 벤치마크 코드를 구현하는 함수들은 `func BenchmarkXxxx(b *testing.B)` 형태이어야 함
+
+```go
+import "testing"
+
+func BenchmarkFibonacci1(b *testing.B) {
+  for i := 0; i < b.N; i++ {
+    fibonacci1(20)
+  }
+}
+
+func BenchmarkFibonacci2(b *testing.B) {
+  for i := 0; i < b.N; i++ {
+    fibonacci2(20)
+  }
+}
+```
+
+- Go는 충분한 테스트를 위해 `b.N` 값을 적절히 증가시키면서 테스트 진행
+- 벤치마크 테스트 실행 명령어: `go test -bench .`
+- 어떤 os, arch, pkg에서 실행해서 얼만큼의 나노초가 걸렸는지 출력해줌
