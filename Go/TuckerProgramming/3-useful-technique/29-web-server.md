@@ -146,3 +146,25 @@ func main() {
   }
 }
 ```
+
+※ 웹 서버 구현에 유용한 프레임워크들
+
+[gin](https://github.com/gin-gonic/gin)
+
+- 가장 인기가 많은 Go 웹 서버 프레임워크
+
+[urfave/negroni]
+
+- HTTP 미들웨어
+- 로그 기능: 요청 및 응답을 할 때 자동으로 로그를 남겨줌
+- panic 자동 복구 기능
+- 파일 서버 기능: public 폴더의 파일 서버 자동 지원
+
+[unrolled/render]
+
+- 웹 서버 응답으로 HTML, JSON, TEXT 등의 포맷을 간단하게 적용할 수 있음
+
+```go
+r := render.New()
+r.JSON(w, http.StatusOK, map[string]string{"hello": "json"})
+```
