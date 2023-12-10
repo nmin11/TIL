@@ -308,7 +308,7 @@ public void method() {
 - 스레드 상태 제어 : 실행 중인 스레드의 상태를 변경하는 것
 - 멀티 스레드 프로그램을 만들기 위해서는 정교한 스레드 상태 제어가 필요함
 
-![스레드 상태 제어](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/%EC%8A%A4%EB%A0%88%EB%93%9C%20%EC%83%81%ED%83%9C%20%EC%A0%9C%EC%96%B4.png)
+![thread-controll](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/%EC%8A%A4%EB%A0%88%EB%93%9C%20%EC%83%81%ED%83%9C%20%EC%A0%9C%EC%96%B4.png)
 
 ※ 취소선을 가진 메소드는 스레드의 안전성을 해친다고 하여 더 이상 사용하지 않도록 Deprecated 된 메소드들
 
