@@ -24,7 +24,7 @@
 
 <br>
 
-![JVM Runtime Data Area](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/JVM-runtime-data-area.jpg)
+![JVM Runtime Data Area](https://github.com/nmin11/TIL/blob/main/JVM/this-is-java/img/JVM-runtime-data-area.jpg)
 
 <br>
 <br>
