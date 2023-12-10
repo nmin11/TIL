@@ -573,7 +573,7 @@ println(numbersTo100.sum())
 
 ```java
 public class Button {
-  public void setOnClickListener(OnClickListener 1) { ... }
+  public void setOnClickListener(OnClickListener l) { ... }
 }
 ```
 
