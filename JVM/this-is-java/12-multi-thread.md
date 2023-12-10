@@ -14,7 +14,7 @@
   - thread는 사전적 의미로 한 가닥의 실이라는 뜻<br>→ 한 가지 작업을 실행하기 위해 순차적으로 실행할 코드를 실처럼 이어 놓았다고 해서 유래된 이름
 - 멀티 프로세스가 애플리케이션 단위의 멀티 태스킹이라면 멀티 스레드는 애플리케이션 내부에서의 멀티 태스킹
 
-![Multi Process & Multi Thread](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/multi%20process.png)
+![Multi Process & Multi Thread](https://github.com/nmin11/TIL/blob/main/JVM/this-is-java/img/multi-process-and-multi-thread.png)
 
 - 멀티 프로세스들은 운영체제에서 할당받은 자신의 메모리를 가지고 실행하기 때문에 서로 독립적
   - 따라서 하나의 프로세스에서 오류가 발생해도 다른 프로세스에 영향을 미치지 않음
@@ -308,7 +308,7 @@ public void method() {
 - 스레드 상태 제어 : 실행 중인 스레드의 상태를 변경하는 것
 - 멀티 스레드 프로그램을 만들기 위해서는 정교한 스레드 상태 제어가 필요함
 
-![thread-controll](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/%EC%8A%A4%EB%A0%88%EB%93%9C%20%EC%83%81%ED%83%9C%20%EC%A0%9C%EC%96%B4.png)
+![thread-controll](https://github.com/nmin11/TIL/blob/main/JVM/this-is-java/img/thread-controll.png)
 
 ※ 취소선을 가진 메소드는 스레드의 안전성을 해친다고 하여 더 이상 사용하지 않도록 Deprecated 된 메소드들
 
@@ -700,7 +700,7 @@ Thread t = new Thread(ThreadGroup group, String name);
 
 # 스레드풀
 
-![스레드풀](https://github.com/nmin11/TIL/blob/main/Java/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/Thread%20Pool.png)
+![thread-pool](https://github.com/nmin11/TIL/blob/main/JVM/this-is-java/img/thread-pool.png)
 
 - 병렬 작업 처리가 많아지면 스레드 개수가 증가되고 그에 따른 스레드 생성과 스케줄링으로 인해<br>메모리 사용량이 늘어나서 애플리케이션 성능이 저하됨
 - 갑작스런 병렬 작업의 폭증으로 인한 스레드 폭증을 막기 위해 **ThreadPool** 을 이용해야 함

@@ -13,7 +13,7 @@
   - JVM은 프로그램 실행 도중 예외가 발생하면 해당 예외 클래스로 객체를 생성하고, 예외 처리 코드에서 예외 객체를 이용할 수 있도록 해줌
   - 모든 예외 클래스들은 `java.lang.Exception` 클래스를 상속받음
 
-![Exception](https://github.com/nmin11/TIL/blob/main/JVM/%EC%9D%B4%EA%B2%83%EC%9D%B4%20%EC%9E%90%EB%B0%94%EB%8B%A4/img/Exception.png)
+![Exception](https://github.com/nmin11/TIL/blob/main/JVM/this-is-java/img/exception.png)
 
 <br>
 <br>
