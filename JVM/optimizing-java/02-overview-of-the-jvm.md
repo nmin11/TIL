@@ -42,3 +42,72 @@ JVM 인터프리터
 - 보통 환경에서 자바는 런타임 환경에서 클래스를 나타내는 `Class` 객체를 만듦
   - 같은 클래스를 서로 다른 클래스로더가 로드할 가능성도 있으니 주의
   - 시스템 안에서 클래스는 _'패키지명을 포함한 풀 클래스명'_ 과 _'자신을 로드한 클래스로더'_ , 2가지 정보로 식별됨
+
+## 2. 바이트코드 실행
+
+- 자바 소스 코드 실행을 위한 변환을 위한 첫 단계는 자바 컴파일러 `javac` 를 이용한 컴파일
+- 보통 전체 빌드 프로세스의 한 부분으로 수행
+- 자바 소스 코드를 바이트코드인 `.class` 파일로 변경
+- 컴파일하면서 최적화는 거의 하지 않기 때문에 결과로 생성된 바이트코드는 쉽게 해독 가능
+  - 표준 역어셈블리 툴 `javap` 를 통해 원래의 자바 코드도 어렵지 않게 알아볼 수 있음
+- 바이트코드: 컴퓨터 아키텍처를 특정하지 않은 IR(Intermediate Representation)
+  - 이식성이 좋기 때문에 JVM 지원 플랫폼 어디서건 실행 가능하고 자바 언어에 대해서도 추상화되어 있음
+
+※ 컴파일러가 생성한 클래스 파일은 VM 명세서에 명확히 정의된 구조를 따름
+
+|         component         |                 description                  |
+| :-----------------------: | :------------------------------------------: |
+|       magic number        |                 `0xCAFEBABE`                 |
+| class file format version |        클래스 파일의 major/minor 버전        |
+|       constant pool       |        클래스 상수들이 모여 있는 위치        |
+|        access flag        | 추상 클래스, 정적 클래스 등 클래스 종류 표시 |
+|        this class         |                현재 클래스명                 |
+|        superclass         |                부모 클래스명                 |
+|         interface         |       클래스가 구현한 모든 인터페이스        |
+|           field           |           클래스에 있는 모든 필드            |
+|          method           |          클래스에 있는 모든 메소드           |
+|         attribute         |           클래스가 지닌 모든 속성            |
+
+magic number
+
+- 모든 클래스 파일은 이 파일이 클래스 파일임을 나타내는 4byte 16진수 `0xCAFEBABE` 로 시작
+
+class file format version
+
+- 그다음 4byte는 컴파일할 때 꼭 필요한 major/minor 버전 숫자
+- 클래스를 실행하는 대상 JVM이 컴파일한 JVM보다 버전이 낮으면 안됨
+- 클래스로더의 호환성 보장을 위해 검사
+- 호환되지 않는 버전의 클래스 파일을 만나면 런타임에 `UnsupportedClassVersionError` 발생
+
+constant pool
+
+- 클래스명, 인터페이스명, 필드명 등의 상숫값
+- JVM은 코드 실행 시 메모리 대신 상수 풀 테이블을 찾아보고 필요한 값을 참조
+
+access flag
+
+- 클래스에 적용하는 수정자 결정
+- public class: `ACC_PUBLIC(0x0001)`
+- final class: `ACC_FiNAL(0x0010)`
+- superclass: `ACC_SUPER(0x0020)`
+- interface: `ACC_INTERFACE(0x0200)`
+- 추상 클래스: `ACC_ABSTRACT(0x0400)`
+- 합성 클래스: `ACC_SYNTHETIC(0x1000)`
+- annotation: `ACC_ANNOTATION(0x2000)`
+- enum: `ACC_ENUM(0x4000)`
+
+this class / superclass / interface
+
+- 클래스에 포함된 타입 계층을 나타냄
+- 각각 상수 풀을 가리키는 인덱스로 표시
+
+field / method
+
+- 시그니처와 비슷한 구조를 정의
+- 수정자도 포함
+
+attribute
+
+- 더 복잡하고 크기가 고정되지 않은 구조를 나타내는 데 쓰임
+
+※ [클래스 파일 구조를 이해하기에 좋은 글](https://blog.lse.epita.fr//2014/04/28/0xcafebabe-java-class-file-format-an-overview.html)
