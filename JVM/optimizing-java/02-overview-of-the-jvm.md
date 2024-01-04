@@ -114,7 +114,7 @@ attribute
 
 ## 3. 핫스팟 입문
 
-(이미지 첨부 - hotspot-jvm)
+![hotspot-jvm](https://github.com/nmin11/TIL/assets/75058239/35ed7281-7982-48e7-bc34-c7008cc73b3f)
 
 - 1999년 Sun Microsystems가 핫스팟 가상 머신을 선보인 이후 C/C++에 필적하는 성능을 자랑하게 되었음
 - 제로-오버헤드 원칙에 대해
