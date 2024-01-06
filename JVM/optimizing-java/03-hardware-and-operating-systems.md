@@ -12,7 +12,7 @@
 
 ### 2.1 메모리 캐시
 
-(이미지 첨부 - cpu-cache.png)
+![cpu-cache](https://github.com/nmin11/TIL/assets/75058239/9a0ed819-deb2-4e4c-a3c6-676bbe5e0ad6)
 
 - 그래서 CPU 캐시가 고안되었음
 - 액세스 빈도가 높은 캐시일수록 프로세스 코어와 가깝게 위치하며 L1, L2, L3 등으로 구분
@@ -68,7 +68,7 @@
   - **run queue** : CPU 실행 대기 중인 프로세스 목록
   - 스케줄러는 인터럽트에 응답하고 CPU 코어 액세스를 관리
 
-(이미지 첨부 - thread-lifecyle.png)
+![thread-lifecycle](https://github.com/nmin11/TIL/assets/75058239/63dc2f90-af32-4a1d-9648-d21724579514)
 
 - OS는 특성상 CPU에서 코드가 실행되지 않는 시간을 유발
   - 코드가 실행되는 시간보다 기다리는 시간이 더 많음
