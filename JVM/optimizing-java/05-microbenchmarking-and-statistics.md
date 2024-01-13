@@ -212,7 +212,7 @@ public class SortBenchmark {
 
 ❖ 정밀도와 정확도의 차이 나타내는 그림
 
-(이미지 첨부 - accuracy-and-percision.png)
+![accuracy-and-precision](https://github.com/nmin11/TIL/assets/75058239/40d2915d-0385-4feb-8171-096da3a65b6a)
 
 ### 3.2 비정규 통계학
 
