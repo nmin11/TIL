@@ -87,8 +87,9 @@ plugins {
 
 ```gradle
 dependencies {
-  implementation 'org.openjdk.jmh:jmh-core:1.35'
-  jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
+  jmh("org.openjdk.jmh:jmh-core:1.36")
+  jmh("org.openjdk.jmh:jmh-generator-annprocess:1.36")
+  jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.36")
 }
 ```
 
@@ -150,46 +151,46 @@ JMH 코드 예시
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Fork(1)
 public class SortBenchmark {
-  private static final int N = 1_000;
-  private static final List<Integer> testData = new ArrayList<>();
+    private static final int N = 1_000;
+    private static final List<Integer> testData = new ArrayList<>();
 
-  @Setup
-  public static final void setup() {
-    Random randomGenerator = new Random();
-    for (int i = 0; i < N; i++) {
-      testData.add(randomGenerator.nextInt(Integer.MAX_VALUE));
+    @Setup
+    public static final void setup() {
+        Random randomGenerator = new Random();
+        for (int i = 0; i < N; i++) {
+            testData.add(randomGenerator.nextInt(Integer.MAX_VALUE));
+        }
+        System.out.println("Setup complete");
     }
-    System.out.println("Setup complete");
-  }
 
-  @Benchmark
-  public List<Integer> classicSort() {
-    List<Integer> copy = new ArrayList<>(testData);
-    Collections.sort(copy);
-    return copy;
-  }
+    @Benchmark
+    public List<Integer> classicSort() {
+        List<Integer> copy = new ArrayList<>(testData);
+        Collections.sort(copy);
+        return copy;
+    }
 
-  @Benchmark
-  public List<Integer> standardSort() {
-    return testData.stream().sorted().collect(Collectors.toList());
-  }
+    @Benchmark
+    public List<Integer> standardSort() {
+        return testData.stream().sorted().collect(Collectors.toList());
+    }
 
-  @Benchmark
-  public List<Integer> parallelSort() {
-    return testData.stream().parallel().sorted().collect(Collectors.toList());
-  }
+    @Benchmark
+    public List<Integer> parallelSort() {
+        return testData.stream().parallel().sorted().collect(Collectors.toList());
+    }
 
-  public static void main(String[] args) throws RunnerException {
-    Options opt = new OptionsBuilder()
-      .include(SortBenchmark.class.getSimpleName())
-      .warmupIterations(100)
-      .measurementIterations(5).forks(1)
-      .jvmArgs("-server", "-Xms2G", "-Xmx2G").build();
-      .addProfiler(GCProfiler.class)
-      .addProfiler(StackProfiler.class)
-      .build();
-    new Runner(opt).run();
-  }
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+                .include(SortBenchmark.class.getSimpleName())
+                .warmupIterations(100)
+                .measurementIterations(5).forks(1)
+                .jvmArgs("-server", "-Xms2G", "-Xmx2G")
+                .addProfiler(GCProfiler.class)
+                .addProfiler(StackProfiler.class)
+                .build();
+        new Runner(opt).run();
+    }
 }
 ```
 
