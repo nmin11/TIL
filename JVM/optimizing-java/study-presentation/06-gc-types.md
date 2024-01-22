@@ -150,3 +150,13 @@ java -XX:+UseZGC
 ```
 
 ⚠️ Java 15 이전 버전에서는 `-XX:+UnlockExperimentalVMOptions` 옵션을 추가해야 함
+
+❖ References
+
+- https://d2.naver.com/helloworld/1329
+- https://www.baeldung.com/jvm-garbage-collectors
+- https://velog.io/@guswlsapdlf/Java-GC-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98
+- https://huisam.tistory.com/entry/jvmgc
+- https://renuevo.github.io/java/garbage-collection/
+- https://www.baeldung.com/jvm-zgc-garbage-collector
+- https://d2.naver.com/helloworld/0128759
