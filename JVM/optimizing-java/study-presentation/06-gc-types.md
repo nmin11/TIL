@@ -10,6 +10,8 @@
 java -XX:+UseSerialGC
 ```
 
+<img width="783" alt="serial-and-parallel" src="https://github.com/nmin11/TIL/assets/75058239/74e91d2a-0edc-4669-8347-aa3ca1fcd465">
+
 ## Parallel GC
 
 - Java 5 ~ 8 까지의 디폴트 GC
@@ -47,6 +49,8 @@ java -XX:+UseParallelOldGC
 
 *Concurrent Mark Sweep*
 
+![cms-gc](https://github.com/nmin11/TIL/assets/75058239/ae758bfe-404e-4b03-ba4a-f5a0cf2384f5)
+
 - Initial Mark 단계: 클래스로더에서 가장 가까운 객체 중 살아있는 객체만 찾고 끝
 - Concurrent Mark 단계: 살아있다고 확인한 객체들을 루트로 하여 참조되는 객체들을 마킹
   - 다른 스레드가 실행 중인 상태에서 동시에 실행됨
@@ -63,6 +67,8 @@ java -XX:+UseParallelOldGC
 ## G1 GC
 
 *Garbage First*
+
+![g1-gc](https://github.com/nmin11/TIL/assets/75058239/f3893306-45de-4b70-912b-12bd2e5e47ba)
 
 - Java 9부터 디폴트 GC
 - 지금까지의 GC와는 완전히 다른 방식
@@ -83,6 +89,8 @@ java -XX:+UseParallelOldGC
 
 ### Major GC
 
+![g1-gc-process](https://github.com/nmin11/TIL/assets/75058239/a9af8b42-4f0b-4b38-bb7d-06e850f6cf2e)
+
 - Initial Mark 단계: Old 리전의 객체들이 참조하는 Survivor 영역의 객체들을 마킹 (STW)
 - Root Region Scan 단계: 위 단계에서 찾은 Survivor 객체들에 대한 스캔 작업
 - Concurrent Mark 단계: 전체 힙에 대한 스캔 작업 실시 → 가비지가 없는 리전들은 다음 단계에서 제외
@@ -98,6 +106,8 @@ java -XX:+UseG1GC
 
 *Scalable Low Latency GC*
 
+![zgc-concept-1](https://github.com/nmin11/TIL/assets/75058239/a26abb49-e049-4240-a634-29ec9fde7635)
+
 - Java 11 때 실험 버전으로 등장, 이후 Java 15부터 정식 버전 출시
 - **STW 시간을 10ms 이하로!**
   - 저지연을 요구하는 동시성 고비용 작업에 적합
@@ -105,18 +115,26 @@ java -XX:+UseG1GC
 - G1 GC와 마찬가지로 힙을 영역별로 나누어 관리하지만, 각 영역의 크기는 다름
   - region 대신 **ZPage**라는 논리적 단위로 구분
   - small(2 MB), medium(32 MB), large(N * 2 MB) 3가지 타입을 가짐
-- **Colored pointers**
-  - 객체를 가리키는 변수의 포인터에서 64bit 메모리를 활용해서 객체 상태값을 저장
-    - 이를 위해 64bit 운영체제에서만 사용 가능
-  - 42bit는 객체의 주소값으로 활용
-  - 4bit는 객체의 상태값을 표현
-    - Finalizable: finalizer를 통해서만 접근 가능한 객체 (가비지)
-    - Remapped: 객체의 재배치 여부를 표시
-    - Marked 1 / 0: 접근 가능한 객체를 표시
-- **Load barriers**
-  - 객체를 참조할 때 실행되는 코드
-  - G1 GC와 다르게 메모리 재배치 과정에서 STW가 발생하지 않게 해줌
-  - RemapMark와 RellocationSet을 확인하면서 참조와 mark를 업데이트
+
+### Colored pointers
+
+![colored-pointers](https://github.com/nmin11/TIL/assets/75058239/7a620525-8a40-4499-a548-ca0b8f80bca4)
+
+- 객체를 가리키는 변수의 포인터에서 64bit 메모리를 활용해서 객체 상태값을 저장
+  - 이를 위해 64bit 운영체제에서만 사용 가능
+- 42bit는 객체의 주소값으로 활용
+- 4bit는 객체의 상태값을 표현
+  - Finalizable: finalizer를 통해서만 접근 가능한 객체 (가비지)
+  - Remapped: 객체의 재배치 여부를 표시
+  - Marked 1 / 0: 접근 가능한 객체를 표시
+
+### Load barriers
+
+![zgc-concept-7](https://github.com/nmin11/TIL/assets/75058239/e7d92b3d-e6db-4a4e-95b5-65031ae2c178)
+
+- 객체를 참조할 때 실행되는 코드
+- G1 GC와 다르게 메모리 재배치 과정에서 STW가 발생하지 않게 해줌
+- RemapMark와 RellocationSet을 확인하면서 참조와 mark를 업데이트
 - GC 수행 단계
   - `Pause` Mark Start 단계: ZGC의 루트에서 가리키는 객체 Mark 표시 (Live Object)
   - Concurrent Mark/Remap 단계: 객체의 참조를 탐색하며 모든 객체에 Mark 표시
@@ -124,6 +142,8 @@ java -XX:+UseG1GC
   - Concurrent Pereare for Relocate 단계: 재배치할 영역을 찾아서 RelocationSet에 배치
   - `Pause` Relocate Start 단계: 모든 루트 참조의 재배치를 진행하고 업데이트
   - Concurrent Relocate 단계: Load barriers를 사용해서 모든 객체를 재배치하고 참조를 수정
+
+![zgc-performance](https://github.com/nmin11/TIL/assets/75058239/6ac87a0a-82fc-499c-962e-f3aa88f4c218)
 
 ```bash
 java -XX:+UseZGC
