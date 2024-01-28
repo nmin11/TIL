@@ -64,6 +64,10 @@ java -XX:+UseParallelOldGC
   - compaction 단계가 없어서 메모리 단편화가 발생할 수 있음
     - 조각난 메모리가 많아 compaction 작업을 할 경우 STW 시간이 훨씬 더 길어짐
 
+```bash
+java -XX:+UseConcMarkSweepGC
+```
+
 ## G1 GC
 
 *Garbage First*
