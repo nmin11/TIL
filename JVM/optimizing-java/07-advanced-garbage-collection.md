@@ -165,7 +165,7 @@ java -XX:+UseConcMarkSweepGC
   - 세대를 불연속적으로 배치 가능
   - 매 GC마다 전체 가비지를 수집할 필요가 없음
 
-(이미지 첨부 - g1-region.png)
+![g1-region](https://github.com/nmin11/TIL/assets/75058239/8619d26e-2645-4bd3-aa91-6cafcdb6ce8e)
 
 - 1, 2, 4, 8, 16, 32, 64MB 크기로 region을 사용할 수 있음
 - 기본적으로 힙에는 2,048 ~ 4,095개의 region 존재
@@ -305,7 +305,7 @@ java -XX:+UseShenandoahGC
 
 ❖ 셰난도아와 다른 수집기의 중단 시간 비교 그래프
 
-(이미지 첨부 - shenandoah-gc.png)
+![shenandoah-gc](https://github.com/nmin11/TIL/assets/75058239/aeda9d29-14c3-4267-9636-5fd951297035)
 
 ## 6. C4(아줄 징)
 
