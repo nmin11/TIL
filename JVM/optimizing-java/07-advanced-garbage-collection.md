@@ -195,6 +195,8 @@ G1 수집기가 하는 일의 맥락
 
 **RSet**
 
+![rset](https://github.com/nmin11/TIL/assets/75058239/ce68836b-8673-46cc-b60e-cc18fe8829f5)
+
 - *Remembered Set*
 - 영역별로 하나씩, 외부에서 힙 영역 내부를 참조하는 레퍼런스 관리 장치
 - 카드 테이블과 함께 floating garbage를 추적하는 데 사용됨
