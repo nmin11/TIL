@@ -1,6 +1,10 @@
 - 로그 정책 관련 옵션
 - 적절한 로깅 툴 선정에 대해
   - 센섬, GCViewer 외에도 괜찮은 툴이 있을지
+  - GCEasy 알아보기
+  - GCViewer 알아보기
+  - GCPlot 알아보기
 - JMX deep dive
   - 책에 부정적인 내용이 많아서 우선순위 낮음
 - G1 힙의 영역별 레이아웃을 시각화하는 자바 FX 애플리케이션 알아보기
+- jHiccup, HdrHistogram
