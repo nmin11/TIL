@@ -217,7 +217,7 @@ JIT 컴파일
 - JIT 컴파일 서브시스템을 구성하는 스레드는 핫스팟 내부에서 가장 중요한 스레드들
   - profiling 스레드와 컴파일러 스레드도 여기에 포함됨
 
-(이미지 첨부 - jit-compiler.png)
+![jit-compiler](https://github.com/nmin11/TIL/assets/75058239/b5a72003-ed62-42d6-aa25-1ed5c243dfd3)
 
 - 최적화된 기계어 생성 후 해당 klass의 vtable은 새로 컴파일된 코드를 가리키도록 수정됨
   - vtable 포인터 업데이트 작업을 **pointer swizzling** 이라고 부름
