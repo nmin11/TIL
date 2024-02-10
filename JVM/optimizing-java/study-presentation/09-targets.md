@@ -1,0 +1,6 @@
+- 바이트코드 작동 방식
+  - JVM에서 어떻게 관리하는지
+- AOT deep dive
+  - GraalVM
+- JIT deep dive
+- 핫스팟의 단계별 컴파일
