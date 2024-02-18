@@ -74,3 +74,33 @@ dynamic method dispatch
 - 단형성은 하드웨어와 가깝다!
 - 하지만 객체지향 언어에서 인터페이스를 작성하고 이에 대한 구현체를 작성하는 것은 매우 중요한 추상화 메커니즘
 - 다형성에 대한 성능 걱정은 일반적인 상황에서 의미가 없다
+
+
+## 온-스택 치환
+
+https://die4taoam.tistory.com/52
+
+- RET(Return Address) : 함수 호출 이후 복귀 지점을 스택에 만드는 것
+- OSR: RET의 일반적인 흐름에서 벗어나 루프를 점프할 수 있도록 최적화하는 기법
+
+https://thangavel-blog.medium.com/java-on-stack-replacement-osr-b527ab3fff8c
+
+- OSR은 오래 실행된 "핫" 바이트코드를 컴파일해준다
+
+단계
+
+1. 런타임이 특정 메소드 (현재 변수값, 프로그램 카운터)
+2. 메소드를 다시 컴파일
+3. 컴파일러는 스택 활성화 프레임을 생성하고 이전 버전에서 추출된 값들로 업데이트
+4. 시스템은 이전 활성화 프레임을 교체하고 새 버전에서 재실행
+
+```bash
+<nmethod compile_id='272' compile_kind='osr' compiler='c1' level='3' entry='0x000000010ce0a5c0' size='15200' address='0x000000010ce0a090' relocation_offset='336' insts_offset='1328' stub_offset='11312' scopes_data_offset='11864' scopes_pcs_offset='13552' dependencies_offset='14992' nul_chk_table_offset='15000' metadata_offset='11720' method='java.util.Properties$LineReader readLine ()I' bytes='584' count='49' backedge_count='62873' iicount='49' stamp='0.126'/>
+```
+
+- `bytes` : 메소드 크기
+- `compiled_kind='osr'` : OSR 기법을 사용했음을 나타냄
+- `compiler='c1'` : C1 컴파일러를 사용했음을 나타냄
+- `count` : 컴파일러에 의해 메소드가 호출된 횟수
+- `backedge_count` : 루프가 포함된 메소드를 감지하는 용도, 인터프리터에 의해 숫자가 증가됨
+- `iicount` : 인터프리터가 메소드를 호출한 횟수
