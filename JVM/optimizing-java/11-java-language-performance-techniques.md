@@ -12,7 +12,7 @@
 
 컬렉션 API
 
-(collection-api.png)
+![collection-api](https://github.com/nmin11/TIL/assets/75058239/e5c6f8e3-3a8a-43dd-84df-ffc197335bef)
 
 - 타입별로 컨테이너가 준수해야 할 작업을 구체적으로 명시한 인터페이스 모음
 - JDK에는 인터페이스 말고도 다양한 컬렉션 구현체가 들어 있음
