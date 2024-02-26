@@ -2,6 +2,48 @@
 
 ⎯ 남궁민
 
+## `invokedynamic` 에 대해 먼저 알아보자
+
+```java
+public class InvokeDynamic {
+    public static void main(String[] args) {
+        Runnable r = () -> System.out.println("Hello");
+        r.run();
+    }
+}
+```
+
+```java
+{
+  public com.livid.javaoptimizing.InvokeDynamic();
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+      stack=1, locals=2, args_size=1
+         0: invokedynamic #7,  0              // InvokeDynamic #0:run:()Ljava/lang/Runnable;
+         5: astore_1
+         6: aload_1
+         7: invokeinterface #11,  1           // InterfaceMethod java/lang/Runnable.run:()V
+        12: return
+}
+
+BootstrapMethods:
+  0: #43 REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #39 ()V
+      #40 REF_invokeStatic com/livid/javaoptimizing/InvokeDynamic.lambda$main$0:()V
+      #39 ()V
+```
+
+- `invokedynamic` 은 BSM(Bootstrap Method)을 호출하고, BSM은 호출할 실제 메소드를 가리키는 객체를 반환
+- CallSite: method handle을 담아두는 홀더 역할 수행
+  - CallSite를 호출하면 MethodHandle을 통해서 타겟 메서드에 위임
+
 ## Method Handle 정의
 
 - 자바 7부터 추가되었고, 이후 지속적으로 개선되어 온 기능
