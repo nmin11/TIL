@@ -1,1 +1,12 @@
 - Akka와 같은 동시성 라이브러리 사용기
+- 자바 동시성 프로그래밍 핵심 개념들 살펴보고 간단한 실습을 통해 이해하기
+  - Semaphore
+  - SpinLock
+  - ReentrantLock
+  - CAS (Compare And Swap)
+  - Atomic Variables
+  - CountDownLatch
+  - CyclicBarrier
+  - ForkJoinPool
+  - ExecutorService
+- `java.util.concurrent.Lock` 활용기
