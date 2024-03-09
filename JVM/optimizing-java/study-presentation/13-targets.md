@@ -1,0 +1,5 @@
+- Java Profiler 직접 사용해보기
+  - Ref: [A Guide to Java Profilers](https://www.baeldung.com/java-profilers)
+- flame graph
+  - [github](https://github.com/brendangregg/FlameGraph)
+  - [blog](https://netflixtechblog.com/java-in-flames-e763b3d32166)
