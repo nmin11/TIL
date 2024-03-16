@@ -141,7 +141,7 @@ https://github.com/real-logic/agrona
 - 자바 및 C++ 용도로 개발된 UDP 유니캐스트, UDP 멀티캐스트, IPC 메시지 전송을 위한 수단
 - 컴포넌트 라이브러리 형태이므로 어떤 프레임워크에도 얽매이지 않음
 
-(이미지 첨부 - 에어론 아키텍처 구조)
+![aeron](https://github.com/nmin11/TIL/assets/75058239/a6fd9131-9c1d-425f-a366-716693233c89)
 
 - media: 에어론이 통신하는 매개체 (UDP, IPC, 인피니밴드 등)
 - media driver: 미디어와 에어론 사이의 연결 통로
