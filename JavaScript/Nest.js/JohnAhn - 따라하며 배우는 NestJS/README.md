@@ -76,3 +76,19 @@ NestJS 기본 6개 파이프
   - value: 파이프가 처리할 인자
   - metadata: 파이프가 처리할 인자의 메타데이터
   - 메소드에서 리턴된 값은 핸들러 메소드로 전달됨
+
+## TypeORM
+
+- node.js에서 실행되고 TypeScript로 작성된 객체 관계 매핑(Object-Relational Mapping) 라이브러리
+- 여러 DB를 지원하는 매퍼
+- 객체와 관계형 DB의 데이터 변형 및 연결
+- 모델을 기반으로 DB 테이블 생성 및 관리
+- DB에서 개체를 쉽게 CRUD 할 수 있음
+- 테이블 간의 매핑을 통해 객체 간의 관계를 쉽게 관리
+- 간단한 CLI 명령 제공
+- NestJS에서 사용하기 위해 `@nestjs/typeorm` 패키지 설치 필요
+- Entity 클래스를 통해 DB 테이블을 정의
+  - `@Entity()` 데코레이터로 클래스 선언
+- Repository 클래스를 통해 Entity 클래스를 조작
+  - `@InjectRepository(Entity)` 데코레이터로 클래스 선언
+  - DB와 관련된 일은 Repository 클래스를 통해 수행하며 이를 Repository 패턴이라고 함
