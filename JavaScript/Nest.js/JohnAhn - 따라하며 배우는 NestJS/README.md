@@ -37,3 +37,42 @@
   - NestJS에서는 class를 권장
 - 데이터 유효성을 체크하는 데 사용됨
 - 여러 군데에서 사용되는 프로퍼티의 이름이 변경되는 경우 유지보수가 편리
+
+## Pipe
+
+- `@Injectable()` 데코레이터가 달린 클래스
+- data transformation, data validation 등을 수행
+- 컨트롤러 메소드의 파라미터에 적용 가능
+- 메소드 호출 직전에 파이프를 삽입하고, 파이프는 메소드로 향하는 인수를 받아서 작동
+
+### Pipe 사용 방법
+
+- Handler-level pipe
+  - `@UsePipes(ValidationPipe)` 데코레이터로 사용
+  - 핸들러의 모든 파라미터에 적용
+- Parameter-level pipe
+  - `@Body('column', ParseIntPipe)` 데코레이터로 사용
+  - 특정 파라미터에만 적용
+- Global-level pipe
+  - `app.useGlobalPipes(new ValidationPipe())` 메소드로 사용
+  - 애플리케이션 전체 적용
+
+### Built-in Pipes
+
+NestJS 기본 6개 파이프
+
+- ValidationPipe
+- ParseIntPipe
+- ParseBoolPipe
+- ParseArrayPipe
+- ParseUUIDPipe
+- DefaultValuePipe
+
+### Custom Pipe
+
+- `PipeTransform` 인터페이스를 구현해서 만들 수 있음
+- 모든 파이프는 `transform()` 메소드를 구현해야 함
+  - 해당 메소드는 NestJS가 파이프를 실행할 때 인자를 처리하기 위해 호출됨
+  - value: 파이프가 처리할 인자
+  - metadata: 파이프가 처리할 인자의 메타데이터
+  - 메소드에서 리턴된 값은 핸들러 메소드로 전달됨
