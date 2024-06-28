@@ -92,3 +92,16 @@ NestJS 기본 6개 파이프
 - Repository 클래스를 통해 Entity 클래스를 조작
   - `@InjectRepository(Entity)` 데코레이터로 클래스 선언
   - DB와 관련된 일은 Repository 클래스를 통해 수행하며 이를 Repository 패턴이라고 함
+
+### remove vs delete
+
+- remove: 무조건 존재하는 것을 삭제하며, 존재하지 않는 경우 404 에러 발생
+- delete: 존재하는 것을 삭제하거나 존재하지 않는 경우 아무런 동작도 하지 않음
+- delete을 활용해야 DB 호출을 한번만 할 수 있음
+
+```ts
+const result = await this.boardRepository.delete(id);
+if (result.affected === 0) {
+  throw new NotFoundException(`Board with ID ${id} not found`);
+}
+```
