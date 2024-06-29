@@ -105,3 +105,15 @@ if (result.affected === 0) {
   throw new NotFoundException(`Board with ID ${id} not found`);
 }
 ```
+
+## Middleware
+
+- Pipes: 요청 유효성 검사, 데이터 변환 등
+- Filters: 예외 처리
+- Guards: 요청 처리 전 인증 및 권한 부여
+- Interceptors: 요청 처리 후 응답 변환, 응답 매핑 및 캐시 관리
+- middleware → guard → interceptor(before) → pipe → controller → service → controller → interceptor(after) → filter → client
+
+### @UseGuards()
+
+- `@nestjs/passport` 패키지를 통해 토큰 검증 및 사용자 정보 조회 가능
