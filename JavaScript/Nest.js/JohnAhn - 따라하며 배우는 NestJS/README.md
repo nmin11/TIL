@@ -117,3 +117,8 @@ if (result.affected === 0) {
 ### @UseGuards()
 
 - `@nestjs/passport` 패키지를 통해 토큰 검증 및 사용자 정보 조회 가능
+
+## Log
+
+- `@nestjs/common` 패키지의 Logger 클래스를 통해 로그 출력 가능
+- `Logger.log()`, `Logger.error()`, `Logger.warn()`, `Logger.debug()`, `Logger.verbose()` 메소드 사용 가능
