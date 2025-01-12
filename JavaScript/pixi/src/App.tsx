@@ -1,7 +1,9 @@
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import NavBar from './NavBar';
+import GettingStarted from './GettingStarted';
 import Home from './Home';
+import NavBar from './NavBar';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 const App:React.FC = () => {
   return (
     <BrowserRouter>
@@ -9,6 +11,7 @@ const App:React.FC = () => {
       <div className="p-4">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/getting-started" element={<GettingStarted />} />
         </Routes>
       </div>
     </BrowserRouter>

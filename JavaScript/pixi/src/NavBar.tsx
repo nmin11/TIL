@@ -7,9 +7,7 @@ const NavBar: React.FC = () => {
       <h1 className="text-xl font-bold">PixiJS Demo</h1>
       <div className="flex space-x-4">
         <Link to="/" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Home</Link>
-        <Link to="/basic" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Basic</Link>
-        <Link to="/sprite" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Sprite</Link>
-        <Link to="/animation" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Animation</Link>
+        <Link to="/getting-started" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Getting Started</Link>
       </div>
     </nav>
   );

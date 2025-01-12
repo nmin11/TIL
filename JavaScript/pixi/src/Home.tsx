@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 const Home:React.FC = () => {
   const blurFilter = useMemo(() => new BlurFilter(2), []);
   const bunnyUrl = 'https://pixijs.io/pixi-react/img/bunny.png';
+
   return (
     <Stage width={800} height={600} options={{ background: '#1099bb' }}>
       <Sprite image={bunnyUrl} x={300} y={150} />
