@@ -1,4 +1,5 @@
 import './App.css';
+import FishPond from './FishPond';
 import GettingStarted from './GettingStarted';
 import Home from './Home';
 import NavBar from './NavBar';
@@ -12,6 +13,7 @@ const App:React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/getting-started" element={<GettingStarted />} />
+          <Route path="/fish-pond" element={<FishPond />} />
         </Routes>
       </div>
     </BrowserRouter>

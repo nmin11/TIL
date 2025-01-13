@@ -1,8 +1,9 @@
 import { Sprite, Stage, useTick } from '@pixi/react';
 import { useState } from 'react';
 
+const BUNNY_URL = 'https://pixijs.io/pixi-react/img/bunny.png';
+
 const Rabbit:React.FC = () => {
-  const bunnyUrl = 'https://pixijs.io/pixi-react/img/bunny.png';
   const [rotation, setRotation] = useState(0);
 
   useTick((delta) => {
@@ -11,7 +12,7 @@ const Rabbit:React.FC = () => {
 
   return (
     <Sprite
-      image={bunnyUrl}
+      image={BUNNY_URL}
       anchor={0.5}
       x={window.innerWidth / 2}
       y={window.innerHeight / 2}
@@ -26,7 +27,8 @@ const GettingStarted:React.FC = () => {
       width={window.innerWidth}
       height={window.innerHeight}
       options={{
-        background: '#1099bb'
+        background: '#1099bb',
+        resizeTo: window
       }}
     >
       <Rabbit />
