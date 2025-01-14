@@ -126,8 +126,8 @@ const WaterOverlay:React.FC = () => {
   )
 }
 
-const DisplacementEffect:React.FC = () => {
-  const [sprite] = useState(() => {
+const FishPond:React.FC = () => {
+  const [displacementSprite] = useState(() => {
     const s = PIXISprite.from(DISPLACEMENT_URL);
     s.texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
     s.scale.x = 4;
@@ -135,16 +135,6 @@ const DisplacementEffect:React.FC = () => {
     return s;
   });
 
-  return (
-    <Container filters={[new DisplacementFilter(sprite, 30)]}>
-      <Background />
-      <Fishes />
-      <WaterOverlay />
-    </Container>
-  )
-}
-
-const FishPond:React.FC = () => {
   return (
     <Stage
       width={window.innerWidth}
@@ -154,7 +144,11 @@ const FishPond:React.FC = () => {
         resizeTo: window
       }}
     >
-      <DisplacementEffect />
+      <Container filters={[new DisplacementFilter(displacementSprite, 30)]}>
+        <Background />
+        <Fishes />
+        <WaterOverlay />
+      </Container>
     </Stage>
   )
 }
