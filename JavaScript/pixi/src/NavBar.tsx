@@ -9,6 +9,7 @@ const NavBar: React.FC = () => {
         <Link to="/" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Home</Link>
         <Link to="/getting-started" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Getting Started</Link>
         <Link to="/fish-pond" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Fish Pond</Link>
+        <Link to="/choo-choo-train" className="px-3 py-2 hover:bg-gray-700 rounded transition duration-200">Choo Choo Train</Link>
       </div>
     </nav>
   );
