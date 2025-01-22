@@ -5,6 +5,7 @@ import FishPond from './FishPond';
 import GettingStarted from './GettingStarted';
 import Home from './Home';
 import NavBar from './NavBar';
+import SpineBoyAdventure from './SpineBoyAdventure';
 
 const App:React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App:React.FC = () => {
           <Route path="/getting-started" element={<GettingStarted />} />
           <Route path="/fish-pond" element={<FishPond />} />
           <Route path="/choo-choo-train" element={<ChooChooTrain />} />
+          <Route path="/spine-boy-adventure" element={<SpineBoyAdventure />} />
         </Routes>
       </div>
     </BrowserRouter>
