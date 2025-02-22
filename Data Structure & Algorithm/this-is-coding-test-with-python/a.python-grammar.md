@@ -215,3 +215,30 @@ print(a)
 {1, 2, 3, 4, 5, 6, 7}
 {1, 2, 4, 5, 6, 7}
 ```
+
+# 조건문
+
+```py
+socre = 85
+
+if score >= 90:
+  print("A")
+elif score >= 80:
+  print("B")
+elif score >= 70:
+  print("C")
+else
+  print("F")
+```
+
+## 논리 연산자
+
+- `X and Y`
+- `X or Y`
+- `not X`
+- `X in Y`
+- `X not in Y`
+
+## `pass`
+
+- `pass` 키워드를 활용하면 조건문이 참이어도 아무 처리를 하지 않게 할 수 있음
