@@ -250,3 +250,16 @@ else
 - `range()` 키워드를 자주 사용
   - `range(시작값, 끝값+1)` 의 형태
   - 인자를 하나만 넣으면 시작 값은 자동으로 0이 됨
+
+# 함수
+
+```py
+def add(a, b):
+  return a + b
+```
+
+## Lambda Express
+
+```py
+lambda a, b: a + b
+```
