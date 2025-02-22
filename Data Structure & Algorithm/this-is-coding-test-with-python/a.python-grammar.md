@@ -263,3 +263,41 @@ def add(a, b):
 ```py
 lambda a, b: a + b
 ```
+
+# 입출력
+
+- 알고리즘 문제 풀이의 첫 번째 단계는 데이터를 입력받는 것
+- 파이썬에서 데이터를 입력 받을 때 `input()` 사용
+- 여러 개의 데이터를 입력받을 때는 보통 공백으로 구분되는 경우가 많음
+- **꿀팁 키워드: `list(map(int, input().split()))`**
+  - 정말 많이 사용되므로 외우고 있자
+
+```py
+n = int(input())
+data = list(map(int, input(),split()))
+```
+
+- 데이터가 적을 경우 꿀팁
+
+```py
+n, m, k = map(int, input().split())
+```
+
+- 1,000만 개가 넘는 라인이 입력되는 경우에는 입력을 더 빠르게 받아야 함
+  - 언어별로 입력을 더 빠르게 받는 방법을 숙지할 것
+  - 파이썬의 경우 `sys.stdin.readline().rstrip()` 함수 사용
+    - `rstrip()`은 공백 문자 제거
+
+```py
+import sys
+data = sys.stdin.readline().rstrip()
+```
+
+## f-string 문법
+
+- 파이썬 3.6부터 사용 가능한 문자열 템플릿 기능
+
+```py
+answer = 7
+print(f"answer is {answer}")
+```
