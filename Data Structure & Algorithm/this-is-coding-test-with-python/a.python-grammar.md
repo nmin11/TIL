@@ -301,3 +301,214 @@ data = sys.stdin.readline().rstrip()
 answer = 7
 print(f"answer is {answer}")
 ```
+
+# 주요 라이브러리의 문법과 유의점
+
+- 파이썬의 일부 라이브러리는 잘못 사용하면 수행 시간이 비효율적으로 증가하므로 유의해야 함
+
+## 표준 라이브러리
+
+- https://docs.python.org/ko/3.13/library/index.html
+- 반드시 알아야 하는 라이브러리는 6가지 정도
+  - **내장 함수**
+  - `itertools`
+  - `heapq`
+  - `bisect`
+  - `collections`
+  - `math`
+
+### 내장 함수
+
+- 기본 입출력, 정렬 기능 등을 포함
+- 파이썬 프로그램 작성에 있어서 필수적
+- 별도의 `import` 문 없이 바로 사용 가능
+- 대표적으로 `input()` `print()`
+- `sum()` `min()` `max()` `eval()` `sorted()` `sort()` 등
+
+```py
+result = sorted([('English', 88), ('Science', 90), ('Maths', 97),],
+                key=lambda x: x[1],
+                reverse=True)
+```
+
+### itertools
+
+- 반복되는 데이터 처리
+- 가장 유용한 클래스는 `permutations` `combinations`
+  - 순열 계산에 용이한 `permutations`
+  - 조합 계산에 용이한 `combinations`
+
+```py
+from itertools import permutations
+
+data = ['A', 'B', 'C']
+result = list(permutations(data, 3))
+print(result)
+```
+
+```sh
+[('A', 'B', 'C'), ('A', 'C', 'B'), ('B', 'A', 'C'), ('B', 'C', 'A'), ('C', 'A', 'B'), ('C', 'B', 'A')]
+```
+
+```py
+from itertools import combinations
+
+data = ['A', 'B', 'C']
+result = list(combinations(data, 2))
+print(result)
+```
+
+```sh
+[('A', 'B'), ('A', 'C'), ('B', 'C')]
+```
+
+- 중복 허용 순열 `product`
+
+```py
+from itertools import product
+
+data = ['A', 'B', 'C']
+result = list(product(data, repeat=2))
+print(result)
+```
+
+```sh
+[('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'B'), ('B', 'C'), ('C', 'A'), ('C', 'B'), ('C', 'C')]
+```
+
+- 중복 허용 조합 `combinations_with_replacement`
+
+```py
+from itertools import combinations_with_replacement
+
+data = ['A', 'B', 'C']
+result = list(combinations_with_replacement(data, 2))
+print(result)
+```
+
+```sh
+[('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'B'), ('B', 'C'), ('C', 'C')]
+```
+
+### heapq
+
+- Heap 기능 제공
+- 우선순위 큐 기능을 구현하기 위해 사용됨
+  - `PriorityQueue` 라이브러리도 있지만 코딩 테스트 환경에서는 `heapq`가 더 빠르다
+- 파이썬의 Heap은 Min Heap
+  - 시간 복잡도 O(NlogN)으로 오름차순 정렬
+- 원소 삽입: `heapq.heappush()`
+- 원소 꺼내기: `heapq.heappop()`
+- 파이썬에서 Max Heap은 제공되지 않으니 직접 구현해야 함
+
+```py
+import heapq
+
+def heapsort(iterable):
+  h = []
+  result = []
+  for value in iterable:
+    heapq.heappush(h, -value)
+  for _ in range(len(h)):
+    result.append(-heapq.heappop(h))
+  return result
+```
+
+### bisect
+
+- 이진 탐색을 쉽게 구현할 수 있도록 해줌
+- 정렬된 배열에서 특정 원소를 찾을 때 매우 효과적
+- 주요 함수 `bisect_left()` `bisect_right()`
+  - 두 함수는 시간 복잡도 O(logN)
+  - `bisect_left(a, x)` 정렬 순서를 유지하며 리스트 a에 데이터 x를 삽입할 가장 왼쪽 인덱스 찾기
+  - `bisect_right(a, x)` 정렬 순서를 유지하며 리스트 a에 데이터 x를 삽입할 가장 오른쪽 인덱스 찾기
+
+```py
+from bisect import bisect_left, bisect_right
+
+a = [1, 2, 4, 4, 8]
+x = 4
+
+print(bisect_left(a, x))
+print(bisect_right(a, x))
+```
+
+```sh
+2
+4
+```
+
+- 정렬된 리스트에서 값이 특정 범위에 속하는 원소의 개수를 효과적으로 구할 수 있음
+
+```py
+from bisect import bisect_left, bisect_right
+
+def count_by_range(a, left_value, right_value):
+  right_index = bisect_right(a, right_value)
+  left_index = bisect_left(a, left_value)
+  return right_index - left_index
+
+a = [1, 2, 3, 3, 3, 3, 4, 4, 8, 9]
+print(count_by_range(a, 4, 4))
+print(count_by_range(a, -1, 3))
+```
+
+```sh
+2
+6
+```
+
+### collections
+
+- 유용한 자료구조 제공
+- `deque` `Counter` 가 특히 유용
+  - `Queue` 라이브러리가 있지만 일반적인 큐 자료구조는 아니므로 `deque`를 이용해 큐를 구현하자
+
+```py
+from collections import deque
+
+data = deque([2, 3, 4])
+data.appendleft(1)
+data.append(5)
+```
+
+```py
+from collections import Counter
+
+counter = Counter(['red', 'blue', 'red', 'green', 'blue', 'blue'])
+
+print(counter['blue'])
+print(counter['green'])
+print(dict(counter))
+```
+
+```sh
+3
+1
+{'red': 2, 'blue': 3, 'green': 1}
+```
+
+### math
+
+- 자주 사용되는 수학적 기능들
+  - 팩토리얼, 제곱근, 최대공약수 등
+
+```py
+import math
+
+print(math.factorial(5))
+print(math.sqrt(7))
+print(math.gcd(21, 14))
+print(math.pow(2, 3))
+print(math.pi)
+print(math.e)
+```
+
+```sh
+120
+2.6457513110645907
+7
+8.0
+3.141592653589793
+2.718281828459045
+```
