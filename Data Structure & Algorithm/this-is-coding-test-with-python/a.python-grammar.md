@@ -274,7 +274,7 @@ lambda a, b: a + b
 
 ```py
 n = int(input())
-data = list(map(int, input(),split()))
+data = list(map(int, input(), split()))
 ```
 
 - 데이터가 적을 경우 꿀팁
