@@ -110,3 +110,28 @@ def quick_sort(array):
 
 print(quick_sort(array))
 ```
+
+# Count Sort
+
+- 특정 조건이 부합할 때만 사용 가능
+  - 데이터 크기가 제한적이며, 정수형일 때
+  - 모든 범위를 담을 수 있는 크기의 리스트를 선언해야 하기 때문
+- 매우 빠르게 동작하며 원리도 간단
+- 데이터 개수 N, 데이터 중 최대값 K 일 때, O(N + K) 보장
+- 일반적인 비교 기반의 정렬 알고리즘이 아님
+- 별도의 리스트를 선언하고 그 안에 정렬에 대한 정보를 담는 방식
+- 동일한 데이터가 여러 번 등장할 때 적합
+
+⇒ 만약 데이터의 특성을 파악하기 어렵다면 퀵 정렬을 쓰는 게 유리
+
+```py
+array = [7, 5, 9, 0, 3, 1, 6, 2, 9, 1, 4, 8, 0, 5, 2]
+count = [0] * (max(array) + 1)
+
+for i in range(len(array)):
+  count[array[i]] += 1
+
+for i in range(len(count)):
+  for j in range(count[i]):
+    print(i, end=' ')
+```
