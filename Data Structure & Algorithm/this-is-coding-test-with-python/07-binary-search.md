@@ -98,6 +98,8 @@ input_data = sys.stdin.readline().rstrip()
 
 - 최적화 문제를 결정 문제로 바꾸어 해결하는 기법
 - '원하는 조건을 만족하는 가장 알맞은 값을 찾는 문제'
+- Related to:
+  - [BOJ 1654](https://www.acmicpc.net/problem/1654)
 
 ## Problem Example
 
