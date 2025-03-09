@@ -93,3 +93,38 @@ import sys
 
 input_data = sys.stdin.readline().rstrip()
 ```
+
+# Parametric Search Problem
+
+- 최적화 문제를 결정 문제로 바꾸어 해결하는 기법
+- '원하는 조건을 만족하는 가장 알맞은 값을 찾는 문제'
+
+## Problem Example
+
+- Input
+  - 첫째 줄: 1 <= N <= 1,000,000, 1 <= M <= 2,000,000,000
+  - 둘째 줄: 자를 숫자들이 들어 있는 배열
+- Output: 자르고 남은 수의 총합이 적어도 M 만큼 남을 수 있도록 하는 절단기의 최대값
+
+```py
+n, m = list(map(int, input().split(' ')))
+array = list(map(int, input().split()))
+
+start = 0
+end = max(array)
+result = 0
+
+while start <= end:
+  total = 0
+  mid = (start + end) // 2
+  for x in array:
+    if x > mid:
+      total += x - mid
+  if total < m:
+    end = mid - 1
+  else:
+    result = mid
+    start = mid + 1
+
+print(result)
+```
