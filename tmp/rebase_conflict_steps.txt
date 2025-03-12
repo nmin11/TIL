@@ -1,0 +1,21 @@
+ 9463  mkdir tmp && cd tmp
+ 9464  touch conflict_test.txt
+ 9465  git add conflict_test.txt
+ 9466  git commit -m "chore: make test file for conflict resolve"
+ 9467  git checkout -b feature
+ 9468  echo "안녕하세요, 여기는 feature 브랜치입니다." > conflict_test.txt
+ 9469  git add conflict_test.txt
+ 9470  git commit -m "chore: feature branch commit test"
+ 9471  git checkout main
+ 9472  echo "안녕하세요, 여기는 main 브랜치입니다." > conflict_test.txt
+ 9473  git add conflict_test.txt
+ 9474  git commit -m "chore: main branch commit test"
+ 9475  git checkout feature
+ 9476  git rebase main
+ 9477  git add conflict_test.txt
+ 9478  git rebase --continue
+ 9479  git log --oneline
+ 9480  cat conflict_test.txt
+ 9481  vim conflict_test.txt
+ 9482  git add conflict_test.txt
+ 9483  git commit -m "chore: feature branch commit test"
