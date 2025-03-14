@@ -134,3 +134,43 @@ for i in range(1, n + 1):
   else:
     print(distance[i])
 ```
+
+# Floyd-Warshall
+
+- 모든 지점에서 다른 모든 지점까지의 최단 경로를 모두 구하는 알고리즘
+  - 다익스트라는 한 지점에서 다른 지점들까지의 최단 경로를 구했음
+- 소스코드가 매우 짧지만 핵심 아이디어를 이해하는 것이 중요
+- 노드의 개수가 N일 때 N번의 단계 수행, 단계마다 O(N²)의 연산을 통해 현재 노드를 거쳐 가는 모든 경로 계산
+  - 따라서 총 시간 복잡도는 **O(N³)**
+- 2차원 리스트에 최단 거리 정보를 저장
+- 다이나믹 프로그래밍 방식
+  - 다익스트라는 그리디였음
+
+```py
+INF = int(1e9)
+n = int(input())
+m = int(input())
+graph = [[INF] * (n + 1) for _ in range(n + 1)]
+
+for a in range(1, n + 1):
+  for b in range(1, n + 1):
+    if a == b:
+      graph[a][b] = 0
+
+for _ in range(m):
+  a, b, c = map(int, input().split())
+  graph[a][b] = c
+
+for k in range(1, n + 1):
+  for a in range(1, n + 1):
+    for b in range(1, n + 1):
+      graph[a][b] = min(graph[a][b], graph[a][k] + graph[k][b])
+
+for a in range(1, n + 1):
+  for b in range(1, n + 1):
+    if graph[a][b] == INF:
+      print("INFINITY", end=" ")
+    else:
+      print(graph[a][b], end=" ")
+  print()
+```
