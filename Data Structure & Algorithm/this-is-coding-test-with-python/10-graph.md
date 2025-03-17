@@ -80,3 +80,64 @@ if cycle:
 else:
   print("사이클 발생 안함")
 ```
+
+# Spanning Tree
+
+- **모든 노드가 연결되면서 사이클이 없는 그래프**
+  - 트리의 성립 조건이기도 함 → 그래서 '신장 트리'라고 불리는 것
+
+## Kruskal Algorithm
+
+- 대표적인 '최소 신장 트리 알고리즘'
+- 그리디 알고리즘으로 분류됨
+
+알고리즘 순서
+
+- 간선 데이터 오름차순 정렬
+- 간선 데이터를 순회하며 간선의 사이클 발생 여부 확인
+  - 사이클 발생 X ⇒ 최소 신장 트리에 포함 O
+  - 사이클 발생 O ⇒ 최소 신장 트리에 포함 X
+
+시간 복잡도
+
+- 간선의 개수가 E일 때, O(ElogE)
+  - 간선을 정렬하는 작업이 제일 큰 시간 복잡도
+
+소스 코드
+
+```py
+def find_parent(parent, i):
+  if parent[i] != i:
+    parent[i] = find_parent(parent, parent[i])
+  return parent[i]
+
+def union_parent(parent, a, b):
+  a = find_parent(parent, a)
+  b = find_parent(parent, b)
+  if a < b:
+    parent[b] = a
+  else:
+    parent[a] = b
+
+v, e = map(int, input().split())
+parent = [0] * (v + 1)
+edges = []
+result = 0
+
+for i in range(1, v + 1):
+  parent[i] = i
+
+for _ in range(e):
+  a, b, cost = map(int, input().split())
+  edges.append((cost, a, b))
+
+edges.sort()
+
+for edge in edges:
+  cost, a, b = edge
+  if find_parent(parent, a) != find_parent(parent, b):
+    union_parent(parent, a, b)
+    result += cost
+
+print(result)
+```
