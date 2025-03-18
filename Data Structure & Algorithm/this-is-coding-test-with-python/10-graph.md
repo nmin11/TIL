@@ -141,3 +141,61 @@ for edge in edges:
 
 print(result)
 ```
+
+# Topology Sort
+
+위상 정렬
+
+- 정렬 알고리즘의 일종
+- 순서가 정해져 있는 일련의 작업을 차례대로 수행해야 할 때 사용 가능한 알고리즘
+- 방향 그래프의 모든 노드를 방향성에 거스르지 않도록 순서대로 나열하는 것
+- Indegree(진입차수) : 특정 노드로 들어오는 간선의 개수
+
+알고리즘 순서
+
+- 진입차수가 0인 노드를 큐에 삽입
+- 큐가 빌 때까지 다음 괴정 반복
+  - 큐에서 원소를 꺼내 해당 노드에서 출발하는 간선을 그래프에서 제거
+  - 새롭게 진입차수가 0이 된 노드를 큐에 삽입
+
+부연 설명
+
+- 큐에서 원소가 V번 추출되기 전에 비어버리면 사이클이 발생한 것
+  - 다만, 기본적으로 위상 정렬 문제는 사이클이 발생하지 않는다고 명시하는 경우가 많음
+- 시간 복잡도 O(V + E)
+  - 모든 노드를 확인하면서 해당 노드에서 출발하는 간선도 차례대로 제거해야 하므로
+
+소스 코드
+
+```py
+from collections import deque
+
+v, e = map(int, input().split())
+indegree = [0] * (v + 1)
+graph = [[] for i in range(v + 1)]
+
+for _ in range(e):
+  a, b = map(int, input().split())
+  graph[a].append(b)
+  indegree[b] += 1
+
+def topology_sort():
+  result = []
+  q = deque()
+  for i in range(1, v + 1):
+    if indegree[i] == 0:
+      q.append(i)
+
+  while q:
+    now = q.popleft()
+    result.append(now)
+    for i in graph[now]:
+      indegree[i] -= 1
+      if indegree[i] == 0:
+        q.append(i)
+
+  for i in result:
+    print(i, end=' ')
+
+topology_sort()
+```
