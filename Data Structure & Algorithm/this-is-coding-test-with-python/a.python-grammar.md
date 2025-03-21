@@ -283,6 +283,13 @@ data = list(map(int, input().split()))
 n, m, k = map(int, input().split())
 ```
 
+- 숫자로 구성된 문자열을 받아서 정수 배열로 만들어야 할 때
+
+```py
+s = input()
+nums = [int(char) for char in s]
+```
+
 - 1,000만 개가 넘는 라인이 입력되는 경우에는 입력을 더 빠르게 받아야 함
   - 언어별로 입력을 더 빠르게 받는 방법을 숙지할 것
   - 파이썬의 경우 `sys.stdin.readline().rstrip()` 함수 사용
