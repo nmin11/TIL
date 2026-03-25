@@ -54,3 +54,50 @@
 
 - AI 엔지니어링: 파운데이션 모델을 기반으로 애플리케이션을 만드는 과정
 - 전통적인 ML 엔지니어링이 모델 자체를 개발하는 것이라면, AI 엔지니어링은 이미 존재하는 모델을 활용함
+
+## 1.2 파운데이션 모델 활용 사례
+
+- [There's An AI For That](https://theresanaiforthat.com/) 사이트에서, 다양한 파운데이션 모델 활용 사례를 찾아볼 수 있음
+- [칩 후옌의 오픈 소스 AI 애플리케이션 목록](https://goodailist.com/)
+
+### 코딩
+
+- 가장 인기 있는 AI 활용 사례
+- 코딩 작업 특화 도구들의 예시
+  - 웹 페이지 및 PDF에서 구조화된 데이터 추출기
+    - [AgentGPT](https://github.com/reworkd/AgentGPT)
+  - 자연어를 코드로 변환
+    - [DB-GPT](https://github.com/eosphoros-ai/DB-GPT)
+    - [SQL chat](https://github.com/sqlchat/sqlchat)
+    - [PandasAI](https://github.com/Sinaptik-AI/pandas-ai)
+  - 디자인 및 스크린샷을 웹사이트로 변환하는 코드 생성기
+    - screenshot-to-code
+    - [draw-a-ui](https://github.com/sawyerhood/draw-a-ui)
+  - 프로그래밍 언어 및 프레임워크 변환기
+    - [GPT-Migrate](https://github.com/joshpxyne/gpt-migrate)
+    - [AI Code Translater](https://github.com/mckaywrigley/ai-code-translator)
+  - 문서 작성
+    - [Autodoc](https://github.com/context-labs/autodoc)
+  - 테스트 생성
+    - [PentestGPT](https://github.com/GreyDGL/PentestGPT)
+  - 커밋 메시지 생성
+    - [AI Commits](https://github.com/Nutlope/aicommits)
+
+### 그밖의 영역들
+
+- 이미지 및 동영상 제작
+- 글쓰기
+  - SEO에 강한 면모
+  - 다만 양산형 웹사이트들을 주의해야 할 것
+- 교육
+- 대화형 봇
+  - 기업에게 가장 인기 있는 봇은 고객 지원 봇
+  - 게임 속 3D 대화형 봇
+- 정보 집계
+  - '문서와 대화하기(talk-to-your-docs)'
+  - 잠재 고객의 중요 정보 및 경쟁사 분석
+- 데이터 체계화
+  - 비정형 또는 반정형 데이터로부터 정형 데이터 추출
+  - 이는 데이터 체계화 및 검색에 도움이 됨
+- 워크플로 자동화
+  - AI 에이전트 활용 (6장에서 알아볼 내용)
